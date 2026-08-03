@@ -532,6 +532,7 @@ def get_dynamic_rules(key, en_content, pt_content, en_comment, pt_comment):
 
     return relevant_rules.strip(), design_type
 
+# --- INTEGRAÇÃO COM A API DA IA (Não altere a lógica) ---
 def fetch_translation(item):
     key = item['string_name']
     en_content = item['en']
