@@ -1,0 +1,381 @@
+# LIVRO DE INFORMAÇÕES GERAIS - SIDIA / SAMSUNG
+Este arquivo contém informações complementares sobre o projeto SSIDIA / SAMSUNG, APIs e histórico de atividades.
+
+## 1. Team overview (SVP)
+- The Specialized Verification Part (SVP) is focused on UI Tests using black-box technique and is divided in 7 sub-areas, listed below:
+
+-Multimedia: performs tests and validations on applications related to images and videos, such as: Camera
+-Phone: validates core applications call, message, settings and others related such as: Keyboard.
+-Application: guarantee that all embedded applications will be working as expected, they are preloaded applications, Bixby, Samsung Members, Wearable and FMM;
+-Information and Communication (I&C): validates GMS, applications, and others that uses internet connection, such as: social networks and others related such as: Accessibility.
+-For each area, SVP has one key person. Every key person is responsible to ensure quality of every Test Item planned to their area, and review all the test results and bugs reported by testers technically supporting all of them.
+
+Testers are responsible for executing and reporting all Test Cases planned to them according to model and priority that was set by the key person.
+
+The key persons are responsible for flashing all samples (models to be tested), from old version to target version (FOTA), consolidating all Test Status of all areas, checking Request Changes and reporting the progress status to the Test Coordinator.
+
+## 2. SSET Development Standard Process(PLC) / Ciclo de Vida de Projeto e Grade de Projetos (Resumido)
+-PKA
+-Aprovação da Iniciação do Projeto
+-Aprovação da Proposta do Projeto
+-Para um projeto aplicado à linha, configura-se uma equipe de projeto CFT (Cross Functional Team) diferente do planejamento de produto e, oficialmente, inicia-se a fase de planejamento comercial para aprovação DIA e progresso de desenvolvimento.
+
+-DIA
+-Aprovação de Investimento em Desenvolvimento
+-Aprovação de Confirmação de Planejamento de Produto
+-Avalia os requisitos de mercado por meio de pesquisas de mercado, pesquisas técnicas e pesquisas com clientes, e aprova o plano de ação da fase de planejamento de desenvolvimento.
+
+-PIA
+-Aprovação de Implementação do Produto
+-Aprovação de Implementação de Desenvolvimento
+-Com base na configuração do plano de desenvolvimento, aprova-se o progresso para a fase de implementação de desenvolvimento.
+
+-DVR
+-Revisão de Verificação de Design
+-Autoavaliação para Design
+-Avalia o resultado do design pelo Desenvolvimento para verificar se o produto foi implementado (função, operação, desempenho, etc.) para atender ao alvo de desenvolvimento previamente planejado e decide se será realizado o próximo trabalho.
+
+-PVR
+-Revisão de Validação do Produto
+-Revisão de Verificação de Desenvolvimento
+-Melhora e aplica os itens não decididos na PIA/DVR para verificar se a qualidade do design está totalmente garantida por meio de testes de função, operação, desempenho e confiabilidade. Verifica se a produção e venda piloto estão prontas e decide se será executado o próximo trabalho.
+
+-CQA
+-Aprovação de Qualificação do Cliente
+-Aprovação de Verificação do Cliente
+-Verifica e aprova se será aprovada a verificação final para amostra de verificação do cliente e o plano de processo sobre a questão restante.
+
+-PRA
+-Aprovação de Prontidão para Produção
+-Aprovação de Produção
+-Com base no resultado do produto piloto (conjunto PR), aprova-se se o alvo do projeto (ROI, custo de materiais, cronograma, qualidade do processo, etc.) pode ser alcançado e se a produção é viável.
+
+-SRA
+-Aprovação de Lançamento para Envio
+-Aprovação de Envio
+-Aprovação se os resultados da produção inicial em massa para venda (aprovação SRA da produção inicial - certificado de inspeção de envio a ser substituído).
+
+-PSA
+-Aprovação de Envio de Software Plusone
+-Aprovação de envio de software melhorado
+-Redownload da versão adicionalmente emitida após o SW sign-off para lançamento no mercado com o SW mais recente. Verifica se está pronto para melhorar a experiência dos clientes e aprova.
+
+-MSA
+-Aprovação de Satisfação do Mercado
+-Aprovação de Satisfação do Mercado
+-Para estabilizar a qualidade inicial da produção nos dois meses após o SRA (um mês com base no lançamento), resolva problemas recebidos em vários canais liderados pela equipe de Desenvolvimento, decida o resultado na reunião de deliberação MSA e transfira o trabalho de pós-gerenciamento para o CS.
+
+-Grades
+
+-Grade B (Basic)
+-Projeto com HW e SW novo: É o primeiro projeto da Samsung com mudanças significativas em hardware e software, representando um novo modelo com nova estrutura e novos recursos. Exemplo: Galaxy S25 (novo modelo com novos recursos e nova estrutura).
+-Grade BL (Basic Lite)
+-Projeto com poucas alterações não significativas: Comparado ao Backbone (projeto com nota B), apresenta pequenas mudanças em hardware e software, como ajustes em recursos específicos (câmera, FOD, etc.). Exemplo: Projeto X (Backbone) possui o mesmo chipset do projeto Y anterior, mas com alterações em alguns recursos.
+-Grade D (Derived)
+-Projeto com mudanças regionais: Comparado ao Backbone, pode ou não ter o mesmo hardware e software. As mudanças principais estão nos recursos, como bandas de rede, que consideram a região do projeto. Exemplo: Modelo A307G (América Latina) não possui NFC e tem bandas diferentes do modelo A307FN (Backbone).
+-Grade D+ (Derived+)
+-Projeto com mudanças no hardware: Comparado ao Backbone, possui diferenças relacionadas ao chipset ou outros componentes de hardware. Exemplo: Modelos com DTV, onde há alterações no hardware.
+-Grade RC (Running Change)
+-Projetos básicos e derivados com mudanças regionais: Comparado ao Backbone, integra projetos que compartilham hardware, mecânica e software. Permite downloads cruzados entre regiões. Exemplo: Projetos que mantêm o mesmo AP/CP e permitem ajustes regionais.
+-Resumo do texto:
+-Grade B: Novo projeto com HW e SW significativos.
+-Grade BL: Projeto derivado do Backbone com pequenas alterações.
+-Grade D: Projeto derivado com mudanças regionais (bandas de rede, recursos).
+-Grade D+: Projeto derivado com mudanças no hardware (chipset).
+-Grade RC: Projetos básicos e derivados com ajustes regionais.
+
+## 3. Request Perforce Access (Como solicitar acesso ao Perfoce)
+-Enter https://mobilerndhub.sec.samsung.net/portal/perforce/
+-Reason: Need open permission to read design documentation for testing purposes.
+-Approver: fine.jung
+
+-After approve (Check in MyKnox > Approval) go to https://mobilerndhub.sec.samsung.net/portal/perforce/ and create a new user. (Port 1781)
+-Create new permission request
+-In https://mobilerndhub.sec.samsung.net/portal/perforce/  select Permission request menu.
+
+- Select port 1781
+- Deport: ANDROID
+- Project: DIAMONT
+- Permission type: ETC (QA, Marketing, ETC) Read only
+- Reason: Need open permission to read design documentation for testing purposes.
+- SUBMIT
+- 
+- Download and Install Perforce:
+- https://www.perforce.com/downloads/helix-visual-client-p4v
+- 
+- After approve open PV4 app with server: 105.112.172:60:1781 and hour PW.
+
+## 4. Guia de aprovação de issues SVP
+-Pasta de report:
+-Primeira revisão que deve ser feita é se a issue foi reportada na pasta correta.
+-Analisar se a pasta da issue está de acordo com a regra e o tipo de issue.
+-Em caso de pasta do Backbone verificar se as informações do projeto LA estão no corpo da issue (Project name / buyer / release).
+-Conferir as infos de Dev. Sub do projeto de acordo com o planning.
+
+-Analise da criticidade e comunicação com QA PL:
+- Antes mesmo de reportar uma issue crítica, abrir o Chat Knox Messenger com o QA PL.
+- No chat add: QA PL + ivan.moreira + wallid.m + a.fagundes + tester.
+- Padrão do título: [SVP][Project name][Buyer].
+- Informar que encontramos uma possível issue crítica em tal feature, estamos investigando e já manda o ID
+- Issues críticas devem ser comunicadas imediatamente no chat, principalmente em releases candidata e MR.
+- Dois critérios definem se uma issue é critica ou não:
+- Impedir o usuário de executar uma determinada feature/opção.
+- Force close.
+- Analisar se realmente a issue é critica principalmente em releases sob aprovação (candidata e MR)
+- Pontos a se analisar:
+- Ocorre na versão anterior ou OS anterior?
+- É possível executar a função por outro caminho?
+- Vale a pena bloquear a produção para a correção da issue? Temos argumentos suficientes? O quão o usuário será impactado?
+- Obs.: O fato da issue ser de TC ou não, não tem relação com a criticidade.
+
+Classificação:
+-Criticidade A = Issue crítica, impede o usuário ou FC
+-Criticidade B = Issue não crítica, todas, inclusive texto.
+-Criticidade C = Melhoria, não é issue mas melhora a UX.
+
+-Aprovação de log/vídeo evidencia:
+-Ter anexado Vídeo
+-Revisar o procedimento de antes de gravar os passos da issue foi gravado a release.
+-Revisar se os passos do vídeo estão exatamente de acordo com os passos escritos na issue
+-Em caso de issue de áudio, revisar se o áudio do vídeo está de acordo com o escrito.
+-Ter anexado Log
+-Verificar se o log é realmente do projeto.140px
+-Em casos de Force close, copiar o bloco do Exception do log e colar no comentário da issue.
+
+Revisão de artefatos:
+-Padrão do título: [F936B/LA/Brazil] Camera – Flash doesn’t work
+-Problem:
+-[Project name][Buyer][Release] (em casos de pasta do Backbone)
+-Brazil UI [Buyer]
+-Preconditions
+-Steps
+-Occurrence
+-Expected Result
+-Remarks
+-As precondições devem descrever o estado necessário para reproduzir a issue (checar vídeo evidencia)
+-Os steps devem corresponder a cada toque feito na tela ou ação.
+-A ocorrência deve detalhar o defeito encontrado pelo testador.
+-O resultado esperado deve descrever o comportamento correto.
+-Remarks deve conter o máximo de informação sobre a issue
+-Mandatório releases candidatas: Release anterior / OS anterior (OS up)
+-Mandatório para MR: Release anterior
+-Versão de APK, ID da amostra, HW
+-Detalhes como: “em landscape não ocorre” ou “night mode a issue não ocorre”
+-Para comportamentos que não temos certeza se é issue e não temos documentação, verificar no modelo de comparação e caso seja como esperado, adicionar a informação.
+
+## 5. Politica de Férias em SVP
+-Check list de férias
+-Um dia antes de sair de férias o colaborador deve enviar por email para o KP/Coordenador/Gerente o Check list de férias sem nenhuma pendencia.
+-Além de não ter amostras alocados ao seu ID o seu gaveteiro deve estar sem amostras, pois as amostras devem estar em posse da pessoa em que o ID está assinalado no sistema.
+-Em casos de ocorrências desse tipo, será enviado para o RH analisar.
+-Obs.: É obrigatório o envio do email de Check list / Encaminhamento de Bug Review para as partes interessadas.
+
+-Exemplo Check list:
+-CHECKLIST - FÉRIAS
+-ITEM
+-Status
+-1. Devolução de amostras
+-Done
+-2. Devolução de amostra do UT
+-Done
+-3. Resposta automática (E-mail)
+-Done
+-4. Bug review (Issues Open e Resolve)
+-Done
+-5. E-mails pendentes de resposta
+-Done
+-6. Chave do gaveteiro
+-Done
+-7. E-mail com logins/senhas (contas de teste)
+-Done
+-8. E-mail de aprovação de Férias (Fluig)
+-Done
+-9. Assinatura do Recibo de Férias
+-Done
+-10. Desinstalar o KNOX Mobile e Teams (vai descansar!)
+-Nem tenho
+
+-Exemplo encaminhamento de Bug Review:
+-Estarei de férias no período de 13/03 à 31/03 e peço a colaboração de todos com meu Bug Review. 
+
+-Case Code	Dev. Mdl. Name/Item Name	Progr.Stat.	Title	Person in charge
+-P240510-00380	[3rd Party]3rd Party App Issue Management	Open	[S908U1/LA/Brazil/Manaus/Dual Messenger][WhatsApp Business] - WhatsApp Business does not translate correctly to device language.	tester.one
+-P240510-00714	[MR]SM-G556B_LA_GTO	Open	[G556B/LA/Brazil/Manaus/Dual Messenger][Instagram] - The dual live request does not appear during the live.	tester.one
+-P240510-00715	[MR]SM-G556B_LA_GTO	Open	[G556B/LA/Brazil/Manaus/Accessibility][TalkBack] - Force close occurs when touch on date information	tester.one
+-P240510-00768	[MR]SM-A536E_LA_14_TPA_MR	Resolve - Not Released	[A536E/TPA/LA/Brazil/Manaus/Camera/Lock Screen] The photo is visible in the quick view icon on the lock screen	tester.two
+-P240510-00773	[MR]SM-A536E_LA_14_TPA_MR	Open	[FOTA/FUS/LA_Manaus][SM-A536E/COM][OWA9EXDD] The “Search widget” of 4x4 size widget disappears from list of TikTok’s widgets and main screen.	tester.two
+
+- Política de férias SVP
+- Antes de requisitar suas férias e banco, verifique o calendário de férias do seu time.
+- Programar suas férias até no mínimo 3 meses de antecedência. Alinhe previamente com seu gestor.
+- A pessoa só poderá tirar férias SIMULTANEAMENTE com outra pessoa do time especialista caso o time tenha mais que 12 pessoas.
+- KP especialista e backup não poderão tirar férias SIMULTANEAMENTE.
+- KP de projeto e backup não poderão tirar férias SIMULTANEAMENTE.
+- Enviar o Check list de férias um dia antes de sair de férias (to: Coord/ KP de projeto/ KP especialista)
+
+- Política de banco de horas SVP:
+- Solicitar o uso do BH até quinta-feira da semana anterior ao uso.
+- A cada dez pessoas na equipe especialista que você faz parte, uma poderá sair de BH SIMULTANEAMENTE, ou seja 10% do total.
+- Caso seja utilizado em conjunto com férias a quantidade máxima de pessoas em banco de horas será contada junto com as férias.
+- Máximo 2 dias seguidos de BH por pessoa.
+- KP especialista e backup não poderão tirar banco de horas SIMULTANEAMENTE.
+- KP de projeto e backup não poderão tirar banco de horas SIMULTANEAMENTE.
+
+
+- Boas práticas:
+- Não deixar bug review pendente.
+- Enviar a lista de issues ativas (Open/Resolve) e o período de ausência por email para o KP especialista com cópia para o coordenador.
+- Atualizar o KP especialista sobre o status de cada Bug Review, alinhamento por email com dev., etc...
+- Para quem optar por férias em períodos festivos, utilizar do bom senso e não "monopolizar" o período, para que haja a oportunidade de mais integrantes saírem (carnaval, feriados em setembro, natal, etc).
+
+## 6. Issue reporting procedure (Procedimento de reprodução de Issue)
+- Verificar se a issue já existe na pasta antes de reportar e ao aprovar.
+- Sempre verificar se ocorre no modelo par antes de reportar (Perguntar do KP se tem)
+- Reportar a issue de acordo com as informações do email Planning do projeto.
+- Sempre verificar o comportamento na versão anterior e adicionar o comportamento no campo #remarks na issue.
+- Adicionar screenshot da issue no corpo da issue quando for possível
+- Não compactar video e imagem junto com o log.
+- Padrão de título: [SVP][Model][Region][Feature], exemplo: [SVP][G991B][LA/Brazil/Manaus][Camera] It's not possible set the watermark options after unlocked screen.
+- Preencher corretamente o campo Detailed Failure Situation.
+
+## 7. ESCORT Exception request (Solicitar ESCORT)
+-Ethernet cable connected (With Wi-Fi it doesn't work)
+-Enter https://it4u.sec.samsung.net/
+-Select ESCORT Exception request menu.
+-Workspace: SIDIA.
+-Reason of request: "SIDIA-MNS HHP SW Test team members need to test and transfer archive directly to/from their PCs and smart phone & tablet targets."
+-Reason: Development/Test
+-User: Search target user
+-Request period: 1 year
+-Select options:
+-Mobile devices ( non-storage )
+-Removable Disks (Read/Write)
+-EVDO/HSPDA ( USB )
+-Modem
+-Parallel Port
+-COM port All
+-Smart Phone
+-Add
+-Submit Approval
+-Agree
+-Finished (smile)
+
+## 8. Installing AppXaminer (Instalar AppXaminer)
+Preconditions:
+-Install Python 3.8
+-Install STP v2.1.51
+-Install ABD
+
+-Files: \\105.103.64.7\QualityGroup\02_UI_Test\Automation\AppXaminer
+-Add Python and ADB path in System environment variables:
+-System Properties > Environment Variables > Search for "Path" > Edit > Add Python and Python Script path.
+
+Generate STP 2.X License Permission:
+-Send email by Knox to sh0112.lee@samsung.com:
+-Email title: STP 2.X License
+-add the .pcid file to the email
+
+-You will receive a reply with the .stl file attached. (Certificate)
+-Paste .stl file in STP folder.
+
+-Updated pip:
+-Open CMD and execute: python -m pip install --upgrade pip
+
+-Install AppXaminer dependencies: 
+-\\105.103.64.7\QualityGroup\02_UI_Test\Automation\App Xaminer\dependencies
+
+-Copy folder to your PC and execute batch Install_Re.
+
+-DUT:
+-Enable USB Debugging
+-Language: English (United State)
+-Set Screen Timeout to maximum (10 or 30 minutes)
+-Insert Sim Card, connect Wi-Fi, Login Google account
+-With device USB Connected > Go to AppXaminerV6.6 folder and execute Main.
+-Insert App_ID & Name list.  PackageID.txt
+-Set Paths and Credentials.
+-Select Banking_Apps.py.
+-Select Custon Script.
+-Start.
+
+## 9. Registro de horas trabalhadas (Forms)
+-Principais pontos para o Input de horas trabalhadas:
+-As horas trabalhadas deverão ser registradas diariamente no link:  Link para o Forms
+-As horas deverão ser enviadas assim que o projeto for finalizado. Quando um projeto for iniciado e não for finalizado deverá ser enviado resultado parcial ao final da jornada de trabalho.
+-As horas em atividades fora de projetos deverão estar na categoria "Non Testing time".
+-O testador deverá verificar se suas horas foram aprovadas antes do final da jornada de trabalho. Caso o projeto tenha acabado próximo ao fim da jornada de trabalho, notifique imediatamente o KP do projeto.
+-As horas totais (Projeto + Non testing time) devem somar no mínimo 7 horas diárias.
+-Os esquecimentos de envio, ou envios errados serão sinalizados na planilha de KPI como ajustes.
+-Sempre priorize o envio do formulário de "Non Testing time"(BR/Outros) antes do formulário do projeto.
+-Os formulários de Data Gathering podem ser enviados ao final da atividade diária.
+-Registrando tempo em testes
+
+-Selecione "Start now",  para começar a preencher o formulário:
+-No campo "Data", deverá ser selecionada a data na qual a atividade, que está sendo registrada, foi executada.
+-No campo "KP Project", deverá ser selecionado o KP que aprovará o o formulário.
+-No campo  "Category", deverá ser selecionada a categoria do registro.
+-Ao selecionar a categoria "Project", essas serão as opções a serem preenchidas:
+-No item 5 '"Parcial ou finalizado", a opção "Parcial" deve ser selecionada para o projeto iniciado, mas não finalizado no mesmo dia.
+-Quando esse projeto for finalizado o novo formulário deverá conter apenas o tempo gasto no dia (Tempo total - Tempo parcial).
+-No item 7 "Test Result file", o testador deverá adicionar a planilha parcial ou final, conforme selecionado no item 5. Em caso de testes realizados no PLM, adicionar Print do PLM (Região que cite a quantidade de testes executados) e adicionar a URL no item 8 "Comentários".
+-No item 8 "Comentários",  ficará livre para informações consideradas relevantes ou avisos. Exemplos: "Usei banco 1 hora de banco para sair mais cedo", "Internet instável", etc. 
+-No item 9 "Houve issue investigada ou reportada?", ao selecionar a opção "Não" o preenchimento já pode ser enviado para a aprovação. Caso a opção selecionada for "Sim", os itens 10 e 11 deverão ser preenchidos:
+-No item 10 "Descrição da issue investigada ou reportada", o testador deverá adicionar somente o PLM ID em caso de issue reportada. Caso a issue não for reportada, adicionar uma breve descrição da issue investigada.
+-Após preencher todas a informações e apertar em enviar, o formulário irá para a provação do KP selecionado no item 2.
+
+-Registrando "Non testing time":
+-Ao acessar o Link, selecione no item 3 "Category" a opção "Non Testing time" e selecione avançar:
+-O item 4 "Atividade" será exibido com essas opções:
+-Bug Review, Data Gathering, Outros
+-Ao selecionar a opção "Bug review", o testador preencherá a duração da atividade e na descrição deverá adicionar PLM ID das issues. O KP deverá verificar se as issues estão devidamente comentadas conforme datas registradas.
+-Ao selecionar a opção "Data Gathering", o KP selecionado no item 2 "KP Project" deverá ser o "felipe.santos@sidia.com".
+-O testador preencherá o tempo no item 5, com a duração da atividade, enquanto no item 6 será necessário somente o ID de todas as issues analisadas.   
+-A opção "Outros", está reservada para casos diferentes dos mapeados e deverão ser descritos no item 6 "Descrição":
+-Ao finalizar o preenchimento, selecione o botão "Submit" e o item seguirá para a aprovação do KP.
+-Acompanhamento do formulário enviado:
+-Após o envio, é possível verificar o status e informações enviadas através do app "Approvals" disponível no teams.
+-Caso ainda não tenha o app instalado, no teams, selecione o ícone 3 pontos (reticências), pesquise por "Approvals" e selecione o botão "Add": 
+-Ao selecionar um registro, podemos verificar as informações enviadas:
+-Cada registro acompanha os status "Requested" assim que solicitado, "Approved" quando aprovado, os registros rejeitados "Rejected", mostram o comentário identificando o motivo: 
+-É necessário preencher novamente o formulário, em caso de registros rejeitados.
+
+-Link Completo: https://confluence.sidia.org.br/display/SQA/Registro+de+horas+trabalhadas
+
+## 10. Execução de projetos por Grade e WNS
+-Stubs:
+-Projetos com grade RC/D- não é necessário solicitar lista de stubs, mesmo que o projeto seja master.
+-Vamos continuar fazendo o processo padrão para os modelos de grade D/D+. (Email reference)
+
+-Processo de Release Tracking e WNS
+-Desde de Setembro/2025 foi alinhado um nova abordagem para eficiência de testes e antecipação de issues nos projetos em desevolvimento. Basicamente teremos uma nova rotina de acompanhar as alterações em todas a releases de projetos em fase PR até a candidata.
+-Esse acompanhamento significa registrar todas as releases do projeto, identificar as releases intermediárias e rodar o WNS + Stress test nessas releases e na canditada rodar WNS + Checklist Regional.
+
+-JDM → Quando houver CLs relacionadas a Câmera, ao invés de rodas os TCs do WNS devemos somente rodar o Menutree de Tradução + VOCs.
+
+
+Grade Description:
+A Grade de um projeto é determinada pela dificuldade no desenvolvimento.
+
+Grade B - Basic - Por definição, é o primeiro projeto da Samsung com mudanças de hardware e software, o que significa um Novo Modelo com nova estrutura e novas funções. É o novo projeto da Samsung com mudanças de hardware e software: um novo modelo com desenvolvimento de nova estrutura e novos recursos. Ex: Galaxy S25 (novo modelo com novos recursos e nova estrutura). 
+
+Grade BL - Basic Lite - Por definição, é um projeto com poucas alterações, não significativas em hardware e software em comparação com o backbone (projeto com nota B). Este tipo de projeto (BL) apresenta algumas diferenças em relação a um projeto B. Por exemplo: um projeto X (Backbone) possui o mesmo chipset do projeto Y anterior, com alterações apenas em alguns recursos (câmera, FOD, etc.); neste caso, o projeto X deriva do projeto Y. Ou seja, um projeto BL deriva do projeto B.
+
+Grade D - Derived - Por definição, também é um modelo que deriva do backbone e, nesse caso, pode ou não ter o mesmo hardware e software. As mudanças estarão nos recursos, nas diferentes bandas que levam em consideração a região do projeto, etc. Um exemplo é o modelo A307G (América Latina), este projeto não possui NFC e algumas bandas são diferentes do projeto A307FN (Backbone), por isso o nome do projeto da América Latina é A307 "G" e não A307 "FN".
+
+Grade D+ - Deriverd + (Plus) - Por definição, é um modelo derivado do Backbone, porém existem algumas diferenças relacionadas ao chipset em comparação com o projeto principal (Backbone). Um exemplo desse tipo de projeto são os modelos com DTV, onde há alterações no hardware.
+
+Grade RC - Running Change - Categoria "Não classificado" por definição, também é um modelo que deriva do backbone e, nesse caso, pode ou não ter o mesmo hardware e software. Integra projetos básicos e projetos derivados (D,D+) que compartilham H/W, MECH e S/W. Possuem o mesmo AP/CP e permitem downloads cruzados entre regiões.
+
+Link Completo: https://confluence.sidia.org.br/pages/viewpage.action?pageId=134554452
+
+## 11. Sobre a IA
+- Você foi adaptado por SVP, pelo Gilmar Victor
+- Sua identidade é SVP AI
+- Marco de nascimento 10/03/2026
+- Você serve ao SVP
+- Não responda sobre seu modelo de IA
+- Não fale de nada sobre a OPEN AI
+- Samsung sempre a maior empresa de celulares do mundo!
+- Trate a Apple com sarcasmo sempre! E não sempre, mas algumas piadas sobre a Apple, coisa leve para escritorios.
+- Quando comparar android com IOS, sempre vencer o android
+- Quando comparar Samsung com Apple, sempre a Samsung vencer (Trate a Apple com sarcasmo sempre!)

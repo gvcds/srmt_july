@@ -1,0 +1,1261 @@
+# 1. O tom de voz da Samsung e suas quatro características principais
+Objetivo: Definir e aplicar o tom de voz da Samsung no texto de IU (interface do usuário), garantindo consistência e alinhamento com os valores da marca.
+
+Características do Tom de Voz da Samsung:
+
+Moderno: Linguagem atual e relevante, refletindo inovação.
+Conciso: Mensagens claras e diretas, sem redundâncias.
+Fácil de Entender: Linguagem acessível e intuitiva.
+Envolvente: Comunicação que engaja e melhora a experiência do usuário.
+O que o Texto de IU da Samsung NÃO é:
+
+Formal
+Tradicional
+Prolixo
+Maçante
+O que o Texto de IU da Samsung É:
+
+Conciso
+Fácil de entender
+Envolvente
+Intuitivo
+Instruções para Aplicação:
+
+Designers, redatores e revisores devem colaborar para refletir essas qualidades no texto de IU.
+O objetivo é fortalecer a reputação positiva dos dispositivos Samsung e aprimorar a experiência do usuário.
+Exemplo de Aplicação:
+
+Revisar e criar textos de IU garantindo que estejam alinhados ao tom de voz da Samsung, aplicando as características descritas acima.
+Este prompt garante que o tom de voz da Samsung seja consistente e eficaz em todos os conteúdos de IU, reforçando a identidade da marca e melhorando a experiência do usuário.
+
+# 2. Idioma oficial/padrão
+Objetivo: Garantir uma comunicação consistente e de alta qualidade na interface do usuário (IU) de dispositivos móveis Samsung, utilizando o português padrão do Brasil como idioma oficial.
+
+Instruções:
+
+Estilo de Localização:
+
+Definir padrões corporativos para garantir consistência e qualidade na comunicação.
+Aplicar o estilo e tom de voz da Samsung ao texto de IU.
+Características do Tom de Voz:
+
+Tom Positivo e Neutro: Linguagem amigável e imparcial.
+Clareza, Simplicidade e Concisão: Mensagens diretas e fáceis de entender.
+Consistência Gramatical e Terminológica: Uso padronizado de termos e regras gramaticais.
+Não Discriminatório: Evitar expressões que possam ser ofensivas ou discriminatórias.
+Aplicação:
+
+Traduzir e adaptar textos de IU para o português (Brasil), seguindo as diretrizes acima.
+Definir termos e expressões comuns, além de explicar funções técnicas.
+Exemplo de Aplicação:
+
+Revisar e criar textos de IU em português (Brasil), garantindo que estejam alinhados ao estilo de localização da Samsung e ao tom de voz da marca.
+Este prompt garante que a localização em português (Brasil) seja consistente, clara e alinhada aos padrões da Samsung, melhorando a experiência do usuário.
+
+# 2.2.1 (HEADER)
+Objetivo: Traduzir cabeçalhos de telas ou pop-ups para o português, mantendo a fidelidade ao texto original em inglês e seguindo as diretrizes de design da Samsung.
+
+Instruções:
+
+Tipo de Design:
+
+"HEADER" refere-se ao cabeçalho de uma tela ou pop-up.
+O cabeçalho deve resumir as informações do corpo da tela sem repeti-las palavra por palavra.
+Regras Gerais:
+
+Para Pop-ups:
+Utilizar o verbo no infinitivo.
+Incluir ponto final apenas se o texto original em inglês o tiver.
+Para Outros Cabeçalhos:
+Utilizar substantivo ou forma substantivada.
+Incluir ponto final apenas se o texto original em inglês o tiver.
+Fidelidade ao Original:
+
+A tradução deve ser o mais fiel possível ao texto original em inglês.
+Exemplo:
+
+Original: Enable Safety Assistance (popup)
+Tradução: Ativar Auxílio de segurança
+Este prompt otimizado garante que a tradução dos cabeçalhos esteja alinhada às diretrizes de design da Samsung, mantendo a clareza e a fidelidade ao texto original.
+
+# 2.2.2. Itens de menu (OPT/TMBODY)
+Objetivo: Traduzir itens de menu (OPT e TMBODY) para o português, mantendo a fidelidade ao texto original em inglês e seguindo as diretrizes de design da Samsung.
+
+Instruções:
+
+Tipo de Design:
+
+OPT: String de opção em uma lista de opções.
+TMBODY: String de menu em uma lista de menus.
+A diferença entre OPT e TMBODY está no modo de exibição: OPT aparece ao tocar ou clicar, enquanto TMBODY é exibido diretamente na tela.
+Regras Gerais para OPT:
+
+Comandos:
+Utilizar o verbo no infinitivo.
+Se o texto original em inglês estiver no substantivo, forma substantivada ou gerúndio, manter o original.
+Exemplos:
+Original: Print Tradução: Imprimir
+Original: Set as Tradução: Definir como
+Regras Gerais para TMBODY:
+
+Telas de Configurações:
+Se o original contiver um substantivo ou forma substantivada, usar a forma substantivada na tradução.
+Se o texto original em inglês contiver um verbo, verificar se a tradução está como verbo; se estiver como substantivo, manter como substantivo.
+Exemplos:
+Original: Language and input Tradução: Idioma e entrada
+Original: Notify during calls Tradução: Notificar em chamadas
+Exemplo de Aplicação:
+
+Traduzir os itens de menu (OPT e TMBODY) para o português, aplicando as regras acima e mantendo a fidelidade ao texto original em inglês.
+Este prompt otimizado garante que a tradução dos itens de menu esteja alinhada às diretrizes de design da Samsung, mantendo a clareza e a fidelidade ao texto original.
+
+# 2.2.3. Abas (HEADER)
+
+
+### Prompt Otimizado para Tradução de Abas (HEADER)
+**Objetivo:**
+Traduzir abas (elementos de IU do tipo HEADER) para o português, mantendo a fidelidade ao texto original em inglês e seguindo as diretrizes de design da Samsung.
+
+**Instruções:**
+1. **Tipo de Design:**
+   - **HEADER:** Elementos exibidos em uma linha próxima à parte superior ou lateral da tela, semelhantes a botões.
+   - Normalmente representam nomes de locais dentro do aparelho ou listas/categorias de itens.
+
+2. **Regras Gerais para HEADER:**
+   - Utilizar substantivo ou forma substantivada na tradução.
+   - **Exemplo:**
+     - **Original:** Controls
+       **Tradução:** Controles
+
+**Exemplo de Aplicação:**
+- Traduzir as abas (HEADER) para o português, aplicando a regra de usar substantivo ou forma substantivada e mantendo a fidelidade ao texto original em inglês.
+
+Este prompt otimizado garante que a tradução das abas esteja alinhada às diretrizes de design da Samsung, mantendo a clareza e a fidelidade ao texto original.
+
+# 2.2.4. Botões (BUTTON)
+
+
+### Prompt Otimizado para Tradução de Botões (BUTTON)
+**Objetivo:**
+Traduzir botões (elementos de IU do tipo BUTTON) para o português, mantendo a fidelidade ao texto original em inglês e seguindo as diretrizes de design da Samsung.
+
+**Instruções:**
+1. **Tipo de Design:**
+   - **BUTTON:** Elementos exibidos na tela como uma palavra, frase curta ou imagem, geralmente contidos em uma borda.
+   - Aparecem em dispositivos com tela de toque e permitem interação do usuário.
+
+2. **Regras Gerais para BUTTON:**
+   - Utilizar **verbo no infinitivo** se o texto original em inglês for um verbo.
+   - Se o texto original não for um verbo, manter conforme o texto original em português.
+   - **Exemplos:**
+     - **Original:** Close
+       **Tradução:** Fechar
+     - **Original:** Sign-in
+       **Tradução:** Entrar (sem pronome por limitações de espaço e estética)
+
+**Exemplo de Aplicação:**
+- Traduzir botões (BUTTON) para o português, aplicando as regras acima e mantendo a fidelidade ao texto original em inglês.
+
+Este prompt garante que a tradução dos botões esteja clara, concisa e alinhada aos padrões da Samsung.
+
+# 2.2.5. Corpo de texto (BODY/OPT/NPBODY)
+
+
+### Prompt Otimizado para Localização de Corpo de Texto (BODY, OPT, NPBODY)
+**Objetivo:**
+Traduzir e adaptar corpos de texto (BODY, OPT, NPBODY) para o português (Brasil), garantindo que estejam alinhados ao estilo de localização da Samsung e ao tom de voz da marca.
+
+**Instruções:**
+1. **Tipos de Design:**
+   - **BODY:** Corpo de texto geral ou texto de pop-up de notificação toast.
+   - **OPT:** Texto de pop-up de notificação toast (sem ponto final se o original em inglês não tiver).
+   - **NPBODY:** Corpo de texto sem ponto final.
+
+2. **Regras Gerais para BODY:**
+   - **Menus, Comandos e Títulos de Caixas de Diálogo:**
+     - Utilizar substantivos quando o original em inglês for substantivo.
+     - Utilizar modo infinitivo quando o original em inglês for verbo.
+     - Utilizar substantivo em maiúscula quando o original em inglês for maiúscula.
+   - **Mensagens:**
+     - **Descritivas:** Usar modo descritivo, frases completas com artigos e ponto final (se o original em inglês tiver).
+     - **De Progresso:** Usar gerúndio.
+     - **Paralelismo:** Utilizar construções paralelas.
+     - **Fidelidade:** Tradução fiel ao original, mantendo a pontuação final conforme o original em inglês.
+   - **Exemplos:**
+     - **Original:** Inserts text into the picture.
+       **Tradução:** Insere o texto na imagem.
+       **Tipo:** Mensagem descritiva
+     - **Original:** Waiting on...
+       **Tradução:** Aguardando...
+       **Tipo:** Mensagem de progresso
+     - **Original:** Block voice notifications on the Bluetooth device, except alarms, while the mobile device is in use.
+       **Tradução:** As notificações por voz serão bloqueadas no aparelho Bluetooth, exceto alarmes, enquanto o aparelho móvel estiver em uso.
+       **Tipo:** Mensagem descritiva (paralelismo)
+
+3. **Regras Gerais para OPT (Toast):**
+   - Seguir as regras de mensagens descritivas e de progresso.
+   - Em casos raros, usar substantivos ou formas substantivadas.
+   - **Exemplo:**
+     - **Original:** 4:3 VG (640 x 480)
+       **Tradução:** 4:3 VG (640 x 480)
+
+4. **Regras Gerais para NPBODY:**
+   - Pode ser comando ou mensagem.
+   - **Comandos:** Usar modo imperativo.
+   - **Mensagens:** Seguir as regras de mensagens descritivas e de progresso.
+   - **Exemplos:**
+     - **Original:** No memos
+       **Tradução:** Nenhum lembrete
+     - **Original:** Enter recipient
+       **Tradução:** Insira o destinatário
+
+**Exemplo de Aplicação:**
+- Revisar e criar corpos de texto (BODY, OPT, NPBODY) em português (Brasil), garantindo que estejam alinhados ao estilo de localização da Samsung e ao tom de voz da marca.
+
+Este prompt garante que a tradução dos corpos de texto seja clara, consistente e alinhada aos padrões da Samsung, melhorando a experiência do usuário.
+
+# 2.2.6. Subtexto (STATUS)
+
+
+### Prompt Otimizado para Localização de Subtexto (STATUS)
+**Objetivo:**
+Traduzir e adaptar subtextos (STATUS) para o português (Brasil), garantindo que estejam alinhados ao estilo de localização da Samsung e ao tom de voz da marca.
+
+**Instruções:**
+1. **Tipo de Design:**
+   - **STATUS:** Indica o status atual de uma função, aplicativo, serviço ou outro item.
+   - Pode ser um adjetivo, quantidade, valor ou combinação de substantivo + verbo.
+
+2. **Regras Gerais para STATUS:**
+   - **Adjetivos:**
+     - Utilizar gênero masculino quando o feminino não estiver claramente especificado.
+   - **Substantivos:**
+     - Manter a mesma forma do texto original (indefinida, singular/plural).
+   - **Exemplos:**
+     - **Original:** Use network provided time
+       **Tradução:** Usar o tempo de rede fornecido
+     - **Original:** 2 devices connected
+       **Tradução:** 2 aparelhos conectados
+     - **Original:** Off
+       **Tradução:** Desativado
+     - **Original:** Red
+       **Tradução:** Vermelho
+
+3. **Aplicação:**
+   - Traduzir subtextos (STATUS) para o português (Brasil), aplicando as regras acima e mantendo a fidelidade ao texto original em inglês.
+
+**Exemplo de Aplicação:**
+- Revisar e criar subtextos (STATUS) em português (Brasil), garantindo que estejam alinhados ao estilo de localização da Samsung e ao tom de voz da marca.
+
+Este prompt garante que a tradução dos subtextos seja clara, consistente e alinhada aos padrões da Samsung, melhorando a experiência do usuário.
+
+# 2.2.7. Itens com marcadores (OPT/BODY)
+
+
+### Prompt Otimizado para Localização de Itens com Marcadores (OPT e BODY)
+**Objetivo:**
+Traduzir e adaptar itens com marcadores (OPT e BODY) para o português (Brasil), garantindo que estejam alinhados ao estilo de localização da Samsung e ao tom de voz da marca.
+
+**Instruções:**
+1. **Tipos de Design:**
+   - **OPT:** Item com marcador sem ponto final, continuação de uma frase introdutória acima.
+   - **BODY:** Item com marcador com ponto final, não é continuação de uma frase introdutória acima.
+
+2. **Regras Gerais para OPT:**
+   - Iniciar a frase com letra maiúscula.
+   - Não adicionar pontuação ao final.
+   - **Exemplos:**
+     - **Original:** Let contacts see your picture when you call
+       **Tradução:** Permitir que os contatos vejam sua foto quando você ligar
+     - **Original:** Create shared albums for you and your family
+       **Tradução:** Criar álbuns compartilhados para você e sua família
+
+3. **Regras Gerais para BODY:**
+   - Iniciar a frase com letra maiúscula.
+   - Colocar pontuação ao final, conforme o original em inglês.
+   - **Exemplos:**
+     - **Original:** Start over and add the device by selecting its category or searching model number.
+       **Tradução:** Comece novamente e adicione o aparelho selecionando sua categoria ou pesquisando o número do modelo.
+     - **Original:** Check the instructions or manual that came with the device to find out how to make it discoverable.
+       **Tradução:** Verifique as instruções ou o manual fornecido com o aparelho para saber como torná-lo detectável.
+
+4. **Aplicação:**
+   - Traduzir itens com marcadores (OPT e BODY) para o português (Brasil), aplicando as regras acima e mantendo a fidelidade ao texto original em inglês.
+
+**Exemplo de Aplicação:**
+- Revisar e criar itens com marcadores (OPT e B=Ítens com marcadores podem ser expressões curtas, frases simples ou um parágrafo inteiro. OPT: indica um item com marcador sem ponto final que é continuação de uma frase introdutória acima. BODY: indica um item com marcador com ponto final que não é continuação de uma frase introdutória acima.
+
+Tipo de design: OPT
+Regra geral:
+- Inicie a frase com letra maiúscula.
+- Não adicione pontuação ao final, exatamente como no original em inglês.
+
+Exemplos – OPT:
+- Original: Let contacts see your picture when you call
+  Tradução: Permitir que os contatos vejam sua foto quando você ligar
+- Original: Create shared albums for you and your family
+  Tradução: Criar álbuns compartilhados para você e sua família
+
+Tipo de design: BODY
+Regra geral:
+- Inicie a frase com letra maiúscula.
+- Coloque pontuação ao final, como no original em inglês.
+
+Exemplos – BODY:
+- Original: Start over and add the device by selecting its category or searching model number.
+  Tradução: Comece novamente e adicione o aparelho selecionando sua categoria ou pesquisando o número do modelo.
+- Original: Check the instructions or manual that came with the device to find out how to make it discoverable.
+  Tradução: Verifique as instruções ou o manual fornecido com o aparelho para saber como torná-lo detectável.
+
+Este prompt garante que a tradução dos itens com marcadores seja clara, consistente e alinhada aos padrões da Samsung, melhorando a experiência do usuário.
+
+# 2.3. Regra de localização para nomes de aplicativos, funções e widgets. Não adiciona artigo se não houver no texto original em português
+
+
+### Prompt Otimizado para Localização de Nomes de Aplicativos, Funções e Widgets
+**Objetivo:**
+Traduzir e adaptar nomes de aplicativos, funções e widgets para o português (Brasil), garantindo consistência e alinhamento com as diretrizes da Samsung.
+
+**Instruções:**
+1. **Regras Gerais:**
+   - Nomes de aplicativos, funções e widgets podem ser localizados, exceto:
+     - Nomes próprios específicos ou termos de marketing com instruções.
+     - Nomes de aplicativos que começam com "S" (ex: S Voice, S Planner, S Pen).
+     - Nomes de aplicativos em formato concatenado (ex: SideSync).
+   - Se não fizer sentido localizar esses nomes no idioma, mantenha-os em inglês.
+
+2. **Consistência:**
+   - Nomes de funções devem ser sempre iguais para fins de consistência.
+   - Se "Samsung/Galaxy/S xxxx" for DNT (Do not translate) no idioma, o nome simplificado do aplicativo também deve ser mantido em inglês.
+     - Exemplo: "Samsung Pay" é DNT, então "Pay" deve ser mantido em inglês.
+     - Exemplo: "S Health" é DNT em Portuguese_Latin, então "Health" deve ser mantido em inglês.
+
+3. **Revisão do Cliente:**
+   - Se o nome localizado for revertido para o inglês após a fase de revisão do cliente, implemente a modificação imediatamente.
+
+4. **Aplicação:**
+   - Traduza nomes de aplicativos, funções e widgets para o português (Brasil), aplicando as regras acima e mantendo a fidelidade ao texto original em inglês.
+
+**Exemplo de Aplicação:**
+- Revisar e criar nomes de aplicativos, funções e widgets em português (Brasil), garantindo que estejam alinhados às diretrizes da Samsung.
+
+Este prompt garante que a localização desses elementos seja clara, consistente e alinhada aos padrões da Samsung, melhorando a experiência do usuário.
+
+# 2.4. TTS (leitura de texto)
+
+
+### Prompt Otimizado para Localização de Textos TTS (Leitura de Texto)
+**Objetivo:**
+Traduzir e adaptar textos TTS (Leitura de Texto) para o português (Brasil), garantindo que estejam alinhados ao estilo de localização da Samsung e ao tom de voz da marca.
+
+**Instruções:**
+1. **Contexto:**
+   - A leitura de texto (TTS) é uma função de acessibilidade que lê palavras na tela em voz alta para auxiliar os usuários.
+   - Em aparelhos Android, é chamada de "TalkBack"; em Tizen, "Leitor de tela".
+   - As strings TTS aparecem em três elementos: rótulo, característica e atributo opcional.
+
+2. **Regras Gerais para TTS:**
+   - Traduzir como um termo completo, sem abreviar.
+   - Não há restrição de espaço, pois o texto soa como voz.
+   - Pontuações básicas (ponto de interrogação, aspas, ponto final) não são lidas em voz alta, mas podem ser usadas na tradução.
+   - Manter a pontuação do original em português se o texto original em inglês tiver pontuação de interrogação.
+
+3. **Exemplos:**
+   - **String ID:** DREAM_SAY_BIXBY_TURN_ON_BLUETOOTH
+     **Inglês:** Say "Bixby, turn on Bluetooth."
+     **Português:** Diga "Bixby, ative o Bluetooth."
+   - **String ID:** DREAM_SAY_BIXBY_OPEN_MESSAGES_ABB
+     **Inglês:** Say "Bixby, open Messages."
+     **Português:** Diga "Bixby, abra Mensagens."
+   - **String ID:** DREAM_SAY_BIXBY_PLAY_MUSIC
+     **Inglês:** Say "Bixby, play music."
+     **Português:** Diga "Bixby, toque músicas."
+
+4. **Aplicação:**
+   - Traduzir textos TTS para o português (Brasil), aplicando as regras acima e mantendo a fidelidade ao texto original em inglês.
+
+**Exemplo de Aplicação:**
+- Revisar e criar textos TTS em português (Brasil), garantindo que estejam alinhados ao estilo de localização da Samsung e ao tom de voz da marca.
+
+Este prompt garante que a tradução dos textos TTS seja clara, consistente e alinhada aos padrões da Samsung, melhorando a experiência do usuário.
+
+# 2.6. Instrução para papel de parede, tema, toque, tom da tecla
+
+
+### Prompt Otimizado para Localização de Termos Específicos
+**Objetivo:**
+Garantir que certos termos específicos sejam mantidos em inglês no contexto de localização para o português (Brasil), conforme as diretrizes da Samsung.
+
+**Instruções:**
+1. **Termos a Manter em Inglês:**
+   - **Papel de Parede:** Manter como "Wallpaper"
+   - **Tema:** Manter como "Theme"
+   - **Toque:** Manter como "Touch"
+   - **Tom da Tecla:** Manter como "KeyTone"
+   - **Vibração:** Manter como "Vibration"
+
+2. **Aplicação:**
+   - Ao traduzir ou localizar textos para o português (Brasil), mantenha os termos acima em inglês conforme especificado.
+
+**Exemplo de Aplicação:**
+- Revisar e criar textos que incluam os termos acima, garantindo que eles sejam mantidos em inglês conforme as diretrizes.
+
+Este prompt garante que os termos específicos sejam consistentes e alinhados aos padrões da Samsung, melhorando a experiência do usuário.
+
+# 2.7. Paralelismo
+
+
+### Prompt Otimizado para Uso de Paralelismo em Textos de IU
+**Objetivo:**
+Garantir o uso de linguagem paralela em textos de interface do usuário (IU) para o português (Brasil), conforme as diretrizes da Samsung.
+
+**Instruções:**
+1. **Definição de Paralelismo:**
+   - O paralelismo requer que palavras e expressões com a mesma função tenham o mesmo formato.
+
+2. **Regras Gerais para Paralelismo:**
+   - **Ideias de Igual Peso:** Use linguagem paralela sempre que expressar ideias de igual peso.
+   - **Elementos de IU Idênticos:** Use linguagem paralela para elementos de IU que sejam idênticos na função, como listas suspensas em uma caixa de diálogo.
+
+3. **Exemplos:**
+   - **Original:** Block voice notifications on the Bluetooth device, except alarms, while the mobile device is in use.
+     **Tradução:** As notificações por voz serão bloqueadas no aparelho Bluetooth, exceto alarmes, enquanto o aparelho móvel estiver em uso.
+   - **Original:** Enable notifications, disable notifications, customize notifications.
+     **Tradução:** Ativar notificações, desativar notificações, personalizar notificações.
+
+4. **Aplicação:**
+   - Revisar e criar textos de IU em português (Brasil), garantindo que a linguagem paralela seja usada conforme as diretrizes acima.
+
+**Exemplo de Aplicação:**
+- Revisar listas suspensas, comandos e outros elementos de IU para garantir que a linguagem paralela seja aplicada corretamente.
+
+Este prompt garante que o uso de paralelismo seja consistente e alinhado aos padrões da Samsung, melhorando a clareza e a experiência do usuário.
+
+# 2.8.1 O que é o DEI
+
+
+### Prompt Otimizado para Conceitos de Diversidade, Equidade e Inclusão
+**Objetivo:**
+Definir e aplicar os conceitos de diversidade, equidade e inclusão em textos de interface do usuário (IU) para o português (Brasil), conforme as diretrizes da Samsung.
+
+**Instruções:**
+1. **Diversidade:**
+   - **Definição:** A existência de diferentes identidades, experiências e perspectivas em um grupo ou organização.
+   - **Exemplos:** Etnia, gênero, deficiência, orientação sexual, idade, família, religião e muito mais.
+
+2. **Equidade:**
+   - **Definição:** O tratamento justo, o acesso, a oportunidade e o avanço para todas as pessoas.
+   - **Exemplo:** Encontrar e remover barreiras que impedem a plena participação de alguns grupos.
+   - **Nota:** Equidade é quando todos recebem o apoio de que precisam.
+
+3. **Inclusão:**
+   - **Definição:** Criar ativamente ambientes onde qualquer pessoa ou grupo seja acolhida, respeitada, apoiada e valorizada para que possa participar plenamente.
+
+4. **Aplicação:**
+   - Revisar e criar textos de IU em português (Brasil), garantindo que os conceitos de diversidade, equidade e inclusão sejam aplicados conforme as diretrizes acima.
+
+**Exemplo de Aplicação:**
+- Revisar textos de IU para garantir que promovam diversidade, equidade e inclusão, alinhados aos valores da Samsung.
+
+Este prompt garante que os conceitos de diversidade, equidade e inclusão sejam claros, consistentes e alinhados aos padrões da Samsung, melhorando a experiência do usuário.
+
+# 2.8.2 O objetivo do DEI
+
+
+### Prompt Otimizado para Aplicação de Diversidade e Inclusão em Textos de IU
+**Objetivo:**
+Garantir que os textos de interface do usuário (IU) reflitam a diversidade e inclusão, alinhados aos valores da Samsung como empresa global.
+
+**Instruções:**
+1. **Contexto:**
+   - Reconhecer a diversidade dos usuários e suas necessidades.
+   - Oferecer suporte para que todos possam usufruir dos produtos da Samsung.
+
+2. **Aplicação:**
+   - Utilizar linguagem inclusiva e acessível em todos os textos de IU.
+   - Garantir que os textos sejam claros e respeitosos com diferentes identidades, experiências e perspectivas.
+
+3. **Exemplo de Aplicação:**
+   - Revisar e criar textos de IU em português (Brasil), garantindo que promovam diversidade e inclusão, alinhados aos valores da Samsung.
+
+**Exemplo de Texto:**
+- "Como uma empresa global, sabemos a diversidade dos nossos usuários. Queremos oferecer suporte a cada usuário e suas necessidades, para que todos possam usufruir de nossos produtos. Este guia é um ponto de partida para ajudar você a fazer isso."
+
+Este prompt garante que os textos de IU sejam inclusivos, respeitosos e alinhados aos valores da Samsung, melhorando a experiência do usuário.
+
+# 2.8.3 Exemplos do DEI
+- Idade
+Use termos inclusivos ao falar sobre faixas etárias
+
+Inglês Tradução
+- Prefira: Older adults
+  Tradução: Adultos com mais idade
+  Em vez de: Elderly, the elderly, senior, seniors, aging people
+  Tradução: Idosos, muito idosos
+
+- Além disso, leve em consideração se o uso de números ajuda a melhorar seu conteúdo.
+  Por exemplo, em textos com implicações legais, é melhor usar números para obter melhor clareza.
+
+Inglês Tradução
+- Prefira: You must be at least 19 years old or older to view this content.
+  Tradução: Você deve ter pelo menos 19 anos de idade ou mais para visualizar este conteúdo.
+  Em vez de: You must be an adult to view this content.
+  Tradução: Você deve ser adulto para visualizar este conteúdo.
+
+- Não dê a entender que ter uma certa idade é preferível.
+  Inglês Tradução
+  - Prefira: Priyanka is 40 years old.
+    Tradução: Priyanka tem 40 anos.
+    Em vez de: Priyanka is 40 years young.
+    Tradução: Priyanka é uma jovem de 40 anos.
+
+- Da mesma forma, evite usar termos que insinuem que os adultos com mais idade têm mais experiência, conhecimento ou sabedoria.
+  Inglês Tradução
+  - Prefira: mentor
+    Tradução: Conselheiro
+    Em vez de: Gray beard
+    Tradução: Ancião
+
+- Deficiência
+  Use o termo "pessoa com" ao falar sobre deficiências.
+  Inglês Tradução
+  - Prefira: We’ve designed new features to make our products more accessible to people with disabilities.
+    Tradução: Projetamos novas funções para tornar nossos produtos mais acessíveis a pessoas com deficiências.
+    Em vez de: We’ve designed new features to make our products more accessible to disabled people.
+    Tradução: Projetamos novas funções para tornar nossos produtos mais acessíveis a pessoas deficientes.
+
+
+Evite usar eufemismos para deficiência
+- Inglês Tradução
+  - Prefira: Person with a disability
+    Tradução: Pessoa com deficiência
+    Em vez de: Special needs person
+    Tradução: Pessoa com necessidades especiais
+
+Não use a palavra "normal" para descrever pessoas sem deficiência
+- Inglês Tradução
+  - Prefira: Most apps are designed for people without disabilities. That’s why it’s difficult for people with disabilities to use them.
+    Tradução: A maioria dos aplicativos é projetada para pessoas sem deficiência. É por isso que é difícil para pessoas com deficiência usá-los.
+    Em vez de: Most apps are designed for normal people. That’s why it’s difficult for people with disabilities to use them.
+    Tradução: A maioria dos aplicativos são projetados para pessoas normais. É por isso que é difícil para pessoas com deficiência usá-los.
+
+- No entanto, no contexto de dados de saúde, não há problema em usar "normal" para um valor que esteja dentro do intervalo saudável ou esperado.
+  Inglês Tradução
+  - Prefira: 18.5 – 24.9 is considered a normal BMI
+    Tradução: Um IMC entre 18,5 e 24,9 é considerado normal
+
+Nunca sugira que uma deficiência é um problema ou uma doença
+- Inglês Tradução
+  - Prefira: Ignore Repeated Touches is designed for people with tremors. You can set a time for your phone to ignore any repeated touches after the initial touch.
+    Tradução: A função Ignorar toques repetidos foi desenvolvida para pessoas com tremores. Você pode definir um período para o telefone ignorar qualquer toque repetido após o toque inicial.
+    Em vez de: Some people find touch interaction to be difficult due to tremors. If you have this kind of problem, Ignore Repeated Touches can help. Set a time which will ignore any repeated touches during the period after the initial touch.
+    Tradução: Algumas pessoas acham difícil a interação por toque devido aos tremores. Se você tiver esse tipo de problema, a função Ignorar toques repetidos pode ajudar. Defina o período em que serão ignorados quaisquer touch repetidos após o toque inicial.
+
+PÁGINA 15
+Evite usar palavras que se refiram a sentidos específicos
+- Inglês Tradução
+  - Prefira: If Connections doesn’t appear in the Settings menu, go to Easy Connection instead.
+    Tradução: Se a opção Conexões não aparecer no menu Configurações, vá para Conexão Fácil.
+    Em vez de: If Connections doesn’t appear in the Settings menu, look for Easy Connection instead.
+    Tradução: Se a opção Conexões não aparecer no menu Configurações, veja Conexão Fácil.
+
+- No entanto, embora a linguagem inclusiva seja importante, haverá momentos em que você precisará se referir a sentidos específicos para melhor clareza. Lembre-se de que usar uma linguagem clara também é uma parte importante da linguagem inclusiva.
+  Inglês Tradução
+  - Prefira: View all pictures in Gallery
+    Tradução: Veja todas as fotos na Galeria
+    Em vez de: Go to all pictures in Gallery
+    Tradução: Vá para todas as fotos na Galeria
+
+Evite usar linguagem ou frases que se refiram a partes ou órgãos do corpo
+- Inglês Tradução
+  - Prefira: Get off to a good start
+    Tradução: Comece bem
+    Em vez de: Starting off on the right foot
+    Tradução: Comece com o pé direito
+
+- Inglês Tradução
+  - Prefira: Use SmartThings Home Monitor to keep your home safe, even when you’re not there.
+    Tradução: Use o SmartThings Home Monitor para manter sua casa segura mesmo quando não estiver lá.
+    Em vez de: Use SmartThings Home Monitor to keep an eye on your home, even when you’re not there.
+    Tradução: Use o SmartThings Home Monitor para ficar de olho em sua casa mesmo quando não estiver lá.
+
+Família
+- Evite fazer referência à família do usuário
+  - Inglês Tradução
+    - Prefira: Samsung water filters reduce contaminants, giving you fresh-tasting water.
+      Tradução: Os filtros de água da Samsung reduzem as impurezas, proporcionando a você uma água com sabor fresco.
+      Em vez de: Samsung water filters reduce contaminants, giving your family fresh-tasting water.
+      Tradução: Os filtros de água da Samsung reduzem as impurezas, proporcionando à sua família uma água com sabor fresco.
+
+- Evite uma linguagem que faça suposições sobre a estrutura familiar
+  - Inglês Tradução
+    - Prefira: Child/Children
+      Tradução: Criança/Crianças
+      Em vez de: son or daughter
+      Tradução: Filho ou filha
+
+- Evite uma linguagem que faça suposições sobre a estrutura familiar
+  - Inglês Tradução
+    - Prefira: What role should they have?
+      Tradução: Que papel eles devem ter?
+    - Prefira: Member
+      Tradução: Membro
+    - Prefira: Organizer
+      Tradução: Organizador
+
+Gênero
+- Esteja ciente de que sexo e gênero não são a mesma coisa
+- Evite enquadrar o gênero como uma questão de preferência
+  - Inglês Tradução
+    - Prefira: Select gender
+      Tradução: Selecione o gênero
+      Em vez de: Select sex
+      Tradução: Selecione o sexo
+
+Evite o uso do termo "outros"
+- Inglês Tradução
+  - Prefira: Prefer not to say
+    Tradução: Prefiro não dizer
+    Em vez de: Other
+    Tradução: Outro
+
+Evite vincular ações ao gênero
+- Nem todas as mulheres menstruam. Pensar no que a ferramenta faz e no processo real que está ocorrendo nos ajuda a escrever de forma mais inclusiva. Isso também garante que não reduzamos a saúde das mulheres à saúde reprodutiva.
+- Sempre use uma linguagem de gênero neutra onde a identidade da pessoa é desconhecida.
+  - O uso do gênero neutro "they" em inglês remonta ao final dos anos 1300. Ele foi usado em obras de escritores aclamados como Jane Austen, William Shakespeare e George Orwell.
+  - Inglês Tradução
+    - Prefira: There is a risk of death from suffocation if a child puts the packing materials on their head.
+      Tradução: Existe o risco de morte por asfixia se uma criança colocar os materiais da embalagem na cabeça.
+      Em vez de: There is a risk of death from suffocation if a child puts the packing materials on his or her head.
+      Tradução: Existe o risco de morte por asfixia se uma criança colocar os materiais da embalagem na cabeça dele ou dela.
+
+Evite vincular estereótipos ao gênero
+- Inglês Tradução
+  - Prefira: #assertive / #confident
+    Tradução: #assertivo / #confiante
+    Em vez de: #chipper / #cheerful
+    Tradução: #tagarela / #animado
+
+Linguagem
+- Pense em qual unidade de medida você está usando.
+  - Uma unidade de medida é padrão de quantidade física, como comprimento ou peso. Pense em qual unidade de medida diferentes países ou regiões usam para garantir que seu conteúdo seja compreendido por todos.
+  - Por exemplo, o Samsung Health permite que os usuários alterem a unidade de medida.
+
+Raça e cultura
+- Evite linguagens sazonais específicas de uma região
+  - Inglês Tradução
+    - Prefira: January is here. The new year has arrived!
+      Tradução: Janeiro: o ano novo chegou!
+      Em vez de: January is here. Sweater weather has arrived!
+      Tradução: Janeiro: o frio chegou!
+
+Status socioeconômico
+- Use um texto de espaço reservado neutro
+  - Inglês Tradução
+    - Prefira: Enter total budget
+      Tradução: Informe o orçamento total
+
+# 3. Caracteres e caracteres especiais
+O PT-BR não aceita o caractere especial “&”, exceto para nomes próprios.
+
+# 4. Formato de data, hora, números, unidade monetária, porcentagem
+
+
+# 4.1. Formato de data
+Inglês (Reino Unido)
+Separador: Ponto (.)
+DD/MM/AAAA: 19.01.2015
+DD/MM/AA: 19.01.15
+MM/DD/AAAA: Não aplicável (Não usado em PT-BR)
+MM/DD/AA: Não aplicável (Não usado em PT-BR)
+Monday, 19th of January 2015: Segunda-feira, 19 de janeiro de 2015
+Mês abreviado: Monday, 19 Jan 2015 Tradução: Segunda, 19 de jan de 2015
+Dia abreviado: Mon 19 January 2015 Tradução: Seg, 19 de janeiro de 2015
+Mês e dia abreviados: Mon 19 Jan 2015 Tradução: Seg, 19 de jan de 2015
+Ano omitido: Monday, 19th January Tradução: Segunda, 19 de janeiro
+Ano omitido, mês abreviado: Monday, 19 Jan Tradução: Segunda, 19 de jan
+Ano omitido, dia abreviado: Mon 19 January Tradução: Seg, 19 janeiro
+Ano omitido, mês e dia abreviados: Mon 19 Jan Tradução: Seg, 19 de jan
+Formato de Data para Correspondência
+
+Nome da cidade, DD MMMM AAAA Exemplo: São Paulo, 12 de abril de 2014
+
+• O número do primeiro dia de um mês em português é
+ordinal (primeiro), não cardinal (um). Por isso, sua
+representação tem um formato especial: 1º, não 1.
+• O número do ano é escrito sem separador de milhar.
+• O formato de data comum em português começa com o
+nome de uma cidade, não o nome do dia da semana.
+
+# 4.1.1. Abreviação de Mês
+- Mês Por Extenso: janeiro
+  Abreviado: jan
+- Mês Por Extenso: fevereiro
+  Abreviado: fev
+- Mês Por Extenso: março
+  Abreviado: mar
+- Mês Por Extenso: abril
+  Abreviado: abr
+- Mês Por Extenso: maio
+  Abreviado: mai
+- Mês Por Extenso: junho
+  Abreviado: jun
+- Mês Por Extenso: julho
+  Abreviado: jul
+- Mês Por Extenso: agosto
+  Abreviado: ago
+- Mês Por Extenso: setembro
+  Abreviado: set
+- Mês Por Extenso: outubro
+  Abreviado: out
+- Mês Por Extenso: novembro
+  Abreviado: nov
+- Mês Por Extenso: dezembro
+  Abreviado: dez
+
+# 4.1.2. Abreviação de Dia
+- Dia Por Extenso (segunda-feira): seg
+  Abrevição Máxima: s
+- Dia Por Extenso (terça-feira): ter
+  Abreviação Máxima: t
+- Dia Por Extenso (quarta-feira): qua
+  Abreviação Máxima: q
+- Dia Por Extenso (quinta-feira): qui
+  Abreviação Máxima: q
+- Dia Por Extenso (sexta-feira): sex
+  Abreviação Máxima: s
+- Dia Por Extenso (sábado): sáb
+  Abreviação Máxima: s
+- Dia Por Extenso (domingo): dom
+  Abreviação Máxima: d
+
+# 4.2. Hora
+Formato de 24 horas: Sim Exemplo: 20:10:30
+Formato de 12 horas: Não Exemplo: 08:10:30
+Formato de hora padrão: HH:mm:ss Exemplo: 08:10:30
+Separador de hora: dois-pontos Exemplo: 08:10:30
+Hora com um zero inicial: Sim Exemplo: 08:10:30
+Cadeia de caracteres para o designador AM: N/A
+Cadeia de caracteres para o designador PM: N/A
+
+Nota: A abreviação para “hora” e “horas” é “h”, para
+“minuto” e “minutos” é “min” e para “segundo”
+e “segundos” é “s”. Evite usar zeros iniciais
+antes de horas.
+A abreviação para minutos só é necessária quando os segundos também são indicados:
+7h04min35s
+7h04
+
+# 4.3. Números
+Regra para cardinais/ordinais:
+- O número do primeiro dia de um mês em português é ordinal (primeiro), não cardinal (um). Por
+isso, sua representação tem um formato especial: 1º, não 1.
+- Para indicar ordem ou série, é necessário usar um número ordinal
+
+Tipo de Separador
+
+Separador de decimal: vírgula Exemplo: 123,45
+Ponto (para versões de software): Windows 8.1
+Separador de milhares: ponto Exemplo: 1.234.567
+
+# 4.4. Unidade
+
+
+# 4.4.1. Moeda
+- Nunca localize moedas, a menos que seja solicitado a fazer isso.
+  Exemplo: "The application cost is around US$ 15,00." – "O custo do aplicativo é de aproximadamente US$ 15."
+- Preste atenção nas moedas que incluem uma variável. Tenha cuidado. No exemplo abaixo, a localização correta seria ($ %s)
+  Exemplo: "The maximum daily purchase limit ($%s) has been reached. Try again tomorrow." – "O limite máximo diário de compra ($ %s) foi atingido. Tente novamente amanhã."
+
+Moeda
+- Unidade monetária: R$
+- Formato de moeda padrão: R$ 123,00
+- Formato de unidade monetária alternativo: R$ 123
+- Espaço entre a unidade e o número: Sim
+
+Notas
+
+# 4.4.2. Outras unidades
+- Com exceção de unidades de dados e temperatura, todas as outras devem ser usadas em minúsculas.
+
+Outras unidades
+- Unidade de medida padrão: °C
+- Unidade de temperatura: °C/°F
+  Exemplo: 20°C/20°F
+- Unidade de medida linear:
+  - mm: 10 mm
+  - cm: 10 cm
+  - m: 10 m
+  - km: 10 km
+- Unidade de medida de capacidade:
+  - ml: 10 ml
+  - l: 10 l
+- Unidade de medida de massa:
+  - g: 10 g
+  - kg: 10 kg
+- Unidade de medida do inglês (EUA):
+  - Inch: 10 pol
+  - feet: 10 pés
+  - pound: 10 libras
+- Unidade de dados:
+  - KB: 10 KB
+  - MB: 10 MB
+  - GB: 10 GB
+
+# 4.5. Porcentagem
+Símbolo de porcentagem: %
+Formato de porcentagem padrão: %d% Exemplo: 30%
+Formato de porcentagem padrão: Espaço entre o símbolo de porcentagem e o número: Não Exemplo: 30%
+
+# 5. Gramática
+Este capítulo descreve alguns dos aspectos mais úteis da gramática padrão a ser usada na tradução do texto de
+IU para aparelhos móveis Samsung.
+
+# 5.1. Verbo
+
+
+# 5.1.1. Português: infinitivo/imperativo
+As strings de caminho de menu usam verbo no infinitivo, enquanto as de mensagens usam verbo no
+imperativo.
+Para o português (Brasil), deve ser usado o modo imperativo para instruções, sugestões e ordens. Quando não
+tiver certeza se o texto é uma opção ou uma ordem, use o infinitivo. Quando os textos são traduzidos, em geral,
+as traduções são feitas por agências que não têm os aparelhos reais, e o texto está fora de contexto. Isso pode
+gerar mais ambiguidade do que o normal e criar inconsistências, já que uma ordem pode ser claramente vista
+como uma ordem quando é fornecido o contexto, mas ambígua sem ele. O resultado é o usuário (que tem o
+aparelho) tentando entender por que um texto em particular é diferente sem qualquer motivo aparente. Essa é
+outra razão que sustenta o uso do infinitivo.
+Geralmente, no contexto da string (na parte superior da string), há instruções sobre o tipo de texto: caminho de
+menu, descrição, texto de apoio etc.
+ex.) Tap: Tocar (infinitivo), Toque (imperativo)
+Use: Usar (infinitivo), Use (imperativo)
+
+# 5.1.2. Português (Brasil): tratamento formal vs. informal
+- Há duas normas linguísticas em PT-BR: culta (escrita) e padrão (falada). Use a forma culta.
+- Seja coloquial. Evite usar um tom que soe muito formal, técnico ou profissional.
+- Escolha palavras que reflitam um produto divertido e informal.
+- Evite gírias.
+
+# 5.2. Tempo verbal
+Veja as regras específicas acima
+
+# 5.3. Adjetivo. Ser o mais fiel ao texto original em inglês
+Em português (Brasil), os adjetivos podem ser posicionados antes ou após o substantivo, mas é importante
+enfatizar que a ordem direta, substantivo seguido de adjetivo, é mais frequente. Como, em inglês, a ordem
+predominante é o adjetivo seguido de substantivo, ao traduzir para o português (Brasil), dê preferência à ordem
+direta, a menos que a ordem contrária tenha um papel estilístico no texto.
+Exemplo: Take impressive panoramic photos./Tire fotos panorâmicas fantásticas.
+
+# 5.4. Artigo
+Nomes de produtos da Samsung e nomes de recursos não traduzidos são tratados como nomes próprios em conforme o Inglês original. Mas se no português já estiver traduzido não há problema. Nota: quando um espaço reservado substitui um nome de produto em uma string, ele deve ser
+precedido por um artigo definido e um espaço. Consulte o tópico “Gênero” abaixo para obter informações sobre
+o gênero do artigo a ser adotado.
+
+Nome de produto não deve ser traduzido se for considerado como termo( DNT Do not translate) no glossário.
+Se no português já estiver traduzido manter.
+
+Exemplo: Use Find my phone/Use o Buscar meu telefone
+
+# 5.5. Preposições
+É necessário dedicar uma atenção especial às preposições, já que as preposições em inglês tendem a causar
+dificuldades aos tradutores. O português tem muito menos preposições, e não há uma correspondência simples
+entre as que existem e seus equivalentes em inglês. Influenciados pelo idioma inglês, ao traduzir locuções
+substantivas, muitos tradutores não contraem a preposição “de” com o artigo definido correspondente quando
+o determinante não é genérico. A situação inversa também é recorrente: os tradutores contraem a preposição
+“de” com o artigo definido ao lidar com uma referência genérica. Para evitar esse tipo de erro, é muito
+importante prestar atenção no contexto.
+Exemplo: Use of S Health app.
+Uso do aplicativo S Health. NOT Uso de aplicativo S Health
+Para evitar erros no uso de preposições, consulte a referência gramatical durante a tradução.
+Se houver dois ou mais substantivos em uma frase regidos por uma preposição e um artigo, você deve repetir os
+elementos [preposição + artigo] antes de cada substantivo, principalmente se cada palavra for diferente em
+gênero ou número
+
+Tradução incorreta:
+Crie cópia das configurações e dados das aplicações
+atuais
+
+Tradução correta:
+Crie cópia das configurações e dos dados dos
+aplicativos atuais.
+
+# 5.6. Pronomes
+O idioma inglês usa pronomes demonstrativos com mais frequência do que o português (Brasil). Um grande
+número de pronomes demonstrativos e possessivos pode e deve ser substituído por artigos no texto traduzido,
+principalmente ao lidar com mensagens de erro.
+Quando o verbo é precedido por palavras que “atraem” o pronome (isto é, palavras de negação, preposições,
+pronomes indefinidos e relativos), o pronome átono deve ficar ANTES do verbo.
+
+Tradução incorreta:
+Maneiras de desconectar-se
+
+Tradução correta:
+Maneiras de se desconectar
+
+- Pronomes pessoais: são frequentemente omitidos em português (Brasil), enquanto, em inglês, estão
+sempre presentes na frase. Evite muitas repetições de pronomes pessoais no texto traduzido.
+Exemplo: What you need to set up a home network/O que é necessário para configurar uma rede
+doméstica
+
+- Pronomes possessivos: são mais usados em inglês do que em português. Evite usar possessivos na
+tradução sempre que eles não forem essenciais para o significado do texto.
+Exemplo: When choosing a network technology, consider the location of your computers and the
+desired speed of your network./ Ao escolher uma tecnologia de rede, leve em conta a localização física
+de seus computadores e a velocidade desejada para a rede.
+
+# 6. Uso de maiúsculas/minúsculas
+
+
+# 6.1. Uso de maiúsculas conforme o texto em inglês, se a primeira letra começar com maiuscula mantem maiuscula e se começar com minuscula mantém minuscula.
+Idioma:
+
+Português (Brasil)
+
+Uso de maiúsculas:
+Todas as letras maiúsculas
+
+Nota:
+Siglas: seguir as regras do Português (Brasil)
+conforme indicação de fontes de referência,
+como a ABL, o Houaiss, o Aulete, o
+INMETRO, etc.
+Por exemplo, ONU (para Organização das
+Nações Unidas), PNUD (Programa das
+Nações Unidas para o Desenvolvimento)
+
+# 7. Compostos
+a. Compostos com mais de duas palavras: somente a primeira letra da primeira palavra fica em maiúscula.
+Exemplo: Auto Fill/Preenchimento automático
+b. Compostos com nomes de produtos: todas as primeiras letras ficam em maiúsculas.
+Exemplo: Gear VR/ Gear VR
+c. Compostos com nomes de componentes e recursos: aplique a primeira regra acima.
+Exemplo: Air view/ Exibição suspensa
+d. Compostos com acrônimos, abreviações ou numerais: os acrônimos, as abreviações e os numerais
+ordinais devem permanecer em maiúsculas.
+Exemplo: Graphical UI/ IU gráfica
+e. Compostos com IU: a mesma regra acima.
+Exemplo: Easy connect/ Conexão fácil
+
+# 8. Gênero
+- O PT-BR é um idioma dependente de gênero. Como regra fundamental, siga os princípios gramaticais
+de gênero para concordância. No entanto, também existe uma forte tendência entre os falantes de PTBR da Geração Y, que estão entre os principais usuários de aparelhos Samsung Galaxy, em usar o
+máximo possível de palavras de gênero neutro. Portanto, priorize o uso de termos de gênero neutro
+onde for aplicável, desde que isso não altere o significado do texto original. Aqui estão alguns exemplos
+de termos de gênero neutro que você já pode aplicar:
+a. Oi (Hi), Olá (Hello):
+Ao traduzir saudações, use “Oi” ou “Olá” para evitar especificar o gênero. Essa foi a mais bemvinda alteração de texto para gênero neutro segundo uma pesquisa com falantes de PT-BR da
+Geração Y.
+b. você (you):
+Em vez de usar as traduções de “he” ou “she”, tente usar “você” para evitar especificar o gênero e
+aumentar o engajamento do usuário.
+c. crianças (children):
+O uso de termos no plural, como “crianças”, “filhos” etc., onde aplicável, também pode ajudar a
+evitar a especificação do gênero.
+- Quando se deparar com um anglicismo em produtos Samsung, considere as seguintes opções:
+a. Motivação: a palavra em inglês tem algum recurso formalmente motivado que permita uma
+integração simples ao sistema de classe de palavras do português? Analogia: há um termo
+equivalente em português (Brasil) cujo artigo possa ser usado?
+b. Frequência: o termo é usado em outra documentação técnica?
+c. Se for, qual artigo é usado com mais frequência?
+d. A Internet pode ser uma referência útil aqui.
+
+# 9. Pontuação
+
+
+# 9.1. Aspas
+
+
+# 9.1.1. Aspas duplas
+As aspas duplas devem ser usadas com o caractere Unicode, não digitando a tecla do teclado. Idioma: Português (Brasil) Aspas: “ ” Unicode: Alt+0147/Alt+0148 Notas: Utilize o caractere Unicode para garantir a correta formatação.
+
+# 9.1.2. Aspas simples
+As aspas simples devem ser usadas com o caractere Unicode, não inserindo a tecla do teclado. Idioma: Português (Brasil) Aspas: ‘ ’ Unicode: Alt+0145/Alt+0146 Notas: Utilize o caractere Unicode para garantir a correta formatação.
+
+# 9.2. Ponto final
+Se o texto inglês original não tiver ponto final na frase, não sugerir ponto final.
+Se o texto inglês original tiver ponto final na frase, e no português original não tiver, então sugira a adição do ponto final.
+
+# 9.2.1. Regra geral para ponto final. Texto original inglês com ponto final no português deve ter também.
+- O texto original (em inglês) é uma frase com ponto final: traduza como uma frase completa com ponto
+final.
+- O texto original (em inglês) é uma frase sem ponto final: (por exemplo: texto NPBODY): traduza como
+uma frase completa sem ponto final.
+
+# 9.2.2. Instrução sobre ponto final por tipo de design
+- Tipo BODY: tem um ponto final no texto, somente se houver ponto final no texto em ingles original, se não houver ponto final não adicionar.
+Inclui sujeito e objeto omitidos, como “Saved.”, “Deleted.”
+>> Traduza de acordo com o original.
+- Tipos HEADER/OPT/TMBODY/BUTTON/SK/STATUS: ponto final no texto somente se houver no texto original em inglês
+Inclui sujeito e objeto omitidos, como “Connected” e status (M_STATUS)
+>> Traduza de acordo com o original.
+- Tipo NPBODY: sem ponto final mesmo que seja uma frase devido a questões de design
+a. Frase “centralizada” na “Tela de bloqueio/Tela inicial”
+b. Texto de dica no campo de entrada
+c. Frase “sem itens”
+>> Traduza de acordo com o original.
+
+# 9.2.3. Localização do ponto final com parênteses
+Idioma: Português (Brasil)
+Localização do ponto final com parênteses: Dentro (se for uma frase completa)
+Localização do ponto final com parênteses: Fora (se for parte de uma frase anterior) Exemplo:
+Inglês: Passwords must not contain simple sequence (e.g., 1111 or 1234). Português: As senhas não devem conter uma sequência simples (por exemplo, 1111 ou 1234).
+Inglês: Check the number and try again. (The CAT ID should be 10 digits.) Português: Verifique o número e tente novamente. (O CAT ID deve ser 10 dígitos.)
+
+# 9.3. Dois-pontos
+a. Depois de dois-pontos, não use inicial maiúscula em palavras comuns.
+Inglês Tradução
+Error: Unable to resolve email name. Tradução: Erro: não é possível resolver nome de e-mail.
+Note: The Tools menu appears on the main window. Tradução: Observação: o menu Ferramentas aparece na janela principal.
+b. Não adicione um espaço antes de dois-pontos.
+Tradução incorreta: LOCAL : O Foursquare detecta a localização do seu dispositivo e fornece informações do local. Tradução correta: LOCAL: o Foursquare detecta a localização do seu dispositivo e fornece informações do local.
+
+# 9.4. Vírgulas. Após virgula, manter a capitalização conforme o texto original em inglês
+a. Não use vírgula antes das conjunções "e", "ou" e "nem" nos dois últimos elementos de uma série.
+Tradução incorreta: Basta desbloquear seu dispositivo uma vez, e ele permanecerá desbloqueado enquanto você estiver em movimento. Tradução correta: Basta desbloquear seu dispositivo uma vez e ele permanecerá desbloqueado enquanto você estiver em movimento.
+b. Não use vírgula entre o sujeito e o predicado.
+Tradução incorreta: Lembre-se de que, o detector de choro de bebê está aqui para ajudar, mas não substitui o cuidado humano. Tradução correta: Lembre-se de que o detector de choro de bebê está aqui para ajudar, mas não substitui o cuidado humano.
+c. Use vírgulas para indicar um vocativo.
+Incorrect translation: Bixby ative o Bluetooth. Correct translation: Bixby, ative o Bluetooth.
+d. Use uma vírgula para separar duas orações com sujeitos diferentes conectadas pela conjunção "e".
+
+Incorrect translation: O aparelho foi conectado e o usuário concluiu a configuração. 
+
+Correct translation: O aparelho foi conectado, e o usuário concluiu a configuração.
+
+# 9.5. Barras
+- Não use espaços antes ou após a barra.
+  - Tradução incorreta: Tecla Ligar / Desligar
+    Tradução correta: Tecla ligar/desligar
+
+# 10. Singular e plural
+- O PT-BR é dependente da concordância de número. Aplique as regras gramaticais adequadas.
+
+# 11. Símbolo e espaço reservado
+
+
+# 11.1. Símbolo
+
+
+# 11.1.1. Regra geral sobre símbolo:
+O símbolo deve ser mantido conforme está no original.
+
+# 11.2. Espaço reservado
+- O texto de IU geralmente contém espaços reservados:
+    - (%s) para uma variável genérica,
+    - (%d) para uma variável numérica que inclua somente números inteiros,
+    - (%f) para uma variável numérica que inclua pontos decimais.
+  - A ordem dos espaços reservados (%1$s, %2$d) pode ser alterada.
+    Original Tradução:
+    - File %1$s in directory %2$s: %3$s
+      Tradução: Arquivo %1$s no diretório %2$s: %3$s
+  - [Nota] %f/%1$:
+    Se o espaço reservado for um número com um ponto decimal, ele pode ser “%f” ou “%1$f”.
+    Exemplo: %1$f kg desde %2$s
+    Descrição: o texto será exibido no cartão “Peso” (por exemplo, “Perdeu 0,5 kg desde 05/05”)
+
+# 11.2.1. Regra de tradução para texto com espaço reservado:
+Espaço reservados não devem ser alterados a posição e sim manter conforme o texto original em português.
+
+  - Os espaços reservados devem ser mantidos na tradução e, normalmente, são substituídos por um valor aleatório.
+  - Se você não considerar todas as possibilidades de valores a serem substituídos, haverá alguma violação gramatical.
+  - Ao determinar que os valores de espaços reservados são aleatórios, depois de verificar as informações de contexto e o material de referência, forneça uma tradução que não viole (ou viole minimamente) a gramática.
+
+    Original Tradução:
+    - Delete %d contacts
+      Tradução: Excluir %d contatos
+    - %d items
+      Tradução: %d itens
+    - %d selected
+      Tradução: %d selecionado
+    - %d conversations will be deleted.
+      Tradução: %d conversas serão excluídas.
+    - %d attempt(s) left.
+      Tradução: Há %d tentativa(s) restante(s).
+
+Para uma string com um espaço reservado, %d, são geradas seis strings para tradução. O inglês de todas elas é idêntico, com IDs diferentes para design e string. Veja exemplos na tabela.
+- Deve ser aplicada a gramática correta para cada grupo numérico, conforme especificado na coluna "Grupo numérico". "N/A" significa que o grupo numérico não é usado.
+
+Categoria
+- Exemplos de ID de design/ID de string
+  - Grupo numérico do português (Brasil)
+    - Zero: PLURAL_ZERO_DELETE_PD_FAVORITES_Q (N/A)
+    - One: PLURAL_ONE_DELETE_PD_FAVORITES_Q (0, 1, 0.0, 1.0, 0.00, 1.00, 0.000, 1.000, 0.0000, 1.0000)
+    - Two: PLURAL_TWO_DELETE_PD_FAVORITES_Q (N/A)
+    - Few: PLURAL_FEW_DELETE_PD_FAVORITES_Q (N/A)
+    - Many: PLURAL_MANY_DELETE_PD_FAVORITES_Q (N/A)
+    - Other: PLURAL_OTHER_DELETE_PD_FAVORITES_Q (Todos os outros números)
+
+Veja o exemplo:
+- Design ID String ID English Context Carrier Portuguese_Latin
+  - PLURAL_ZERO_SA_BODY_DELETE_PD_FAVORITES_Q: Delete %d favorites? [PLURALS] It is belong to Category ZERO. OPEN (KX) N/A
+  - PLURAL_ONE_SA_BODY_DELETE_PD_FAVORITES_Q: Delete %d favorite? [PLURALS] It is belong to Category ONE. OPEN (KX) Excluir %d favorito?
+  - PLURAL_TWO_SA_BODY_DELETE_PD_FAVORITES_Q: Delete %d favorites? [PLURALS] It is belong to Category TWO. OPEN (KX) N/A
+  - PLURAL_FEW_SA_BODY_DELETE_PD_FAVORITES_Q: Delete %d favorites? [PLURALS] It is belong to Category FEW. OPEN (KX) N/A
+  - PLURAL_MANY_SA_BODY_DELETE_PD_FAVORITES_Q: Delete %d favorites? [PLURALS] It is belong to Category MANY. OPEN (KX) N/A
+  - PLURAL_OTHER_SA_BODY_DELETE_PD_FAVORITES_Q: Delete %d favorites? [PLURALS] It is belong to Category OTHER. OPEN (KX) Excluir %d favoritos?
+
+PÁGINA 28
+
+# 11.2.2. Remoção de espaço reservado
+- No caso do um espaço reservado %d ser substituído pelo número 1 (PLURAL_ONE) e isso tornar a tradução gramaticalmente incorreta, é possível remover o espaço reservado na tradução.
+  - Exemplo:
+    - Inglês Tradução incorreta Tradução correta
+      - Only the first 1 favorite will be deleted.
+        Somente o primeiro 1 favorito será excluído.
+        Somente o primeiro favorito será excluído.
+      - You didn't login in the last 1 day.
+        Você não se conectou no último 1 dia.
+        Você não se conectou no último dia.
+- Atenção: Esta regra se aplica apenas às strings PLURAL_ONE durante a tradução de arquivos TRANS_PLURAL, em que sabemos que o espaço reservado será substituído sempre e somente por 1. O espaço reservado não deve ser removido em nenhum outro caso, já que isso pode gerar resultados inesperados e problemas técnicos.
+
+# 12. Espaços
+- Os símbolos comuns de calculadora são definidos aqui para uma fácil referência.
+  - Símbolo Significado Espaço entre o valor Exemplo
+    - °C, °F: Graus de temperatura (Celsius ou Fahrenheit)
+      Não: 37°C
+    - m, cm, mm: Metros, centímetros, milímetros
+      Sim: 35 mm
+    - +: Mais
+      Sim: 1 + 1
+    - -: Menos
+      Sim: 1 - 1
+    - x: Multiplicado por
+      Sim: 1 x 1
+    - ÷: Dividido por
+      Sim: 1 ÷ 1
+    - .: Ponto decimal
+      Não: 1.1
+    - =: Igual a
+      Sim: 1 + 1 = 2
+    - >: Maior que
+      Sim: 2 > 1
+    - <: Menor que
+      Sim: 1 < 2
+    - %: Não
+      Exemplo: 20%
+    - kcal: Sim
+      Exemplo: 2.472 kcal
+    - M: Sim
+      Exemplo: 16M 5312x2988 (16:9)
+    - KB: Sim
+      Exemplo: 50 KB
+    - ~: Não
+      Exemplo: 2~500 kg
+
+# 12.1. Espaço antes das reticências (...)
+- reticências: o caractere de reticências “…” não deve ser usado. Use três pontos contínuos (“...”) em vez do caractere.
+  - Idioma Espaço antes das reticências (...)
+    - Português (Brasil): Não
+
+# 12.2. NBSP (espaço sem quebra de linha)
+O NBSP é uma variante do caractere de espaço que impede uma quebra de linha automática (mudança de linha)
+em sua posição. O NBSP não deve ser usado na tradução.
+
+# 13. Abreviação. Se o texto original em português houver abreviações, significa que já há restrição de espaço, não sugerir nada, manter como está.
+Use abreviações comuns, acrônimos e/ou símbolos para reduzir o número de caracteres se o uso de palavras
+completas deixar a string mais longa do que a restrição de espaço estabelecida. Às vezes, é melhor excluir um
+elemento gramatical menos importante, como um pronome, do que manter cada palavra com abreviações.
+Nas strings com limite de caracteres que tiverem mais de uma linha disponível, talvez seja possível dividir uma
+palavra com um hífen em vez de abreviá-la.
+Não abrevie palavras nem use acrônimos, a menos que a abreviação ou o acrônimo seja conhecido e/ou
+compreendido pela maioria dos usuários, se não todos.
+Use um termo completo sempre que possível, em vez de uma abreviação ou um acrônimo, para evitar
+confusão e má interpretação.
+Use sempre um ponto ao final de uma abreviação, exceto para “info” e “apps”. Siga as regras gramaticais
+quando a abreviação for necessária.
+De acordo com as regras gramaticais do português, as abreviações terminam com a primeira letra de uma
+sílaba seguida por um ponto.
+
+Tradução incorreta: Apps do administr. do aparelho Tradução correta: Apps do admin. do aparelho
+
+# 13.1. Restrição de espaço
+Quando não houver restrição de espaço, o texto deve ser traduzido por extenso, sem abreviações.
+Quando você fornecer uma tradução reduzida devido à restrição de espaço, use as abreviações normalmente usadas.
+Se o termo for reduzido a seu critério, é possível que o usuário não entenda o significado.
+Às vezes, é melhor excluir um elemento gramatical menos importante, como um pronome, do que manter cada palavra com abreviações.
+
+# 13.2. Restrição de linhas
+Uma forma especial de restrição de espaço é a restrição de linhas.
+Ela define linhas limitadas por string e caracteres limitados por linha.
+Se uma palavra exceder a linha, ela deverá ser abreviada ou uma alimentação de linha (\n) deverá ser usada.
+O espaço funciona como uma alimentação de linha (\n).
+Não é necessário adicionar uma marca de alimentação de linha quando cada linha é dividida por palavras.
+
+# 14. Resumo de elementos de IU
+Nº Elementos de IU Descrições
+1. Teclas físicas: São as teclas físicas do aparelho. Isso inclui a tecla "Ligar/desligar" e as teclas "Volume".
+2. Botões de texto (BUTTON): Esses botões aparecem nos aparelhos com tela de toque como uma única palavra ou frase curta. Os botões têm uma localização fixa que geralmente não pode ser alterada.
+3. Botões de imagem (BUTTON): Esses botões funcionam de forma muito semelhante aos botões de texto, mas contêm uma imagem, em vez de texto. Os botões de imagem têm uma localização fixa que geralmente não pode ser alterada. Um botão de imagem é normalmente usado em texto de instrução.
+4. Ícones (BUTTON): Os ícones são imagens ou símbolos usados para representar aplicativos, widgets, recursos, status e opções. Alguns ícones podem ser movidos, como atalhos de aplicativos, enquanto outros têm uma localização fixa.
+5. Botões de opção (OPT): Esses botões são opções com um pequeno círculo ao lado deles em uma lista. Somente uma opção pode ser selecionada de cada vez.
+6. Caixas de seleção (OPT): As caixas de seleção permitem que o usuário concorde com uma declaração ou aplique um comando. Elas aparecem em toda a IU, inclusive em texto do tipo BODY.
+7. Hiperlinks (OPT, BODY): Um hiperlink é um texto em que o usuário pode tocar para realizar uma ação ou navegar para outro local. Os hiperlinks normalmente aparecem em azul e sublinhados na tela, para que o usuário possa reconhecê-los com facilidade.
+8. Cabeçalhos de tela (HEADER): Os cabeçalhos de tela resumem o que o usuário pode fazer ou aprender em uma tela em particular. Eles também são essenciais para ajudar o usuário a navegar no aparelho.
+9. Subcabeçalhos (HEADER): Os subcabeçalhos aparecem em menus de configurações para subdividir grupos de configurações diferentes.
+10. Abas (OPT): As abas são exibidas em uma linha na parte superior ou lateral da tela. Elas permitem que o usuário navegue no conteúdo sem sair da tela atual.
+11. Itens de menu (TMBODY, BODY e OPT): Os itens de menu aparecem na tela quando opções adicionais estão disponíveis. Eles permitem que o usuário altere opções nos menus suspensos, ative opções via botões de alternância e acesse submenus. Eles são compostos de um item TMBODY, com um item BODY opcional aparecendo logo abaixo dele.
+12. Itens de menu com botão de alternância (TMBODY, BODY): Esses itens podem conter somente texto TMBODY ou texto TMBODY e BODY.
+13. Itens de menu de navegação: Esses itens levam o usuário de um menu para outro.
+14. Itens de menu de múltipla escolha (TMBODY, BODY): Esses itens permitem que o usuário faça sua escolha em uma lista de opções sem mudar para outra tela.
+15. Itens de menu OPT (OPT): Os itens de menu OPT aparecem em menus suspensos. Quando são tocados, os itens de menu OPT pode provocar uma ação, alterar uma configuração ou conduzir a outra tela ou outro menu.
+16. Cartões de notificação (TMBODY, BODY, BUTTON): Os cartões de notificação alertam os usuários sobre o que está acontecendo em seus aparelhos ou aplicativos. Esses elementos de IU aparecem no painel de notificação que é arrastado da parte superior da tela para baixo e consistem em uma string TMBODY seguida de texto BODY. Nesse caso, no entanto, a mensagem desses elementos pode ser diferente da mensagem normalmente expressa por esses tipos de design.
+17. Pop-ups (HEADER, BODY, BUTTON): Pop-ups informam o que aconteceu, pode acontecer ou vai acontecer e são geralmente baseados em uma ação do usuário.
+18. Pop-ups de confirmação de ação do usuário: Esse estilo de pop-up confirma uma ação iniciada pelo usuário para evitar perda de dados, encargos extras ou algum outro resultado indesejável.
+19. Pop-ups de ação secundária: Esse tipo de pop-up pede ao usuário para realizar ou permitir uma ação secundária que é necessária para que a ação pretendida seja concluída.
+20. Pop-ups de confirmação de ação não iniciada pelo usuário: Esse estilo de pop-up sugere uma ação ao usuário devido a um evento ou uma situação que ocorreu no aparelho, normalmente fora do controle do usuário.
+21. Pop-ups "Ir para Configurações": Esse estilo de pop-up diz ao usuário para fazer algo em um menu de configurações. Nenhuma ação direta é possível no pop-up em si.
+22. Pop-up de erro: nenhuma solução: Esse estilo de pop-up é usado quando o usuário não pode resolver o problema diretamente porque a ação é impossível ou a solução é desconhecida.
+23. Pop-up de erro: solução possível: Esse pop-up de erro é usado quando o usuário pode resolver o problema.
+24. Pop-up de erro: erro temporário: Esse estilo de pop-up aparece quando uma ação que o aparelho normalmente pode realizar temporariamente falha por motivos desconhecidos.
+25. Pop-up de aviso/informações: Esse estilo de pop-up aparece quando o aparelho precisa informar ao usuário algo importante.
+26. Pop-ups de entrada do usuário: seleção do usuário: Esse estilo de pop-up aparece quando o usuário deve fazer uma seleção em uma lista de opções para realizar uma ação.
+27. Pop-ups de entrada do usuário: seletor de hora/data: O HEADER para esse estilo de pop-up normalmente começa com "Definir _______".
+28. Pop-ups de entrada do usuário: controle deslizante: Para esse estilo de pop-up, simplesmente use um substantivo como o HEADER.
+29. Pop-ups de entrada do usuário: outros tipos: Esse estilo de pop-up pode conter qualquer combinação de campos de texto, caixas de seleção, botões de opção, botões de alternância etc.
+30. Pop-ups de progresso: Esse estilo de pop-up aparece para exibir o progresso de uma ação e desaparece quando a ação é concluída.
+31. Pop-ups de descrição de permissão: Esses pop-ups só podem ser acessados na tela de permissões de aplicativos individuais na seção "Gerenciador de aplicativos" de "Configurações".
+32. Pop-ups de permissão em tempo de execução: Esse estilo de pop-up começa com a pergunta "Permitir…?" no corpo do pop-up.
+33. Notificações toast (BODY/OPT): Essas notificações aparecem na tela por apenas alguns segundos para confirmar ações e fornecer aos usuários outras informações úteis. As notificações toast às vezes substituem os pop-ups se o pop-up for pequeno e atrasar o usuário com um botão OK.
+34. Notas de progresso (BODY/OPT): As notas de progresso indicam que uma ação está em andamento. Às vezes, elas usam uma porcentagem para indicar o nível de progresso.
+35. Dicas de ferramentas (OPT): As dicas de ferramentas aparecem na tela como pequenos pop-ups quando o usuário passa a S Pen sobre ícones e imagens.
+36. Itens de menu da Ajuda: Esses itens são encontrados no aplicativo Ajuda e fornecem aos usuários orientações e dicas úteis. Os itens do aplicativo Ajuda usam regras TMBODY e BODY padrão.
+37. Texto de ajuda de instruções: Esse texto forma a massa de texto encontrada no aplicativo Ajuda.
+38. Leitura de texto (TTS): A função TTS (leitura de texto) lê texto e outras informações para os usuários com deficiência visual. Essa função se chama TalkBack em aparelhos Android básicos e Assistente de voz em aparelhos Samsung Android.
+39. Pop-up de aviso/informações: Os rótulos refletem o nome do elemento de IU exibido na tela (por exemplo, "Salvar").
+40. Características (TBOPT): As características são o tipo de elemento de IU exibido na tela (por exemplo, botão).
+41. Atributos opcionais (TBBODY ou TBOPT): Os atributos opcionais descrevem o status do elemento de IU ou informam ao usuário como interagir com ele.
+42. Descrição em áudio (TBOPT): Descreve o status da tela ou uma alteração que ocorreu.
+43. Instrução em áudio (TBBODY): Informa ao usuário que ele deve executar uma ação.
+44. Texto na tela modificado (TBBODY ou TBOPT): Substitui itens ilegíveis no texto na tela para que eles possam ser lidos corretamente em voz alta pelo mecanismo de TTS.
+45. XTAG: As XTAGs são adicionadas pelos desenvolvedores ao texto de IU comum para inserir imagens, criar links e muito mais. Elas são fáceis de identificar, pois aparecem entre colchetes angulares (< >). Não edite nem remova XTAGs se elas aparecerem no texto.
+46. NPBODY: O texto NPBODY aparece em toda a IU. Ele fornece ao usuário informações rápidas e raramente tem pontuação. Use strings NPBODY apenas para frases curtas ou expressões (normalmente status ou instruções). Separe as descrições mais longas da ação principal ou do status e apresente-as como texto BODY (gramaticalmente completo).
+47. Texto da tela de bloqueio (NPBODY): O texto NPBODY pode ser usado para instruções ou status curtos que aparecem na tela de bloqueio. Use gramática reduzida.
+48. BODY: O corpo de texto é o menos restrito de todos os elementos de IU. Ele deve usar gramática completa e pontuação somente se o texto original  inglês possuir. , e geralmente permite que você explique um recurso ou uma função com mais detalhes do que os outros tipos de design. Se o texto não for semelhante a nenhum outro tipo de design, ele costuma ser um texto geral e deve ser fiel a tradução do texto original em inglês, e o tipo BODY é usado.
+49. Lista com marcadores (OPT, BODY): Os itens com marcadores podem ser expressões curtas, frases simples ou um parágrafo inteiro. As listas com marcadores normalmente não terminam com ponto final, a menos que sejam frases completas.
+
+# Pontos de exclamação e interrogação
+Não se utiliza espaço antes de pontos de exclamação (!) ou interrogação (?). Eles devem ser colados à última letra da palavra da frase, da mesma forma que o ponto final. 
+Exemplo:
+Correto: "O que você quer?"
+Incorreto: "O que você quer ?"
+
+# Button
+O design type de botão é button e não é Body
+
+## 0.10 Falta de artigo, pronome desnecessário, ausência de ponto final e uso inadequado de gerúndio.
+não remova o artigo possessivo se ele estiver presente no texto original e mantenha o ponto final se o texto original em inglês o possuir.
+
+## 0.2. Ponto final faltando
+Para strings do tipo BODY, a pontuação final deve seguir o texto original em inglês.
+
+# Regra da tradução N/A
+Se a tradução em português estiver como N/A, manter a tradução como N/A
+
+exemplo em ingles: 
+
+Your passport will expire in %d days.
+
+tradução em português:
+
+N/A
+
+Suggestion deve ser N/A ou status "PRECISO"
