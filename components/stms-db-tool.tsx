@@ -705,7 +705,7 @@ export function STMSDBTool({ onFocusChange }: { onFocusChange?: (focused: boolea
  </div>
 
  {/* Main Filter Bar */}
- <Card className={`p-4 rounded-xl border shadow-2xl transition-all duration-500 backdrop-blur-2xl ${isDarkMode ? 'bg-[#111]/40 border-white/5 shadow-black/40 text-gray-100' : 'bg-white/60 border-slate-200 shadow-slate-200/50 text-gray-900'}`}>
+ <Card className={`relative z-50 p-4 rounded-xl border shadow-2xl transition-all duration-500 backdrop-blur-2xl ${isDarkMode ? 'bg-[#111]/40 border-white/5 shadow-black/40 text-gray-100' : 'bg-white/60 border-slate-200 shadow-slate-200/50 text-gray-900'}`}>
  <div className="flex flex-col lg:flex-row gap-3 items-center mb-4">
  <div className="flex gap-2 w-full lg:w-auto">
  <Button onClick={loadData} disabled={isGlobalLoading || isBatchProcessing} variant="ghost" className={`rounded-xl h-12 px-7 text-[10px] font-black uppercase tracking-[0.2em] transition-all border ${isDarkMode ? 'bg-white/5 border-white/5 hover:bg-white/10' : 'bg-gray-50 border-black/5 hover:bg-gray-100 shadow-sm'}`}>
