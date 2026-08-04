@@ -121,7 +121,8 @@ const translations = {
  selectAll: 'Selecionar Todos (Filtrados)',
  bulkApprove: 'Aprovar',
  bulkReject: 'Rejeitar',
- bulkPostpone: 'Adiar'
+ bulkPostpone: 'Adiar',
+ bulkUndo: 'Desfazer'
  },
  en: {
  total: 'Total',
@@ -178,7 +179,8 @@ const translations = {
  selectAll: 'Select All (Filtered)',
  bulkApprove: 'Approve',
  bulkReject: 'Reject',
- bulkPostpone: 'Postpone'
+ bulkPostpone: 'Postpone',
+ bulkUndo: 'Undo'
  },
  ko: {
  total: '전체',
@@ -235,7 +237,8 @@ const translations = {
  selectAll: '모두 선택 (필터링됨)',
  bulkApprove: '승인',
  bulkReject: '거절',
- bulkPostpone: '연기하다'
+ bulkPostpone: '연기하다',
+ bulkUndo: '되돌리기'
  }
 };
 
@@ -574,10 +577,10 @@ export function STMSDBTool({ onFocusChange }: { onFocusChange?: (focused: boolea
  }
  };
 
- const handleBulkAction = async (action: 'approve' | 'reject' | 'postpone') => {
+ const handleBulkAction = async (action: 'approve' | 'reject' | 'postpone' | 'undo') => {
     setIsGlobalLoading(true);
     const ids = Array.from(selectedIds);
-    const actionFn = action === 'approve' ? handleApprove : action === 'reject' ? handleReject : handlePostpone;
+    const actionFn = action === 'approve' ? handleApprove : action === 'reject' ? handleReject : action === 'postpone' ? handlePostpone : handleUndo;
     
     for (let i = 0; i < ids.length; i += 10) {
       const chunk = ids.slice(i, i + 10);
@@ -942,6 +945,9 @@ export function STMSDBTool({ onFocusChange }: { onFocusChange?: (focused: boolea
       </Button>
       <Button size="sm" onClick={() => handleBulkAction('postpone')} disabled={isGlobalLoading} className="bg-slate-600 text-white hover:bg-slate-500 rounded-lg px-3 h-8 shadow-md shadow-slate-600/20 text-[10px] font-bold uppercase tracking-widest">
         {isGlobalLoading ? <Loader2 className="w-3 h-3 animate-spin mr-1" /> : <Clock className="w-3 h-3 mr-1" />} {t.bulkPostpone}
+      </Button>
+      <Button size="sm" onClick={() => handleBulkAction('undo')} disabled={isGlobalLoading} className="bg-orange-600 text-white hover:bg-orange-500 rounded-lg px-3 h-8 shadow-md shadow-orange-600/20 text-[10px] font-bold uppercase tracking-widest">
+        {isGlobalLoading ? <Loader2 className="w-3 h-3 animate-spin mr-1" /> : <RotateCcw className="w-3 h-3 mr-1" />} {t.bulkUndo}
       </Button>
     </div>
   )}
