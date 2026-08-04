@@ -117,7 +117,11 @@ const translations = {
  errorsTooltip: 'Mostrar Apenas Erros',
  okTooltip: 'Mostrar Apenas Itens Sem Erro (OK)',
  focusTooltip: 'Modo Foco (Tela Cheia)',
- exitFocusTooltip: 'Sair do Modo Foco'
+ exitFocusTooltip: 'Sair do Modo Foco',
+ selectAll: 'Selecionar Todos (Filtrados)',
+ bulkApprove: 'Aprovar',
+ bulkReject: 'Rejeitar',
+ bulkPostpone: 'Adiar'
  },
  en: {
  total: 'Total',
@@ -170,7 +174,11 @@ const translations = {
  errorsTooltip: 'Show Errors Only',
  okTooltip: 'Show OK Items Only',
  focusTooltip: 'Focus Mode (Fullscreen)',
- exitFocusTooltip: 'Exit Focus Mode'
+ exitFocusTooltip: 'Exit Focus Mode',
+ selectAll: 'Select All (Filtered)',
+ bulkApprove: 'Approve',
+ bulkReject: 'Reject',
+ bulkPostpone: 'Postpone'
  },
  ko: {
  total: '전체',
@@ -223,7 +231,11 @@ const translations = {
  errorsTooltip: '오류만 표시',
  okTooltip: '정상 항목만 표시 (OK)',
  focusTooltip: '집중 모드 (전체 화면)',
- exitFocusTooltip: '집중 모드 종료'
+ exitFocusTooltip: '집중 모드 종료',
+ selectAll: '모두 선택 (필터링됨)',
+ bulkApprove: '승인',
+ bulkReject: '거절',
+ bulkPostpone: '연기하다'
  }
 };
 
@@ -249,6 +261,7 @@ export function STMSDBTool({ onFocusChange }: { onFocusChange?: (focused: boolea
  const [showOnlyErrors, setShowOnlyErrors] = useState(false);
  const [hideErrors, setHideErrors] = useState(false);
  const [isFocusModeState, setIsFocusModeState] = useState(false);
+ const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
  const isFocusMode = isFocusModeState;
 
  const setIsFocusMode = (focused: boolean) => {
@@ -561,6 +574,20 @@ export function STMSDBTool({ onFocusChange }: { onFocusChange?: (focused: boolea
  }
  };
 
+ const handleBulkAction = async (action: 'approve' | 'reject' | 'postpone') => {
+    setIsGlobalLoading(true);
+    const ids = Array.from(selectedIds);
+    const actionFn = action === 'approve' ? handleApprove : action === 'reject' ? handleReject : handlePostpone;
+    
+    for (let i = 0; i < ids.length; i += 10) {
+      const chunk = ids.slice(i, i + 10);
+      await Promise.all(chunk.map(id => actionFn({ stopPropagation: () => {} } as any, id)));
+    }
+    
+    setSelectedIds(new Set());
+    setIsGlobalLoading(false);
+  };
+
  const handleUpdate = async (id: number, newValue: string) => {
  try {
  const response = await fetch(`${API_URL}/stms/update_string`, {
@@ -674,6 +701,18 @@ export function STMSDBTool({ onFocusChange }: { onFocusChange?: (focused: boolea
 
  const totalPages = Math.ceil(filteredAndSortedItems.length / itemsPerPage);
  const currentItems = filteredAndSortedItems.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+
+ const isAllFilteredSelected = filteredAndSortedItems.length > 0 && filteredAndSortedItems.every(item => selectedIds.has(item.id));
+
+ const handleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newSelected = new Set(selectedIds);
+    if (e.target.checked) {
+      filteredAndSortedItems.forEach(item => newSelected.add(item.id));
+    } else {
+      filteredAndSortedItems.forEach(item => newSelected.delete(item.id));
+    }
+    setSelectedIds(newSelected);
+  };
 
  useEffect(() => {
  setCurrentPage(1);
@@ -871,7 +910,7 @@ export function STMSDBTool({ onFocusChange }: { onFocusChange?: (focused: boolea
  <Button 
  onClick={handleExportExcel} 
  disabled={isExporting || items.length === 0}
- className={`rounded-xl h-12 w-12 p-0 shadow-2xl transition-all flex items-center justify-center bg-blue-600 text-white shadow-blue-600/30 hover:bg-blue-500`}
+ className={`rounded-xl h-12 w-12 p-0 shadow-2xl transition-all flex items-center justify-center bg-blue-600 text-white shadow-blue-600/30 hover:bg-blue-500 shrink-0`}
  title={t.exportBtn}
  >
  {isExporting ? <Loader2 className="animate-spin w-5 h-5" /> : <Download size={18} />}
@@ -879,15 +918,34 @@ export function STMSDBTool({ onFocusChange }: { onFocusChange?: (focused: boolea
  </div>
  </div>
 
- <div className="relative w-full">
- <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 opacity-20" />
- <Input 
- value={globalSearch} 
- onChange={(e) => setGlobalSearch(e.target.value)} 
- placeholder={t.searchPlaceholder} 
- className={`pl-14 rounded-xl border-none h-12 text-sm font-black tracking-tight placeholder:font-bold placeholder:opacity-20 transition-all ${isDarkMode ? 'bg-white/[0.04] focus:bg-white/[0.08]' : 'bg-black/[0.04] focus:bg-black/[0.06] shadow-inner'}`} 
- />
- </div>
+ <div className="relative w-full flex items-center gap-4">
+  <div className="relative flex-1">
+  <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 opacity-20" />
+  <Input 
+  value={globalSearch} 
+  onChange={(e) => setGlobalSearch(e.target.value)} 
+  placeholder={t.searchPlaceholder} 
+  className={`pl-14 rounded-xl border-none h-12 text-sm font-black tracking-tight placeholder:font-bold placeholder:opacity-20 transition-all w-full ${isDarkMode ? 'bg-white/[0.04] focus:bg-white/[0.08]' : 'bg-black/[0.04] focus:bg-black/[0.06] shadow-inner'}`} 
+  />
+  </div>
+  
+  {selectedIds.size > 0 && (
+    <div className={`flex items-center gap-2 px-4 rounded-xl h-12 shrink-0 animate-in fade-in zoom-in duration-300 border ${isDarkMode ? 'bg-white/5 border-white/10' : 'bg-gray-50 border-black/5'}`}>
+      <span className={`text-[10px] font-black uppercase tracking-widest mr-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+        {selectedIds.size} selecionados
+      </span>
+      <Button size="sm" onClick={() => handleBulkAction('approve')} disabled={isGlobalLoading} className="bg-blue-600 text-white hover:bg-blue-500 rounded-lg px-3 h-8 shadow-md shadow-blue-600/20 text-[10px] font-bold uppercase tracking-widest">
+        {isGlobalLoading ? <Loader2 className="w-3 h-3 animate-spin mr-1" /> : <CheckCircle2 className="w-3 h-3 mr-1" />} {t.bulkApprove}
+      </Button>
+      <Button size="sm" onClick={() => handleBulkAction('reject')} disabled={isGlobalLoading} className="bg-red-600 text-white hover:bg-red-500 rounded-lg px-3 h-8 shadow-md shadow-red-600/20 text-[10px] font-bold uppercase tracking-widest">
+        {isGlobalLoading ? <Loader2 className="w-3 h-3 animate-spin mr-1" /> : <X className="w-3 h-3 mr-1" />} {t.bulkReject}
+      </Button>
+      <Button size="sm" onClick={() => handleBulkAction('postpone')} disabled={isGlobalLoading} className="bg-slate-600 text-white hover:bg-slate-500 rounded-lg px-3 h-8 shadow-md shadow-slate-600/20 text-[10px] font-bold uppercase tracking-widest">
+        {isGlobalLoading ? <Loader2 className="w-3 h-3 animate-spin mr-1" /> : <Clock className="w-3 h-3 mr-1" />} {t.bulkPostpone}
+      </Button>
+    </div>
+  )}
+  </div>
  </Card>
 
  {/* RESULTS TABLE */}
@@ -920,6 +978,17 @@ export function STMSDBTool({ onFocusChange }: { onFocusChange?: (focused: boolea
  <thead className={`${isDarkMode ? 'bg-white/5' : 'bg-gray-50'} border-b border-black/5 dark:border-white/5`}>
  {/* Row 1: Headers & Sort */}
  <tr>
+ <th className="p-4 w-12 text-center border-r border-black/5 dark:border-white/5">
+    <div className="flex items-center justify-center">
+      <input 
+        type="checkbox" 
+        checked={isAllFilteredSelected}
+        onChange={handleSelectAll}
+        title={t.selectAll}
+        className={`w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer ${isDarkMode ? 'bg-black/20 border-white/20' : 'bg-white'}`}
+      />
+    </div>
+  </th>
  <th className="p-4 min-w-[120px] cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 transition-colors" onClick={() => handleSort('excel_row')}>
  <div className="flex items-center gap-2 text-[9px] font-black uppercase tracking-[0.2em] opacity-40">
  Row
@@ -981,6 +1050,7 @@ export function STMSDBTool({ onFocusChange }: { onFocusChange?: (focused: boolea
  </tr>
  {/* Row 2: Column Filters */}
  <tr className="border-t border-black/5 dark:border-white/5">
+ <th className="p-3 border-r border-black/5 dark:border-white/5"></th>
  <th className="p-3"></th>
  {showContext && <th className="p-3"></th>}
  {showDesignId && <th className="p-3"></th>}
@@ -1053,30 +1123,41 @@ export function STMSDBTool({ onFocusChange }: { onFocusChange?: (focused: boolea
  <tbody className="divide-y divide-black/5 dark:divide-white/5">
  {currentItems.length === 0 ? (
  <tr>
- <td colSpan={showContext ? 8 : 7} className="p-20 text-center opacity-40 font-bold text-lg">
+ <td colSpan={showContext && showDesignId ? 10 : (showContext || showDesignId ? 9 : 8)} className="p-20 text-center opacity-40 font-bold text-lg">
  Nenhum resultado corresponde aos filtros.
  </td>
  </tr>
  ) : (
  currentItems.map((item) => (
- <tr 
- key={item.id} 
- onClick={() => setSelectedItem(item)}
- onDoubleClick={(e) => {
- e.stopPropagation();
- setSelectedItem(null);
- setTempEditItem(item);
- setEditValue(item.suggested_text || item.target_text);
- setIsEditModalOpen(true);
- }}
- className={`transition-all duration-300 group hover:bg-blue-500/[0.04] cursor-pointer border-l-4 border-transparent hover:shadow-lg hover:shadow-black/5 
- ${item.status === 'reviewing' ? 'border-l-blue-500/40 bg-blue-500/[0.01]' : ''}
- ${item.status === 'approved' ? 'border-l-blue-600/40 bg-blue-600/[0.01]' : ''}
- ${item.status === 'rejected' ? 'border-l-slate-500/40 bg-slate-500/[0.01]' : ''}
- ${item.status === 'postponed' ? 'border-l-slate-400/40 bg-slate-400/[0.01]' : ''}
- `}
- >
- <td className="px-4 py-3 align-top max-w-[120px]">
+  <tr 
+  key={item.id} 
+  onClick={() => setSelectedItem(item)}
+  onDoubleClick={(e) => {
+  e.stopPropagation();
+  setSelectedItem(null);
+  setTempEditItem(item);
+  setEditValue(item.suggested_text || item.target_text);
+  setIsEditModalOpen(true);
+  }}
+  className={`transition-all duration-300 group hover:bg-blue-500/[0.04] cursor-pointer hover:shadow-lg hover:shadow-black/5 
+  ${selectedIds.has(item.id) ? (isDarkMode ? 'bg-blue-600/10' : 'bg-blue-50') : ''}
+  ${item.status === 'reviewing' ? 'border-l-blue-500/40' : (item.status === 'approved' ? 'border-l-blue-600/40' : (item.status === 'rejected' ? 'border-l-slate-500/40' : (item.status === 'postponed' ? 'border-l-slate-400/40' : 'border-l-transparent')))} border-l-4
+  `}
+  >
+  <td className="px-4 py-3 align-middle text-center border-r border-black/5 dark:border-white/5" onClick={(e) => e.stopPropagation()}>
+    <input 
+      type="checkbox"
+      checked={selectedIds.has(item.id)}
+      onChange={(e) => {
+        const newSelected = new Set(selectedIds);
+        if (e.target.checked) newSelected.add(item.id);
+        else newSelected.delete(item.id);
+        setSelectedIds(newSelected);
+      }}
+      className={`w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer ${isDarkMode ? 'bg-black/20 border-white/20' : 'bg-white'}`}
+    />
+  </td>
+  <td className="px-4 py-3 align-top max-w-[120px]">
    <div className="flex flex-col gap-1">
      <span className="text-[11px] font-black tracking-tighter text-blue-600 dark:text-blue-400 uppercase">Row {item.excel_row}</span>
      <span className="text-[10px] truncate w-full block opacity-40 font-medium" title={item.source_filename}>{item.source_filename}</span>
