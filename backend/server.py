@@ -951,10 +951,14 @@ def review_stms_ai(item: STMSReviewRequest, db: Session = Depends(get_db)):
         reason = result.get('reason', 'Revisão automática realizada.')
         simply = result.get('simplyReason', 'Revisão OK')
         
+        # Se a IA retornou erro, NÃO salvar no banco — devolver o erro ao frontend
+        if advice == "ERRO":
+            return {"suggestion": item.target_text, "reasoning": f"Erro na API da IA: {reason}", "simplyReason": simply, "error": True}
+        
         if advice == "Mantido":
             advice = item.target_text
             
-        # Atualiza Banco
+        # Atualiza Banco somente com resultados válidos
         db_item = db.query(STMSTranslation).filter(STMSTranslation.id == item.id).first()
         if db_item:
             db_item.suggested_text = advice
@@ -966,7 +970,7 @@ def review_stms_ai(item: STMSReviewRequest, db: Session = Depends(get_db)):
         return {"suggestion": advice, "reasoning": reason, "simplyReason": simply}
     except Exception as e:
         print(f"Erro na revisão STMS: {e}")
-        return {"suggestion": item.target_text, "reasoning": f"Erro Local: {str(e)}"}
+        return {"suggestion": item.target_text, "reasoning": f"Erro Local: {str(e)}", "error": True}
 
 @app.post("/stms/approve_string")
 def approve_stms_string(data: STMSApproveRequest, db: Session = Depends(get_db)):
