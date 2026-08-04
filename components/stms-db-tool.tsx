@@ -980,7 +980,7 @@ export function STMSDBTool({ onFocusChange }: { onFocusChange?: (focused: boolea
  )}
  
  <div className={`overflow-x-auto custom-scrollbar flex-1 ${!isFocusMode ? 'rounded-t-2xl' : ''}`}>
- <table className="w-full text-left text-[13px]">
+ <table className="w-full text-left text-[11px]">
  <thead className={`${isDarkMode ? 'bg-white/5' : 'bg-gray-50'} border-b border-black/5 dark:border-white/5`}>
  {/* Row 1: Headers & Sort */}
  <tr>
@@ -1204,10 +1204,10 @@ export function STMSDBTool({ onFocusChange }: { onFocusChange?: (focused: boolea
  )}
  </td>
  <td className="px-4 py-3 align-top max-w-[200px]">
-   <div className={`font-bold text-[14px] leading-snug ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{item.source_text}</div>
+   <div className={`font-bold text-[12px] leading-snug ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{item.source_text}</div>
  </td>
  <td className="px-4 py-3 align-top max-w-[200px]">
-   <div className={`leading-relaxed text-[14px] font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>{item.target_text}</div>
+   <div className={`leading-relaxed text-[12px] font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>{item.target_text}</div>
  </td>
  <td className="px-4 py-3 align-top max-w-[250px] relative group"> <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-all duration-300">
  <Button variant="ghost" size="sm" className="h-8 w-8 p-0 rounded-lg bg-blue-500/10 text-blue-500 hover:bg-blue-500/20 shadow-sm" onClick={(e) => {
@@ -1220,7 +1220,7 @@ export function STMSDBTool({ onFocusChange }: { onFocusChange?: (focused: boolea
  <Maximize2 size={14} />
  </Button>
  </div>
- <div className={`h-full text-[14px] font-black tracking-tight leading-relaxed ${item.status === 'reviewing' ? 'text-blue-600 dark:text-blue-400' : ''}`}>
+ <div className={`h-full text-[12px] font-black tracking-tight leading-relaxed ${item.status === 'reviewing' ? 'text-blue-600 dark:text-blue-400' : ''}`}>
  {renderDiff(item.target_text, item.suggested_text)}
  </div>
  {(() => {
