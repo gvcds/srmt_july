@@ -316,7 +316,7 @@ const KnowledgeBaseManager = ({ isDarkMode, API_URL }: any) => {
   );
 };
 
-type TabType = 'bug_review' | 'general_info' | 'tone_of_voice' | 'glossary' | 'remarks' | 'system_notices';
+type TabType = 'bug_review' | 'general_info' | 'tone_of_voice' | 'glossary' | 'remarks' | 'system_notices' | 'tone_of_voice_es' | 'glossary_es';
 
 export default function KnowledgeBasePage() {
   const { isDarkMode } = useTheme();
@@ -415,8 +415,9 @@ export default function KnowledgeBasePage() {
       if (activeTab === 'system_notices') {
         const res = await fetch(`${API_URL}/system-notices`);
         if (res.ok) setSystemNotices(await res.json());
-      } else if (activeTab === 'glossary') {
-        const res = await fetch(`${API_URL}/glossary`);
+      } else if (activeTab === 'glossary' || activeTab === 'glossary_es') {
+        const endpoint = activeTab === 'glossary_es' ? 'glossary_es' : 'glossary';
+        const res = await fetch(`${API_URL}/${endpoint}`);
         if (res.ok) {
           const data = await res.json();
           setGlossaryItems(data);
@@ -489,7 +490,8 @@ export default function KnowledgeBasePage() {
     try {
       const isEdit = !!editingItem.id;
       const method = isEdit ? 'PUT' : 'POST';
-      const url = isEdit ? `${API_URL}/glossary/${editingItem.id}` : `${API_URL}/glossary`;
+      const endpoint = activeTab === 'glossary_es' ? 'glossary_es' : 'glossary';
+      const url = isEdit ? `${API_URL}/${endpoint}/${editingItem.id}` : `${API_URL}/${endpoint}`;
       
       // Remove o ID do corpo se for um novo item para evitar conflitos no backend
       const payload = { ...editingItem };
@@ -521,7 +523,8 @@ export default function KnowledgeBasePage() {
   const handleDeleteGlossary = async (id: string) => {
     if (!confirm('Deseja excluir este item do glossário?')) return;
     try {
-      await fetch(`${API_URL}/glossary/${id}`, { method: 'DELETE' });
+      const endpoint = activeTab === 'glossary_es' ? 'glossary_es' : 'glossary';
+      await fetch(`${API_URL}/${endpoint}/${id}`, { method: 'DELETE' });
       loadData();
     } catch (error) {
       console.error(error);
@@ -588,9 +591,9 @@ export default function KnowledgeBasePage() {
       itemsToAnalyze = specificItems;
       promptType = 'Glossário Técnico (Seleção)';
       setIsAiSelectionModalOpen(false);
-    } else if (activeTab === 'glossary') {
+    } else if (activeTab === 'glossary' || activeTab === 'glossary_es') {
       itemsToAnalyze = glossaryItems;
-      promptType = 'Glossário Técnico';
+      promptType = activeTab === 'glossary_es' ? 'Glossário Técnico (Espanhol)' : 'Glossário Técnico';
     } else {
       itemsToAnalyze = textSections;
       promptType = `Manual de Procedimentos (${activeTab})`;
@@ -710,8 +713,14 @@ export default function KnowledgeBasePage() {
           <button onClick={() => setActiveTab('tone_of_voice')} className={`px-6 py-3 rounded-2xl text-xs font-black uppercase tracking-widest transition-all ${activeTab === 'tone_of_voice' ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/20' : 'hover:bg-black/5 dark:hover:bg-white/10 opacity-60'}`}>
             <span className="flex items-center gap-2"><Sparkles size={14}/> Tom de Voz (STMS)</span>
           </button>
+          <button onClick={() => setActiveTab('tone_of_voice_es')} className={`px-6 py-3 rounded-2xl text-xs font-black uppercase tracking-widest transition-all ${activeTab === 'tone_of_voice_es' ? 'bg-orange-600 text-white shadow-lg shadow-orange-600/20' : 'hover:bg-black/5 dark:hover:bg-white/10 opacity-60'}`}>
+            <span className="flex items-center gap-2"><Sparkles size={14}/> Tom de Voz (STMS ES)</span>
+          </button>
           <button onClick={() => setActiveTab('glossary')} className={`px-6 py-3 rounded-2xl text-xs font-black uppercase tracking-widest transition-all ${activeTab === 'glossary' ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-600/20' : 'hover:bg-black/5 dark:hover:bg-white/10 opacity-60'}`}>
             Glossário DB
+          </button>
+          <button onClick={() => setActiveTab('glossary_es')} className={`px-6 py-3 rounded-2xl text-xs font-black uppercase tracking-widest transition-all ${activeTab === 'glossary_es' ? 'bg-teal-600 text-white shadow-lg shadow-teal-600/20' : 'hover:bg-black/5 dark:hover:bg-white/10 opacity-60'}`}>
+            Glossário (ES)
           </button>
           <button onClick={() => setActiveTab('remarks')} className={`px-6 py-3 rounded-2xl text-xs font-black uppercase tracking-widest transition-all ${activeTab === 'remarks' ? 'bg-amber-600 text-white shadow-lg shadow-amber-600/20' : 'hover:bg-black/5 dark:hover:bg-white/10 opacity-60'}`}>
             Remarks (Autocomplete)
@@ -802,7 +811,7 @@ export default function KnowledgeBasePage() {
               )}
 
               {/* INTERFACE DE MANUAIS (ACCORDION DE CAPÍTULOS) */}
-              {(activeTab === 'bug_review' || activeTab === 'general_info' || activeTab === 'tone_of_voice') && (
+              {(activeTab === 'bug_review' || activeTab === 'general_info' || activeTab === 'tone_of_voice' || activeTab === 'tone_of_voice_es') && (
                 <Card className={`p-8 rounded-[2.5rem] border shadow-2xl flex flex-col ${isDarkMode ? 'bg-[#111]/80 border-white/10 backdrop-blur-3xl' : 'bg-white border-black/5'}`}>
                   
                   {/* Cabeçalho e Filtros */}
@@ -820,7 +829,7 @@ export default function KnowledgeBasePage() {
                       <Button onClick={() => { setEditingSection({ id: 'new_' + Date.now(), title: '# Novo Capítulo', content: '' }); setIsSectionModalOpen(true); }} className="rounded-full font-bold h-12 bg-blue-600/10 text-blue-600 hover:bg-blue-600/20 shadow-none border-none">
                         <Plus className="w-4 h-4 mr-2" /> Novo Capítulo
                       </Button>
-                      <Button onClick={() => startBatchAIAnalysis()} className={`rounded-full font-bold h-12 text-white shadow-lg ${activeTab === 'tone_of_voice' ? 'bg-purple-600 hover:bg-purple-500 shadow-purple-600/20' : 'bg-blue-600 hover:bg-blue-500 shadow-blue-600/20'}`}>
+                      <Button onClick={() => startBatchAIAnalysis()} className={`rounded-full font-bold h-12 text-white shadow-lg ${activeTab.startsWith('tone_of_voice') ? 'bg-purple-600 hover:bg-purple-500 shadow-purple-600/20' : 'bg-blue-600 hover:bg-blue-500 shadow-blue-600/20'}`}>
                         <Sparkles className="w-4 h-4 mr-2" /> Análise IA (Lotes)
                       </Button>
                       <Button onClick={handleSaveTextFile} disabled={saving} className="rounded-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold h-12 shadow-lg shadow-emerald-600/20">
@@ -896,7 +905,7 @@ export default function KnowledgeBasePage() {
               )}
 
               {/* GLOSSÁRIO INTERFACE */}
-              {activeTab === 'glossary' && (
+              {(activeTab === 'glossary' || activeTab === 'glossary_es') && (
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                   {/* Formulário Esquerdo */}
                   <div className="lg:col-span-1">
