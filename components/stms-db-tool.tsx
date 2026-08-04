@@ -248,9 +248,10 @@ const getCharLimit = (limitStr: string): number | null => {
  return match ? parseInt(match[0], 10) : null;
 };
 
-export function STMSDBTool({ onFocusChange }: { onFocusChange?: (focused: boolean) => void }) {
- const { isDarkMode } = useTheme();
- const [lang, setLanguage] = useState<'pt' | 'en' | 'ko'>('pt');
+ export function STMSDBTool({ onFocusChange }: { onFocusChange?: (focused: boolean) => void }) {
+  const { isDarkMode } = useTheme();
+  const [lang, setLanguage] = useState<'pt' | 'en' | 'ko'>('pt');
+  const [targetLang, setTargetLang] = useState<'pt' | 'es'>('pt');
  const t = translations[lang];
 
  const [items, setItems] = useState<STMSString[]>([]);
@@ -464,7 +465,8 @@ export function STMSDBTool({ onFocusChange }: { onFocusChange?: (focused: boolea
  context: item.context,
  source_text: item.source_text,
  target_text: item.target_text,
- char_limit: item.char_limit
+ char_limit: item.char_limit,
+ target_lang: targetLang
  };
 
  const response = await fetch(`${API_URL}/stms/review_ai`, {
@@ -795,6 +797,18 @@ export function STMSDBTool({ onFocusChange }: { onFocusChange?: (focused: boolea
  <Sparkles size={18} />
  )}
  </Button>
+ 
+ <div className={`relative flex items-center rounded-xl border px-3 h-12 transition-all ${isDarkMode ? 'bg-white/5 border-white/5' : 'bg-gray-50 border-black/5'}`}>
+   <span className="text-xs font-bold mr-2 opacity-50">Alvo:</span>
+   <select 
+     value={targetLang}
+     onChange={(e) => setTargetLang(e.target.value as 'pt' | 'es')}
+     className={`bg-transparent outline-none text-xs font-black cursor-pointer appearance-none pr-4`}
+   >
+     <option value="pt">PT-BR</option>
+     <option value="es">Espanhol</option>
+   </select>
+ </div>
  </div>
 
  <div className="relative flex-1 w-full" ref={dropdownRef}>

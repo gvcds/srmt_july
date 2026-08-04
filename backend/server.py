@@ -390,14 +390,15 @@ def init_db_xml():
     except Exception as e:
         print(f"Aviso - Não foi possível conectar ao banco de dados XML: {e}")
 
-def search_glossary(english_text):
+def search_glossary(english_text, target_lang="pt"):
     """Busca exata — retorna um único match se o texto inteiro for um termo do glossário."""
     if not db_pool_xml: return None
     conn = None
     try:
         conn = db_pool_xml.getconn()
         cur = conn.cursor()
-        query = "SELECT translation, description, dnt FROM glossary WHERE LOWER(english) = LOWER(%s) LIMIT 1"
+        table = "glossary_es" if target_lang == "es" else "glossary"
+        query = f"SELECT translation, description, dnt FROM {table} WHERE LOWER(english) = LOWER(%s) LIMIT 1"
         cur.execute(query, (english_text.strip(),))
         result = cur.fetchone()
         cur.close()
@@ -408,7 +409,7 @@ def search_glossary(english_text):
         if conn:
             db_pool_xml.putconn(conn)
 
-def search_glossary_multi(english_text):
+def search_glossary_multi(english_text, target_lang="pt"):
     """Busca inteligente — encontra TODOS os termos do glossário que aparecem dentro do texto fonte."""
     if not db_pool_xml: return []
     conn = None
@@ -416,7 +417,8 @@ def search_glossary_multi(english_text):
         conn = db_pool_xml.getconn()
         cur = conn.cursor()
         # Busca todos os termos do glossário que estão contidos no texto (case-insensitive)
-        cur.execute("SELECT english, translation, description, dnt, app_name FROM glossary")
+        table = "glossary_es" if target_lang == "es" else "glossary"
+        cur.execute(f"SELECT english, translation, description, dnt, app_name FROM {table}")
         all_terms = cur.fetchall()
         cur.close()
         
@@ -492,8 +494,9 @@ def parse_xml(content):
         print("Parse error:", e)
     return res
 
-def get_tov_sections():
-    kb_path = os.path.join(os.path.dirname(__file__), 'knowledge_base', 'tone_of_voice.txt')
+def get_tov_sections(target_lang="pt"):
+    filename = "tone_of_voice_es.txt" if target_lang == "es" else "tone_of_voice.txt"
+    kb_path = os.path.join(os.path.dirname(__file__), 'knowledge_base', filename)
     if not os.path.exists(kb_path):
         return {}, ""
     
@@ -522,8 +525,8 @@ def get_tov_sections():
         print(f"Erro ao ler tone_of_voice.txt: {e}")
         return {}, ""
 
-def get_dynamic_rules(key, en_content, pt_content, en_comment, pt_comment):
-    tov_sections, tov_raw = get_tov_sections()
+def get_dynamic_rules(key, en_content, pt_content, en_comment, pt_comment, target_lang="pt"):
+    tov_sections, tov_raw = get_tov_sections(target_lang)
     design_type = "GERAL"
     
     if not tov_sections:
@@ -589,14 +592,14 @@ def get_dynamic_rules(key, en_content, pt_content, en_comment, pt_comment):
     return relevant_rules.strip(), design_type
 
 # --- INTEGRAÇÃO COM A API DA IA (Não altere a lógica) ---
-def fetch_translation(item):
+def fetch_translation(item, target_lang="pt"):
     key = item['string_name']
     en_content = item['en']
     pt_content = item['pt']
     en_comment = item.get('en_comment', '').upper()
     pt_comment = item.get('pt_comment', '').upper()
     
-    glossary_match = search_glossary(en_content)
+    glossary_match = search_glossary(en_content, target_lang)
     glossary_hint = ""
     if glossary_match:
         trans, desc, dnt = glossary_match
@@ -606,7 +609,7 @@ def fetch_translation(item):
             glossary_hint = f"\n[REGRA DE OURO DO GLOSSÁRIO: Tradução Obrigatória: '{trans}'. Contexto: {desc}]"
     
     # Busca inteligente: encontra TODOS os termos do glossário contidos no texto
-    glossary_multi = search_glossary_multi(en_content)
+    glossary_multi = search_glossary_multi(en_content, target_lang)
     if glossary_multi:
         glossary_rules = []
         for g in glossary_multi:
@@ -616,20 +619,23 @@ def fetch_translation(item):
                 glossary_rules.append(f"- '{g['english']}' → Traduzir como '{g['translation']}'. {g['description']}")
         glossary_hint += "\n[TERMOS DO GLOSSÁRIO ENCONTRADOS NO TEXTO — RESPEITE CADA UM:]\n" + "\n".join(glossary_rules)
 
-    relevant_rules, design_type = get_dynamic_rules(key, en_content, pt_content, en_comment, pt_comment)
+    relevant_rules, design_type = get_dynamic_rules(key, en_content, pt_content, en_comment, pt_comment, target_lang)
 
     headers = {
         "Authorization": f"Bearer {API_KEY}",
         "Content-Type": "application/json"
     }
     
+    lang_name = "ESPANHOL" if target_lang == "es" else "PORTUGUÊS"
+    lang_code = "ES" if target_lang == "es" else "PT"
+    
     system_prompt = f"""Você é o Revisor de Tradução da SAMSUNG.
 DIRETRIZES APLICÁVEIS PARA ESTA STRING:
 {relevant_rules}
 
 INSTRUÇÕES (LEIA COM ATENÇÃO):
-- Analise SEVERAMENTE o texto 'PT' atual. Ele atende ao Tom de Voz da Samsung, regras gramaticais e de design ({design_type}) listadas acima?
-- Se o 'PT' violar QUALQUER regra (ex: falta de espaço na unidade, gerúndio errado, pronome sobrando), corrija-o obrigatoriamente.
+- Analise SEVERAMENTE o texto '{lang_code}' atual. Ele atende ao Tom de Voz da Samsung, regras gramaticais e de design ({design_type}) listadas acima?
+- Se o '{lang_code}' violar QUALQUER regra (ex: falta de espaço na unidade, erro gramatical, pronome sobrando), corrija-o obrigatoriamente.
 - Se a Regra de Ouro do Glossário estiver presente, ELA É SOBERANA.
 - Responda EXATAMENTE neste formato XML: 
 <advice>sugestão corrigida ou 'Mantido' se estiver perfeito</advice>
@@ -638,7 +644,7 @@ INSTRUÇÕES (LEIA COM ATENÇÃO):
 Revise o texto priorizando a fidelidade ao original em inglês. Mantenha o texto o mais próximo possível do original, removendo apenas redundâncias óbvias e corrigindo erros graves de pontuação, gramática ou formatação. Preserve termos técnicos, jargões e abreviações, e evite adicionar palavras ou sinônimos que alterem o significado. Corrija apenas o necessário para garantir clareza e fidelidade ao original.
 """
 
-    user_content = f"Chave: {key} | Contexto: {design_type}\nEN: {en_content}\nPT: {pt_content}{glossary_hint}"
+    user_content = f"Chave: {key} | Contexto: {design_type}\nEN: {en_content}\n{lang_code}: {pt_content}{glossary_hint}"
     
     messages = [
         {"role": "system", "content": system_prompt},
@@ -746,6 +752,7 @@ class SystemNoticeUpdate(BaseModel):
 
 class BatchRequest(BaseModel):
     items: List[Dict[str, Any]]
+    target_lang: Optional[str] = "pt"
 
 @app.post("/process_batch")
 async def process_batch(request: BatchRequest):
@@ -753,7 +760,7 @@ async def process_batch(request: BatchRequest):
     results = []
     
     with concurrent.futures.ThreadPoolExecutor(max_workers=40) as executor:
-        futures = [executor.submit(fetch_translation, item) for item in items]
+        futures = [executor.submit(fetch_translation, item, request.target_lang) for item in items]
         for future in concurrent.futures.as_completed(futures):
             results.append(future.result())
             
@@ -946,6 +953,7 @@ class STMSReviewRequest(BaseModel):
     source_text: str
     target_text: Optional[str] = ""
     char_limit: Optional[str] = ""
+    target_lang: Optional[str] = "pt"
 
 class STMSApproveRequest(BaseModel):
     id: int
@@ -1013,7 +1021,7 @@ def review_stms_ai(item: STMSReviewRequest, db: Session = Depends(get_db)):
         
     try:
         # Chama a lógica principal de revisão da IA que já existe no servidor
-        result = fetch_translation(mapping_item)
+        result = fetch_translation(mapping_item, target_lang=item.target_lang)
         
         advice = result.get('advice', item.target_text)
         reason = result.get('reason', 'Revisão automática realizada.')
