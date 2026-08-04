@@ -375,6 +375,7 @@ def init_db_xml():
         print(f"Aviso - Não foi possível conectar ao banco de dados XML: {e}")
 
 def search_glossary(english_text):
+    """Busca exata — retorna um único match se o texto inteiro for um termo do glossário."""
     if not db_pool_xml: return None
     conn = None
     try:
@@ -387,6 +388,41 @@ def search_glossary(english_text):
         return result
     except Exception as e:
         return None
+    finally:
+        if conn:
+            db_pool_xml.putconn(conn)
+
+def search_glossary_multi(english_text):
+    """Busca inteligente — encontra TODOS os termos do glossário que aparecem dentro do texto fonte."""
+    if not db_pool_xml: return []
+    conn = None
+    try:
+        conn = db_pool_xml.getconn()
+        cur = conn.cursor()
+        # Busca todos os termos do glossário que estão contidos no texto (case-insensitive)
+        cur.execute("SELECT english, translation, description, dnt, app_name FROM glossary")
+        all_terms = cur.fetchall()
+        cur.close()
+        
+        matches = []
+        text_lower = english_text.lower()
+        for term in all_terms:
+            term_english = (term[0] or "").strip()
+            if not term_english:
+                continue
+            # Verifica se o termo do glossário aparece como palavra inteira no texto
+            pattern = r'\b' + re.escape(term_english.lower()) + r'\b'
+            if re.search(pattern, text_lower):
+                matches.append({
+                    "english": term_english,
+                    "translation": term[1] or "",
+                    "description": term[2] or "",
+                    "dnt": term[3] or "No",
+                    "app_name": term[4] or ""
+                })
+        return matches
+    except Exception as e:
+        return []
     finally:
         if conn:
             db_pool_xml.putconn(conn)
@@ -552,6 +588,17 @@ def fetch_translation(item):
             glossary_hint = f"\n[REGRA DE OURO DO GLOSSÁRIO: Manter como '{en_content}' (DNT)]"
         else:
             glossary_hint = f"\n[REGRA DE OURO DO GLOSSÁRIO: Tradução Obrigatória: '{trans}'. Contexto: {desc}]"
+    
+    # Busca inteligente: encontra TODOS os termos do glossário contidos no texto
+    glossary_multi = search_glossary_multi(en_content)
+    if glossary_multi:
+        glossary_rules = []
+        for g in glossary_multi:
+            if g['dnt'] in ('Y', 'Yes', 'y', 'yes'):
+                glossary_rules.append(f"- '{g['english']}': NÃO TRADUZIR (DNT). Manter exatamente como está.")
+            else:
+                glossary_rules.append(f"- '{g['english']}' → Traduzir como '{g['translation']}'. {g['description']}")
+        glossary_hint += "\n[TERMOS DO GLOSSÁRIO ENCONTRADOS NO TEXTO — RESPEITE CADA UM:]\n" + "\n".join(glossary_rules)
 
     relevant_rules, design_type = get_dynamic_rules(key, en_content, pt_content, en_comment, pt_comment)
 
