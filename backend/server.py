@@ -2611,7 +2611,7 @@ class SuggestKnowledgeRequest(BaseModel):
 
 @app.get("/knowledge/{filename}")
 def get_knowledge_file(filename: str):
-    valid_files = ["bug_review.txt", "general_info.txt", "tone_of_voice.txt"]
+    valid_files = ["bug_review.txt", "general_info.txt", "tone_of_voice.txt", "tone_of_voice_es.txt"]
     if filename not in valid_files:
         raise HTTPException(status_code=400, detail="Arquivo inválido")
     
@@ -2624,7 +2624,7 @@ def get_knowledge_file(filename: str):
 
 @app.post("/knowledge/{filename}")
 def update_knowledge_file(filename: str, data: KnowledgeUpdateRequest):
-    valid_files = ["bug_review.txt", "general_info.txt", "tone_of_voice.txt"]
+    valid_files = ["bug_review.txt", "general_info.txt", "tone_of_voice.txt", "tone_of_voice_es.txt"]
     if filename not in valid_files:
         raise HTTPException(status_code=400, detail="Arquivo inválido")
     

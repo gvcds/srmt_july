@@ -920,7 +920,9 @@ export default function KnowledgeBasePage() {
                           <Input value={editingItem.english} onChange={e => setEditingItem({...editingItem, english: e.target.value})} className={`rounded-xl border-none h-12 font-bold ${isDarkMode ? 'bg-black/40' : 'bg-white'}`} placeholder="Ex: Display" />
                         </div>
                         <div className="space-y-1">
-                          <label className="text-[10px] font-black uppercase opacity-60 ml-1">Tradução (PT-BR)</label>
+                          <label className="text-[10px] font-black uppercase opacity-60 ml-1">
+                            {activeTab === 'glossary_es' ? 'Tradução (ES)' : 'Tradução (PT-BR)'}
+                          </label>
                           <Input value={editingItem.translation} onChange={e => setEditingItem({...editingItem, translation: e.target.value})} className={`rounded-xl border-none h-12 font-bold ${isDarkMode ? 'bg-black/40' : 'bg-white'}`} placeholder="Ex: Tela" />
                         </div>
                         <div className="space-y-1">
@@ -1005,7 +1007,9 @@ export default function KnowledgeBasePage() {
                             <tr className="bg-black/5 dark:bg-white/5">
                               <th className="p-5 text-[10px] font-black uppercase tracking-widest opacity-50 w-[15%]">App</th>
                               <th className="p-5 text-[10px] font-black uppercase tracking-widest opacity-50 w-[30%]">Termo (EN)</th>
-                              <th className="p-5 text-[10px] font-black uppercase tracking-widest opacity-50 w-[30%]">Sugestão (PT)</th>
+                              <th className="p-5 text-[10px] font-black uppercase tracking-widest opacity-50 w-[30%]">
+                                {activeTab === 'glossary_es' ? 'Sugestão (ES)' : 'Sugestão (PT)'}
+                              </th>
                               <th className="p-5 text-[10px] font-black uppercase tracking-widest opacity-50 w-[10%] text-center">DNT</th>
                               <th className="p-5 text-[10px] font-black uppercase tracking-widest opacity-50 w-[15%] text-right">Ações</th>
                             </tr>
@@ -1201,7 +1205,9 @@ export default function KnowledgeBasePage() {
                     <th className="p-4 text-[10px] font-black uppercase tracking-widest opacity-50 w-[40%] cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 transition-colors" onClick={() => setAiSelectionSort(s => s === 'english_asc' ? 'english_desc' : 'english_asc')}>
                       Termo (EN) {aiSelectionSort === 'english_asc' ? '↑' : aiSelectionSort === 'english_desc' ? '↓' : ''}
                     </th>
-                    <th className="p-4 text-[10px] font-black uppercase tracking-widest opacity-50 w-[40%] rounded-tr-2xl">Tradução (PT)</th>
+                    <th className="p-4 text-[10px] font-black uppercase tracking-widest opacity-50 w-[40%] rounded-tr-2xl">
+                      {activeTab === 'glossary_es' ? 'Tradução (ES)' : 'Tradução (PT)'}
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-black/5 dark:divide-white/5">
