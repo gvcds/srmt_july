@@ -31,7 +31,11 @@ import {
  Eye,
  EyeOff,
  RotateCcw,
- Trash2
+ Trash2,
+ Hash,
+ MessageSquare,
+ AlertTriangle,
+ CheckSquare
 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -107,7 +111,13 @@ const translations = {
  undo: 'Desfazer',
  editResultTitle: 'Editar Resultado da IA',
  saveBtn: 'Salvar Alteração',
- cancelBtn: 'Cancelar'
+ cancelBtn: 'Cancelar',
+ designIdTooltip: 'Mostrar/Ocultar Design ID',
+ contextTooltip: 'Mostrar/Ocultar Contexto',
+ errorsTooltip: 'Mostrar Apenas Erros',
+ okTooltip: 'Mostrar Apenas Itens Sem Erro (OK)',
+ focusTooltip: 'Modo Foco (Tela Cheia)',
+ exitFocusTooltip: 'Sair do Modo Foco'
  },
  en: {
  total: 'Total',
@@ -154,7 +164,13 @@ const translations = {
  undo: 'Undo',
  editResultTitle: 'Edit AI Result',
  saveBtn: 'Save Changes',
- cancelBtn: 'Cancel'
+ cancelBtn: 'Cancel',
+ designIdTooltip: 'Show/Hide Design ID',
+ contextTooltip: 'Show/Hide Context',
+ errorsTooltip: 'Show Errors Only',
+ okTooltip: 'Show OK Items Only',
+ focusTooltip: 'Focus Mode (Fullscreen)',
+ exitFocusTooltip: 'Exit Focus Mode'
  },
  ko: {
  total: '전체',
@@ -201,7 +217,13 @@ const translations = {
  undo: '취소',
  editResultTitle: 'AI 결과 편집',
  saveBtn: '변경 사항 저장',
- cancelBtn: '취소'
+ cancelBtn: '취소',
+ designIdTooltip: '디자인 ID 표시/숨기기',
+ contextTooltip: '컨텍스트 표시/숨기기',
+ errorsTooltip: '오류만 표시',
+ okTooltip: '정상 항목만 표시 (OK)',
+ focusTooltip: '집중 모드 (전체 화면)',
+ exitFocusTooltip: '집중 모드 종료'
  }
 };
 
@@ -809,40 +831,40 @@ export function STMSDBTool({ onFocusChange }: { onFocusChange?: (focused: boolea
  <Button 
  onClick={() => setShowDesignId(!showDesignId)} 
  variant="outline"
- title="Design ID"
+ title={t.designIdTooltip}
  className={`rounded-xl h-12 w-12 p-0 flex items-center justify-center transition-all ${showDesignId ? (isDarkMode ? 'bg-blue-600/10 text-blue-400 border-blue-500/30 shadow-lg shadow-blue-500/10' : 'bg-blue-50 text-blue-600 border-blue-200 shadow-xl shadow-blue-600/5') : (isDarkMode ? 'bg-white/5 border-white/5 hover:bg-white/10' : 'bg-gray-50 border-black/5 hover:bg-gray-100')}`}
  >
- {showDesignId ? <EyeOff size={18} /> : <Eye size={18} />}
+ <Hash size={18} className={showDesignId ? 'opacity-100' : 'opacity-50'} />
  </Button>
  <Button 
  onClick={() => setShowContext(!showContext)} 
  variant="outline"
- title={t.context}
+ title={t.contextTooltip}
  className={`rounded-xl h-12 w-12 p-0 flex items-center justify-center transition-all ${showContext ? (isDarkMode ? 'bg-blue-600/10 text-blue-400 border-blue-500/30 shadow-lg shadow-blue-500/10' : 'bg-blue-50 text-blue-600 border-blue-200 shadow-xl shadow-blue-600/5') : (isDarkMode ? 'bg-white/5 border-white/5 hover:bg-white/10' : 'bg-gray-50 border-black/5 hover:bg-gray-100')}`}
  >
- {showContext ? <EyeOff size={18} /> : <Eye size={18} />}
+ <MessageSquare size={18} className={showContext ? 'opacity-100' : 'opacity-50'} />
  </Button>
  <Button 
   onClick={() => setShowOnlyErrors(!showOnlyErrors)} 
   variant="outline"
-  title="Erros"
+  title={t.errorsTooltip}
   className={`rounded-xl h-12 w-12 p-0 flex items-center justify-center transition-all ${showOnlyErrors ? (isDarkMode ? 'bg-red-600/10 text-red-400 border-red-500/30 shadow-lg shadow-red-500/10' : 'bg-red-50 text-red-600 border-red-200 shadow-xl shadow-red-600/5') : (isDarkMode ? 'bg-white/5 border-white/5 hover:bg-white/10' : 'bg-gray-50 border-black/5 hover:bg-gray-100')}`}
   >
-  {showOnlyErrors ? <AlertCircle size={18} /> : <Filter size={18} />}
+  {showOnlyErrors ? <AlertTriangle size={18} /> : <AlertCircle size={18} className="opacity-50" />}
   </Button>
   <Button 
   onClick={() => { setHideErrors(!hideErrors); if (showOnlyErrors) setShowOnlyErrors(false); }} 
   variant="outline"
-  title={hideErrors ? 'Mostrando apenas itens sem erro' : 'Ocultar erros (Mostrar apenas OK)'}
+  title={t.okTooltip}
   className={`rounded-xl h-12 w-12 p-0 flex items-center justify-center transition-all ${hideErrors ? (isDarkMode ? 'bg-green-600/10 text-green-400 border-green-500/30 shadow-lg shadow-green-500/10' : 'bg-green-50 text-green-600 border-green-200 shadow-xl shadow-green-600/5') : (isDarkMode ? 'bg-white/5 border-white/5 hover:bg-white/10' : 'bg-gray-50 border-black/5 hover:bg-gray-100')}`}
   >
-  {hideErrors ? <CheckCircle2 size={18} /> : <EyeOff size={18} />}
+  {hideErrors ? <CheckSquare size={18} /> : <CheckCircle2 size={18} className="opacity-50" />}
   </Button>
  <Button 
  onClick={() => setIsFocusMode(!isFocusMode)} 
  variant="outline"
  className={`rounded-xl h-12 w-12 p-0 transition-all ${isFocusMode ? 'bg-blue-600 text-white border-blue-600 shadow-2xl shadow-blue-600/40' : (isDarkMode ? 'bg-white/5 border-white/5 hover:bg-white/10' : 'bg-gray-50 border-black/5 hover:bg-gray-100 shadow-sm')}`}
- title={isFocusMode ? "Sair do Modo Foco" : "Modo Foco (Tela Cheia)"}
+ title={isFocusMode ? t.exitFocusTooltip : t.focusTooltip}
  >
  {isFocusMode ? <Minimize2 size={18} /> : <Maximize2 size={18} />}
  </Button>
