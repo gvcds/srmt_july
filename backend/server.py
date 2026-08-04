@@ -365,6 +365,22 @@ def init_db_xml():
             language_context TEXT,
             id TEXT PRIMARY KEY
         );
+        CREATE TABLE IF NOT EXISTS glossary_es (
+            no_id TEXT,
+            english TEXT,
+            language TEXT,
+            translation TEXT,
+            description TEXT,
+            parts_of_speech TEXT,
+            polysemy TEXT,
+            dnt TEXT,
+            app_name TEXT,
+            abbreviation TEXT,
+            tag TEXT,
+            trans_status TEXT,
+            language_context TEXT,
+            id TEXT PRIMARY KEY
+        );
         """
         cur.execute(create_table_query)
         conn.commit()
@@ -2734,6 +2750,73 @@ def delete_glossary_item(item_id: str):
         conn = psycopg2.connect(**DB_CONFIG_XML)
         cur = conn.cursor()
         cur.execute("DELETE FROM glossary WHERE id=%s", (item_id,))
+        conn.commit()
+        return {"status": "success"}
+    except Exception as e:
+        if conn: conn.rollback()
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        if conn: conn.close()
+
+@app.get("/glossary_es")
+def list_glossary_es():
+    conn = None
+    try:
+        conn = psycopg2.connect(**DB_CONFIG_XML)
+        cur = conn.cursor(cursor_factory=DictCursor)
+        cur.execute("SELECT id, english, translation, description, dnt, app_name FROM glossary_es ORDER BY english ASC")
+        rows = cur.fetchall()
+        return [dict(row) for row in rows]
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        if conn: conn.close()
+
+@app.post("/glossary_es")
+def create_glossary_item_es(item: GlossaryItem):
+    conn = None
+    try:
+        conn = psycopg2.connect(**DB_CONFIG_XML)
+        cur = conn.cursor()
+        item_id = item.id or str(int(time.time() * 1000))
+        cur.execute("""
+            INSERT INTO glossary_es (id, english, translation, description, dnt, app_name)
+            VALUES (%s, %s, %s, %s, %s, %s)
+        """, (item_id, item.english, item.translation, item.description, item.dnt, item.app_name))
+        conn.commit()
+        return {"status": "success", "id": item_id}
+    except Exception as e:
+        if conn: conn.rollback()
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        if conn: conn.close()
+
+@app.put("/glossary_es/{item_id}")
+def update_glossary_item_es(item_id: str, item: GlossaryItem):
+    conn = None
+    try:
+        conn = psycopg2.connect(**DB_CONFIG_XML)
+        cur = conn.cursor()
+        cur.execute("""
+            UPDATE glossary_es 
+            SET english=%s, translation=%s, description=%s, dnt=%s, app_name=%s
+            WHERE id=%s
+        """, (item.english, item.translation, item.description, item.dnt, item.app_name, item_id))
+        conn.commit()
+        return {"status": "success"}
+    except Exception as e:
+        if conn: conn.rollback()
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        if conn: conn.close()
+
+@app.delete("/glossary_es/{item_id}")
+def delete_glossary_item_es(item_id: str):
+    conn = None
+    try:
+        conn = psycopg2.connect(**DB_CONFIG_XML)
+        cur = conn.cursor()
+        cur.execute("DELETE FROM glossary_es WHERE id=%s", (item_id,))
         conn.commit()
         return {"status": "success"}
     except Exception as e:
