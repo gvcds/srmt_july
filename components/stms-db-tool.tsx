@@ -712,23 +712,23 @@ export function STMSDBTool({ onFocusChange }: { onFocusChange?: (focused: boolea
  <Card className={`relative z-50 p-4 rounded-xl border shadow-2xl transition-all duration-500 backdrop-blur-2xl ${isDarkMode ? 'bg-[#111]/40 border-white/5 shadow-black/40 text-gray-100' : 'bg-white/60 border-slate-200 shadow-slate-200/50 text-gray-900'}`}>
  <div className="flex flex-col lg:flex-row gap-3 items-center mb-4">
  <div className="flex gap-2 w-full lg:w-auto">
- <Button onClick={loadData} disabled={isGlobalLoading || isBatchProcessing} variant="ghost" className={`rounded-xl h-12 px-7 text-[10px] font-black uppercase tracking-[0.2em] transition-all border ${isDarkMode ? 'bg-white/5 border-white/5 hover:bg-white/10' : 'bg-gray-50 border-black/5 hover:bg-gray-100 shadow-sm'}`}>
- <RefreshCw size={14} className={`mr-3 ${isGlobalLoading ? "animate-spin" : ""}`} />
- {t.syncBtn}
+ <Button onClick={loadData} disabled={isGlobalLoading || isBatchProcessing} variant="ghost" title={t.syncBtn} className={`rounded-xl h-12 w-12 p-0 transition-all border flex items-center justify-center ${isDarkMode ? 'bg-white/5 border-white/5 hover:bg-white/10' : 'bg-gray-50 border-black/5 hover:bg-gray-100 shadow-sm'}`}>
+ <RefreshCw size={18} className={`${isGlobalLoading ? "animate-spin" : ""}`} />
  </Button>
  <Button 
  onClick={runAIReview} 
  disabled={stats.pending === 0 && !isBatchProcessing} 
- className={`rounded-xl h-12 px-9 text-[10px] font-black uppercase tracking-[0.2em] transition-all ${
+ title={isBatchProcessing ? t.stopReviewBtn : t.startReviewBtn}
+ className={`rounded-xl h-12 w-12 p-0 flex items-center justify-center transition-all ${
  isBatchProcessing 
  ? 'bg-red-600 hover:bg-red-500 text-white shadow-red-600/30' 
  : 'bg-blue-600 hover:bg-blue-500 text-white shadow-blue-600/40'
  }`}
  >
  {isBatchProcessing ? (
- <><StopCircle size={14} className="mr-3" /> {t.stopReviewBtn}</>
+ <StopCircle size={18} />
  ) : (
- <><Sparkles size={14} className="mr-3" /> {t.startReviewBtn}</>
+ <Sparkles size={18} />
  )}
  </Button>
  </div>
@@ -809,35 +809,34 @@ export function STMSDBTool({ onFocusChange }: { onFocusChange?: (focused: boolea
  <Button 
  onClick={() => setShowDesignId(!showDesignId)} 
  variant="outline"
- className={`rounded-xl h-12 px-6 text-[10px] font-black uppercase tracking-[0.2em] transition-all ${showDesignId ? (isDarkMode ? 'bg-blue-600/10 text-blue-400 border-blue-500/30 shadow-lg shadow-blue-500/10' : 'bg-blue-50 text-blue-600 border-blue-200 shadow-xl shadow-blue-600/5') : (isDarkMode ? 'bg-white/5 border-white/5 hover:bg-white/10' : 'bg-gray-50 border-black/5 hover:bg-gray-100')}`}
+ title="Design ID"
+ className={`rounded-xl h-12 w-12 p-0 flex items-center justify-center transition-all ${showDesignId ? (isDarkMode ? 'bg-blue-600/10 text-blue-400 border-blue-500/30 shadow-lg shadow-blue-500/10' : 'bg-blue-50 text-blue-600 border-blue-200 shadow-xl shadow-blue-600/5') : (isDarkMode ? 'bg-white/5 border-white/5 hover:bg-white/10' : 'bg-gray-50 border-black/5 hover:bg-gray-100')}`}
  >
- {showDesignId ? <EyeOff size={14} className="mr-3" /> : <Eye size={14} className="mr-3" />}
- ID
+ {showDesignId ? <EyeOff size={18} /> : <Eye size={18} />}
  </Button>
  <Button 
  onClick={() => setShowContext(!showContext)} 
  variant="outline"
- className={`rounded-xl h-12 px-6 text-[10px] font-black uppercase tracking-[0.2em] transition-all ${showContext ? (isDarkMode ? 'bg-blue-600/10 text-blue-400 border-blue-500/30 shadow-lg shadow-blue-500/10' : 'bg-blue-50 text-blue-600 border-blue-200 shadow-xl shadow-blue-600/5') : (isDarkMode ? 'bg-white/5 border-white/5' : 'bg-gray-50 border-black/5')}`}
+ title={t.context}
+ className={`rounded-xl h-12 w-12 p-0 flex items-center justify-center transition-all ${showContext ? (isDarkMode ? 'bg-blue-600/10 text-blue-400 border-blue-500/30 shadow-lg shadow-blue-500/10' : 'bg-blue-50 text-blue-600 border-blue-200 shadow-xl shadow-blue-600/5') : (isDarkMode ? 'bg-white/5 border-white/5 hover:bg-white/10' : 'bg-gray-50 border-black/5 hover:bg-gray-100')}`}
  >
- {showContext ? <EyeOff size={14} className="mr-3" /> : <Eye size={14} className="mr-3" />}
- Ctx
+ {showContext ? <EyeOff size={18} /> : <Eye size={18} />}
  </Button>
  <Button 
   onClick={() => setShowOnlyErrors(!showOnlyErrors)} 
   variant="outline"
-  className={`rounded-xl h-12 px-6 text-[10px] font-black uppercase tracking-[0.2em] transition-all ${showOnlyErrors ? (isDarkMode ? 'bg-red-600/10 text-red-400 border-red-500/30 shadow-lg shadow-red-500/10' : 'bg-red-50 text-red-600 border-red-200 shadow-xl shadow-red-600/5') : (isDarkMode ? 'bg-white/5 border-white/5 hover:bg-white/10' : 'bg-gray-50 border-black/5 hover:bg-gray-100')}`}
+  title="Erros"
+  className={`rounded-xl h-12 w-12 p-0 flex items-center justify-center transition-all ${showOnlyErrors ? (isDarkMode ? 'bg-red-600/10 text-red-400 border-red-500/30 shadow-lg shadow-red-500/10' : 'bg-red-50 text-red-600 border-red-200 shadow-xl shadow-red-600/5') : (isDarkMode ? 'bg-white/5 border-white/5 hover:bg-white/10' : 'bg-gray-50 border-black/5 hover:bg-gray-100')}`}
   >
-  {showOnlyErrors ? <AlertCircle size={14} className="mr-3" /> : <Filter size={14} className="mr-3" />}
-  Erros
+  {showOnlyErrors ? <AlertCircle size={18} /> : <Filter size={18} />}
   </Button>
   <Button 
   onClick={() => { setHideErrors(!hideErrors); if (showOnlyErrors) setShowOnlyErrors(false); }} 
   variant="outline"
-  title={hideErrors ? 'Mostrando apenas itens sem erro — clique para mostrar tudo' : 'Ocultar linhas com erros — mostra apenas itens OK'}
-  className={`rounded-xl h-12 px-6 text-[10px] font-black uppercase tracking-[0.2em] transition-all ${hideErrors ? (isDarkMode ? 'bg-green-600/10 text-green-400 border-green-500/30 shadow-lg shadow-green-500/10' : 'bg-green-50 text-green-600 border-green-200 shadow-xl shadow-green-600/5') : (isDarkMode ? 'bg-white/5 border-white/5 hover:bg-white/10' : 'bg-gray-50 border-black/5 hover:bg-gray-100')}`}
+  title={hideErrors ? 'Mostrando apenas itens sem erro' : 'Ocultar erros (Mostrar apenas OK)'}
+  className={`rounded-xl h-12 w-12 p-0 flex items-center justify-center transition-all ${hideErrors ? (isDarkMode ? 'bg-green-600/10 text-green-400 border-green-500/30 shadow-lg shadow-green-500/10' : 'bg-green-50 text-green-600 border-green-200 shadow-xl shadow-green-600/5') : (isDarkMode ? 'bg-white/5 border-white/5 hover:bg-white/10' : 'bg-gray-50 border-black/5 hover:bg-gray-100')}`}
   >
-  {hideErrors ? <CheckCircle2 size={14} className="mr-3" /> : <EyeOff size={14} className="mr-3" />}
-  OK
+  {hideErrors ? <CheckCircle2 size={18} /> : <EyeOff size={18} />}
   </Button>
  <Button 
  onClick={() => setIsFocusMode(!isFocusMode)} 
