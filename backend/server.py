@@ -617,8 +617,8 @@ INSTRUÇÕES (LEIA COM ATENÇÃO):
 - Se a Regra de Ouro do Glossário estiver presente, ELA É SOBERANA.
 - Responda EXATAMENTE neste formato XML: 
 <advice>sugestão corrigida ou 'Mantido' se estiver perfeito</advice>
-<reason>motivo detalhado da alteração baseada na regra</reason>
-<simplyReason>resumo curto do erro ou 'Preciso'</simplyReason>
+<reason>motivo detalhado da alteração baseada na regra. Qualquer alteração deve ser expressamente explicada.</reason>
+<simplyReason>resumo curto do erro ou 'Correto' se não houver nenhuma alteração</simplyReason>
 Revise o texto priorizando a fidelidade ao original em inglês. Mantenha o texto o mais próximo possível do original, removendo apenas redundâncias óbvias e corrigindo erros graves de pontuação, gramática ou formatação. Preserve termos técnicos, jargões e abreviações, e evite adicionar palavras ou sinônimos que alterem o significado. Corrija apenas o necessário para garantir clareza e fidelidade ao original.
 """
 
