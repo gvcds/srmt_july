@@ -618,7 +618,7 @@ INSTRUÇÕES (LEIA COM ATENÇÃO):
 - Responda EXATAMENTE neste formato XML: 
 <advice>sugestão corrigida ou 'Mantido' se estiver perfeito</advice>
 <reason>motivo detalhado da alteração baseada na regra. Qualquer alteração deve ser expressamente explicada.</reason>
-<simplyReason>resumo curto do erro ou 'Correto' se não houver nenhuma alteração</simplyReason>
+<simplyReason>resumo curto do erro (ex: 'Falta de espaço'). Retorne 'Correto' SOMENTE SE advice for 'Mantido'</simplyReason>
 Revise o texto priorizando a fidelidade ao original em inglês. Mantenha o texto o mais próximo possível do original, removendo apenas redundâncias óbvias e corrigindo erros graves de pontuação, gramática ou formatação. Preserve termos técnicos, jargões e abreviações, e evite adicionar palavras ou sinônimos que alterem o significado. Corrija apenas o necessário para garantir clareza e fidelidade ao original.
 """
 
@@ -651,6 +651,11 @@ Revise o texto priorizando a fidelidade ao original em inglês. Mantenha o texto
                 advice = match.group(1).strip() if match else "Sem sugestão"
                 reason = match.group(2).strip() if match else "Tradução OK"
                 simply = match.group(3).strip() if match else reason
+                
+                # Trava de segurança no Python: se alterou algo (inclusive uma vírgula), NÃO pode ser 'Correto'
+                if advice != "Mantido" and advice != pt_content:
+                    if simply.lower() in ["correto", "preciso", "ok", "perfeito"]:
+                        simply = "Alteração de formatação/pontuação"
                 
                 return {**item, "advice": advice, "reason": reason, "simplyReason": simply}
             else:
