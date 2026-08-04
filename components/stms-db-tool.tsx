@@ -548,7 +548,7 @@ export function STMSDBTool({ onFocusChange }: { onFocusChange?: (focused: boolea
  if (response.ok) {
  setItems(prev => prev.map(item => 
  item.id === id 
- ? { ...item, status: 'rejected', suggested_text: item.target_text } 
+ ? { ...item, status: 'rejected' } 
  : item
  ));
  } else {
