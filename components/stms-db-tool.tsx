@@ -225,6 +225,7 @@ export function STMSDBTool({ onFocusChange }: { onFocusChange?: (focused: boolea
  const [showContext, setShowContext] = useState(false);
  const [showDesignId, setShowDesignId] = useState(false);
  const [showOnlyErrors, setShowOnlyErrors] = useState(false);
+ const [hideErrors, setHideErrors] = useState(false);
  const [isFocusModeState, setIsFocusModeState] = useState(false);
  const isFocusMode = isFocusModeState;
 
@@ -626,8 +627,9 @@ export function STMSDBTool({ onFocusChange }: { onFocusChange?: (focused: boolea
  const matchesAnalysis = (item.simply_reason || '').toLowerCase().includes(colFilters.analysis.toLowerCase());
  const matchesStatus = colFilters.status === '' || item.status === colFilters.status;
  const matchesError = !showOnlyErrors || (item.suggested_text && item.suggested_text !== item.target_text && item.suggested_text !== 'Mantido');
+ const matchesNonError = !hideErrors || !item.suggested_text || item.suggested_text === item.target_text || item.suggested_text === 'Mantido';
  
- return matchesGlobal && matchesFile && matchesEn && matchesPt && matchesAi && matchesAnalysis && matchesStatus && matchesError;
+ return matchesGlobal && matchesFile && matchesEn && matchesPt && matchesAi && matchesAnalysis && matchesStatus && matchesError && matchesNonError;
  }).sort((a, b) => {
  if (!sortConfig.key || !sortConfig.direction) return 0;
  const key = sortConfig.key;
@@ -821,13 +823,22 @@ export function STMSDBTool({ onFocusChange }: { onFocusChange?: (focused: boolea
  Ctx
  </Button>
  <Button 
- onClick={() => setShowOnlyErrors(!showOnlyErrors)} 
- variant="outline"
- className={`rounded-xl h-12 px-6 text-[10px] font-black uppercase tracking-[0.2em] transition-all ${showOnlyErrors ? (isDarkMode ? 'bg-red-600/10 text-red-400 border-red-500/30 shadow-lg shadow-red-500/10' : 'bg-red-50 text-red-600 border-red-200 shadow-xl shadow-red-600/5') : (isDarkMode ? 'bg-white/5 border-white/5 hover:bg-white/10' : 'bg-gray-50 border-black/5 hover:bg-gray-100')}`}
- >
- {showOnlyErrors ? <AlertCircle size={14} className="mr-3" /> : <Filter size={14} className="mr-3" />}
- Erros
- </Button>
+  onClick={() => setShowOnlyErrors(!showOnlyErrors)} 
+  variant="outline"
+  className={`rounded-xl h-12 px-6 text-[10px] font-black uppercase tracking-[0.2em] transition-all ${showOnlyErrors ? (isDarkMode ? 'bg-red-600/10 text-red-400 border-red-500/30 shadow-lg shadow-red-500/10' : 'bg-red-50 text-red-600 border-red-200 shadow-xl shadow-red-600/5') : (isDarkMode ? 'bg-white/5 border-white/5 hover:bg-white/10' : 'bg-gray-50 border-black/5 hover:bg-gray-100')}`}
+  >
+  {showOnlyErrors ? <AlertCircle size={14} className="mr-3" /> : <Filter size={14} className="mr-3" />}
+  Erros
+  </Button>
+  <Button 
+  onClick={() => { setHideErrors(!hideErrors); if (showOnlyErrors) setShowOnlyErrors(false); }} 
+  variant="outline"
+  title={hideErrors ? 'Mostrando apenas itens sem erro — clique para mostrar tudo' : 'Ocultar linhas com erros — mostra apenas itens OK'}
+  className={`rounded-xl h-12 px-6 text-[10px] font-black uppercase tracking-[0.2em] transition-all ${hideErrors ? (isDarkMode ? 'bg-green-600/10 text-green-400 border-green-500/30 shadow-lg shadow-green-500/10' : 'bg-green-50 text-green-600 border-green-200 shadow-xl shadow-green-600/5') : (isDarkMode ? 'bg-white/5 border-white/5 hover:bg-white/10' : 'bg-gray-50 border-black/5 hover:bg-gray-100')}`}
+  >
+  {hideErrors ? <CheckCircle2 size={14} className="mr-3" /> : <EyeOff size={14} className="mr-3" />}
+  OK
+  </Button>
  <Button 
  onClick={() => setIsFocusMode(!isFocusMode)} 
  variant="outline"

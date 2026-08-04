@@ -322,8 +322,12 @@ app.add_middleware(
 
 # --- INTEGRAÇÃO DO STMS TOOL XML ---
 
+# --- CONFIGURAÇÃO DA API DE INTELIGÊNCIA ARTIFICIAL (SIDIA PROXY) ---
+# Endpoint do proxy corporativo OpenWebUI da Sidia
 PROXY_URL = "https://openwebui.sidia.org.br/api/chat/completions"
+# Chave de autenticação para o proxy da IA
 API_KEY = 'sk-22424335d6864b07bf8f21ce0a20e5f4'
+# Modelo de linguagem utilizado nas revisões e análises
 MODEL_ID = "openai/gpt-oss-120b"
 
 DB_CONFIG_XML = {
