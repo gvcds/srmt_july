@@ -1200,10 +1200,20 @@ def translate_stms_text(data: STMSTranslateRequest):
         dest = "Espanhol" if data.target_lang == "es" else "Português do Brasil (PT-BR)"
         prompt = f"Traduza o seguinte texto técnico para {dest}. Retorne APENAS a tradução, sem aspas ou comentários:\n\n{data.text}"
         
-        response = chat_session.send_message(prompt)
-        translation = response.text.strip()
+        messages = [{"role": "user", "content": prompt}]
+        payload = {"model": MODEL_ID, "messages": messages, "stream": False}
         
-        return {"translated_text": translation}
+        response = requests.post(PROXY_URL, json=payload, headers=headers, timeout=20, verify=False)
+        if response.status_code == 200:
+            res_data = response.json()
+            content = res_data.get('message', {}).get('content')
+            if not content and 'choices' in res_data and len(res_data['choices']) > 0:
+                content = res_data['choices'][0].get('message', {}).get('content', '')
+            
+            translation = content.strip() if content else ""
+            return {"translated_text": translation}
+        else:
+            raise Exception(f"API Error: {response.status_code}")
     except Exception as e:
         print(f"Erro ao traduzir texto: {e}")
         raise HTTPException(status_code=500, detail=str(e))
