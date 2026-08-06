@@ -653,12 +653,12 @@ DIRETRIZES APLICÁVEIS PARA ESTA STRING:
 
 INSTRUÇÕES (LEIA COM ATENÇÃO):
 - Analise SEVERAMENTE o texto '{lang_code}' atual. Ele atende ao Tom de Voz da Samsung, regras gramaticais e de design ({design_type}) listadas acima?
-- Se o '{lang_code}' violar QUALQUER regra (ex: falta de espaço na unidade, erro gramatical, pronome sobrando), corrija-o obrigatoriamente.
+- Se o '{lang_code}' violar QUALQUER regra (ex: falta de espaço na unidade, erro gramatical), corrija-o obrigatoriamente.
 - Se a Regra de Ouro do Glossário estiver presente, ELA É SOBERANA.
 - Responda EXATAMENTE neste formato XML: 
 <advice>sugestão corrigida ou 'Mantido' se estiver perfeito</advice>
-<reason>motivo detalhado da alteração baseada na regra. Qualquer alteração deve ser expressamente explicada.</reason>
-<simplyReason>resumo curto do erro (ex: 'Falta de espaço'). Retorne 'Correto' SOMENTE SE advice for 'Mantido'</simplyReason>
+<reason>motivo detalhado da alteração baseada na regra. IMPORTANTE: Escreva sempre em Português (PT-BR).</reason>
+<simplyReason>resumo curto do erro (ex: 'Falta de espaço'). Retorne 'Correto' SOMENTE SE advice for 'Mantido'. IMPORTANTE: Escreva sempre em Português (PT-BR).</simplyReason>
 Revise o texto priorizando a fidelidade ao original em inglês. Mantenha o texto o mais próximo possível do original, removendo apenas redundâncias óbvias e corrigindo erros graves de pontuação, gramática ou formatação. Preserve termos técnicos, jargões e abreviações, e evite adicionar palavras ou sinônimos que alterem o significado. Corrija apenas o necessário para garantir clareza e fidelidade ao original.
 """
 
@@ -1188,6 +1188,24 @@ def submit_stms_feedback(data: STMSFeedbackRequest, db: Session = Depends(get_db
     except Exception as e:
         db.rollback()
         print(f"Erro ao processar feedback {data.id}: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+class STMSTranslateRequest(BaseModel):
+    text: str
+    target_lang: str
+
+@app.post("/stms/translate_text")
+def translate_stms_text(data: STMSTranslateRequest):
+    try:
+        dest = "Espanhol" if data.target_lang == "es" else "Português do Brasil (PT-BR)"
+        prompt = f"Traduza o seguinte texto técnico para {dest}. Retorne APENAS a tradução, sem aspas ou comentários:\n\n{data.text}"
+        
+        response = chat_session.send_message(prompt)
+        translation = response.text.strip()
+        
+        return {"translated_text": translation}
+    except Exception as e:
+        print(f"Erro ao traduzir texto: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/stms/postpone_string")
