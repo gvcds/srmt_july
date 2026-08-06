@@ -1084,8 +1084,9 @@ def reject_stms_string(data: STMSApproveRequest, db: Session = Depends(get_db)):
         db_item = db.query(STMSTranslation).filter(STMSTranslation.id == data.id).first()
         if db_item:
             db_item.status = 'rejected'
+            db_item.suggested_text = db_item.target_text
             db.commit()
-            return {"status": "success"}
+            return {"status": "success", "suggestion": db_item.target_text}
         raise HTTPException(status_code=404, detail="Item não encontrado")
     except Exception as e:
         db.rollback()

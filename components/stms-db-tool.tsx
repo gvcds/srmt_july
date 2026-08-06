@@ -572,12 +572,25 @@ const getCharLimit = (limitStr: string): number | null => {
 
  const handleReject = async (e: React.MouseEvent, id: number) => {
  e.stopPropagation();
- const item = items.find(i => i.id === id);
- if (item) {
-   setFeedbackItem(item);
-   setFeedbackText('');
-   setFeedbackAction('reject');
-   setIsFeedbackModalOpen(true);
+ try {
+   const response = await fetch(`${API_URL}/stms/reject_string`, {
+     method: 'POST',
+     headers: { 'Content-Type': 'application/json' },
+     body: JSON.stringify({ id })
+   });
+   
+   if (response.ok) {
+     const data = await response.json();
+     setItems(prev => prev.map(item => 
+       item.id === id 
+         ? { ...item, status: 'rejected', suggested_text: data.suggestion } 
+         : item
+     ));
+   } else {
+     alert("Erro ao rejeitar no servidor.");
+   }
+ } catch (error) {
+   console.error("Erro ao rejeitar:", error);
  }
  };
 
@@ -594,33 +607,57 @@ const getCharLimit = (limitStr: string): number | null => {
 
  const submitFeedback = async () => {
  if (!feedbackItem || !feedbackText.trim()) return;
- setIsFeedbackLoading(true);
- const isSpanish = feedbackItem.source_filename?.toLowerCase().includes('_es') || feedbackItem.source_filename?.toLowerCase().includes('-es') || feedbackItem.source_filename?.toLowerCase().includes('spanish');
+ 
+ const currentItemId = feedbackItem.id;
+ const currentFeedbackText = feedbackText.trim();
+ const currentFeedbackItem = feedbackItem;
+ const currentAction = feedbackAction;
+
+ // Close modal immediately and set loading state
+ setIsFeedbackModalOpen(false);
+ setFeedbackItem(null);
+ setFeedbackText('');
+ setLoadingIds(prev => new Set(prev).add(currentItemId));
+ setItems(prev => prev.map(item => item.id === currentItemId ? { ...item, status: 'pending' as const } : item));
+
+ const isSpanish = currentFeedbackItem.source_filename?.toLowerCase().includes('_es') || currentFeedbackItem.source_filename?.toLowerCase().includes('-es') || currentFeedbackItem.source_filename?.toLowerCase().includes('spanish');
  const detectedLang = isSpanish ? 'es' : 'pt';
+
  try {
    const payload = {
-     id: feedbackItem.id, feedback: feedbackText.trim(), ai_reason: feedbackItem.reason || '',
-     source_text: feedbackItem.source_text, target_text: feedbackItem.target_text,
-     suggested_text: feedbackItem.suggested_text || '', target_lang: detectedLang, action: feedbackAction
+     id: currentItemId, feedback: currentFeedbackText, ai_reason: currentFeedbackItem.reason || '',
+     source_text: currentFeedbackItem.source_text, target_text: currentFeedbackItem.target_text,
+     suggested_text: currentFeedbackItem.suggested_text || '', target_lang: detectedLang, action: currentAction
    };
+   
    const response = await fetch(`${API_URL}/stms/feedback`, {
      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
    });
+   
    if (response.ok) {
      const data = await response.json();
-     if (feedbackAction === 'reject') {
-       setItems(prev => prev.map(item => item.id === feedbackItem.id ? { ...item, status: 'rejected' as const } : item));
+     if (currentAction === 'reject') {
+       setItems(prev => prev.map(item => item.id === currentItemId ? { ...item, status: 'rejected' as const } : item));
      } else if (data.action === 're_reviewed') {
-       setItems(prev => prev.map(item => item.id === feedbackItem.id ? { ...item, suggested_text: data.suggestion, reason: data.reasoning, simply_reason: data.simplyReason, status: 'reviewing' as const } : item));
+       setItems(prev => prev.map(item => item.id === currentItemId ? { ...item, suggested_text: data.suggestion, reason: data.reasoning, simply_reason: data.simplyReason, status: 'reviewing' as const } : item));
      }
-     setIsFeedbackModalOpen(false);
-     setFeedbackItem(null);
-     setFeedbackText('');
-   } else { alert("Erro ao enviar feedback."); }
+   } else { 
+     alert("Erro ao enviar feedback.");
+     // Revert to reviewing state on error
+     setItems(prev => prev.map(item => item.id === currentItemId ? { ...item, status: 'reviewing' as const } : item));
+   }
  } catch (error) {
    console.error("Erro ao enviar feedback:", error);
    alert("Erro ao enviar feedback.");
- } finally { setIsFeedbackLoading(false); }
+   // Revert to reviewing state on error
+   setItems(prev => prev.map(item => item.id === currentItemId ? { ...item, status: 'reviewing' as const } : item));
+ } finally { 
+   setLoadingIds(prev => {
+     const next = new Set(prev);
+     next.delete(currentItemId);
+     return next;
+   });
+ }
  };
 
  const handlePostpone = async (e: React.MouseEvent, id: number) => {
@@ -1054,8 +1091,9 @@ const getCharLimit = (limitStr: string): number | null => {
         type="checkbox" 
         checked={isAllFilteredSelected}
         onChange={handleSelectAll}
+        disabled={filteredAndSortedItems.some(i => i.status === 'pending')}
         title={t.selectAll}
-        className={`w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer ${isDarkMode ? 'bg-black/20 border-white/20' : 'bg-white'}`}
+        className={`w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 ${filteredAndSortedItems.some(i => i.status === 'pending') ? 'opacity-20 cursor-not-allowed' : 'cursor-pointer'} ${isDarkMode ? 'bg-black/20 border-white/20' : 'bg-white'}`}
       />
     </div>
   </th>
@@ -1628,13 +1666,13 @@ const getCharLimit = (limitStr: string): number | null => {
  
  <div className={`p-6 border-b ${isDarkMode ? 'border-white/10' : 'border-gray-100'}`}>
  <div className="flex items-center gap-3">
- <div className={`p-2.5 rounded-xl ${feedbackAction === 'reject' ? 'bg-red-500/10' : 'bg-amber-500/10'}`}>
- {feedbackAction === 'reject' ? <X size={20} className="text-red-500" /> : <RefreshCcw size={20} className="text-amber-500" />}
+ <div className="p-2.5 rounded-xl bg-amber-500/10">
+ <RefreshCcw size={20} className="text-amber-500" />
  </div>
  <div>
  <h3 className="text-lg font-black tracking-tight">{t.feedbackTitle}</h3>
  <p className="text-xs opacity-50 mt-0.5">
- {feedbackAction === 'reject' ? t.feedbackRejectBtn : t.feedbackReReviewBtn}
+ {t.feedbackReReviewBtn}
  </p>
  </div>
  </div>
@@ -1671,7 +1709,7 @@ const getCharLimit = (limitStr: string): number | null => {
 
  {/* User Feedback Input */}
  <div className="space-y-2">
- <label className={`text-[10px] font-black uppercase tracking-widest ${feedbackAction === 'reject' ? 'text-red-500' : 'text-amber-500'}`}>
+ <label className="text-[10px] font-black uppercase tracking-widest text-amber-500">
  O que a IA errou?
  </label>
  <textarea
@@ -1680,7 +1718,7 @@ const getCharLimit = (limitStr: string): number | null => {
  placeholder={t.feedbackPlaceholder}
  className={`w-full p-4 text-sm rounded-xl border-2 focus:ring-4 outline-none transition-all min-h-[100px] resize-none
  ${isDarkMode ? 'bg-black/40 border-white/10 text-white placeholder:text-white/20' : 'bg-gray-50 border-gray-200 placeholder:text-gray-300'}
- ${feedbackAction === 'reject' ? 'focus:ring-red-500/20 focus:border-red-500/50' : 'focus:ring-amber-500/20 focus:border-amber-500/50'}`}
+ focus:ring-amber-500/20 focus:border-amber-500/50`}
  autoFocus
  />
  </div>
@@ -1691,13 +1729,10 @@ const getCharLimit = (limitStr: string): number | null => {
  <Button 
  onClick={submitFeedback} 
  disabled={!feedbackText.trim() || isFeedbackLoading}
- className={`rounded-xl px-6 text-white font-bold shadow-lg transition-all gap-2
- ${feedbackAction === 'reject' 
-   ? 'bg-red-600 hover:bg-red-500 shadow-red-600/20 disabled:bg-red-600/30' 
-   : 'bg-amber-600 hover:bg-amber-500 shadow-amber-600/20 disabled:bg-amber-600/30'}`}
+ className="rounded-xl px-6 text-white font-bold shadow-lg transition-all gap-2 bg-amber-600 hover:bg-amber-500 shadow-amber-600/20 disabled:bg-amber-600/30"
  >
  {isFeedbackLoading ? <Loader2 size={14} className="animate-spin" /> : <Send size={14} />}
- {feedbackAction === 'reject' ? t.feedbackRejectBtn : t.feedbackReReviewBtn}
+ {t.feedbackReReviewBtn}
  </Button>
  </div>
 
