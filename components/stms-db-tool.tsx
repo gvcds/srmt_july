@@ -671,13 +671,11 @@ export function STMSDBTool({ onFocusChange }: { onFocusChange?: (focused: boolea
         }
       } else {
         alert("Erro ao enviar feedback.");
-        // Revert to reviewing state on error
         setItems(prev => prev.map(item => item.id === currentItemId ? { ...item, status: 'reviewing' as const } : item));
       }
     } catch (error) {
       console.error("Erro ao enviar feedback:", error);
       alert("Erro ao enviar feedback.");
-      // Revert to reviewing state on error
       setItems(prev => prev.map(item => item.id === currentItemId ? { ...item, status: 'reviewing' as const } : item));
     } finally {
       setLoadingIds(prev => {
@@ -686,43 +684,40 @@ export function STMSDBTool({ onFocusChange }: { onFocusChange?: (focused: boolea
         return next;
       });
     }
-  }
-};
+  };
 
-const handleTranslate = async (text: string, targetLang: 'es' | 'pt', key: string) => {
-  if (!text) return;
-
-  // If we already have the translation cached, just switch the view
-  if (translatedTexts[key]) {
-    setViewTranslation(prev => ({ ...prev, [key]: targetLang }));
-    return;
-  }
-
-  setTranslatingKeys(prev => new Set(prev).add(key));
-  try {
-    const response = await fetch(`${API_URL}/stms/translate_text`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ text, target_lang: targetLang })
-    });
-
-    if (response.ok) {
-      const data = await response.json();
-      setTranslations(prev => ({ ...prev, [key]: data.translated_text }));
+  const handleTranslate = async (text: string, targetLang: 'es' | 'pt', key: string) => {
+    if (!text) return;
+    if (translatedTexts[key]) {
       setViewTranslation(prev => ({ ...prev, [key]: targetLang }));
-    } else {
-      console.error("Translation failed");
+      return;
     }
-  } catch (error) {
-    console.error("Erro ao traduzir:", error);
-  } finally {
-    setTranslatingKeys(prev => {
-      const next = new Set(prev);
-      next.delete(key);
-      return next;
-    });
-  }
-};
+
+    setTranslatingKeys(prev => new Set(prev).add(key));
+    try {
+      const response = await fetch(`${API_URL}/stms/translate_text`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text, target_lang: targetLang })
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setTranslatedTexts(prev => ({ ...prev, [key]: data.translated_text }));
+        setViewTranslation(prev => ({ ...prev, [key]: targetLang }));
+      } else {
+        console.error("Translation failed");
+      }
+    } catch (error) {
+      console.error("Erro ao traduzir:", error);
+    } finally {
+      setTranslatingKeys(prev => {
+        const next = new Set(prev);
+        next.delete(key);
+        return next;
+      });
+    }
+  };
 
 const handlePostpone = async (e: React.MouseEvent, id: number) => {
   e.stopPropagation();
