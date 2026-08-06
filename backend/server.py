@@ -1190,37 +1190,7 @@ def submit_stms_feedback(data: STMSFeedbackRequest, db: Session = Depends(get_db
         print(f"Erro ao processar feedback {data.id}: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
-class STMSTranslateRequest(BaseModel):
-    text: str
-    target_lang: str
 
-@app.post("/stms/translate_text")
-def translate_stms_text(data: STMSTranslateRequest):
-    try:
-        dest = "Espanhol" if data.target_lang == "es" else "Português do Brasil (PT-BR)"
-        prompt = f"Traduza o seguinte texto técnico para {dest}. Retorne APENAS a tradução, sem aspas ou comentários:\n\n{data.text}"
-        
-        messages = [{"role": "user", "content": prompt}]
-        payload = {"model": MODEL_ID, "messages": messages, "stream": False}
-        headers = {
-            "Authorization": f"Bearer {API_KEY}",
-            "Content-Type": "application/json"
-        }
-        
-        response = requests.post(PROXY_URL, json=payload, headers=headers, timeout=20, verify=False)
-        if response.status_code == 200:
-            res_data = response.json()
-            content = res_data.get('message', {}).get('content')
-            if not content and 'choices' in res_data and len(res_data['choices']) > 0:
-                content = res_data['choices'][0].get('message', {}).get('content', '')
-            
-            translation = content.strip() if content else ""
-            return {"translated_text": translation}
-        else:
-            raise Exception(f"API Error: {response.status_code}")
-    except Exception as e:
-        print(f"Erro ao traduzir texto: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/stms/postpone_string")
 def postpone_stms_string(data: STMSApproveRequest, db: Session = Depends(get_db)):

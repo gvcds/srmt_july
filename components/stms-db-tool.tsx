@@ -340,11 +340,6 @@ export function STMSDBTool({ onFocusChange }: { onFocusChange?: (focused: boolea
   const [feedbackAction, setFeedbackAction] = useState<'reject' | 're_review'>('reject');
   const [isFeedbackLoading, setIsFeedbackLoading] = useState(false);
 
-  // Translation state
-  const [translatedTexts, setTranslatedTexts] = useState<Record<string, string>>({});
-  const [translatingKeys, setTranslatingKeys] = useState<Set<string>>(new Set());
-  const [viewTranslation, setViewTranslation] = useState<Record<string, 'pt' | 'es'>>({});
-
   useEffect(() => {
     if (selectedItem) {
       setTempDesignId(selectedItem.design_id || '');
@@ -686,38 +681,6 @@ export function STMSDBTool({ onFocusChange }: { onFocusChange?: (focused: boolea
     }
   };
 
-  const handleTranslate = async (text: string, targetLang: 'es' | 'pt', key: string) => {
-    if (!text) return;
-    if (translatedTexts[key]) {
-      setViewTranslation(prev => ({ ...prev, [key]: targetLang }));
-      return;
-    }
-
-    setTranslatingKeys(prev => new Set(prev).add(key));
-    try {
-      const response = await fetch(`${API_URL}/stms/translate_text`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text, target_lang: targetLang })
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setTranslatedTexts(prev => ({ ...prev, [key]: data.translated_text }));
-        setViewTranslation(prev => ({ ...prev, [key]: targetLang }));
-      } else {
-        console.error("Translation failed");
-      }
-    } catch (error) {
-      console.error("Erro ao traduzir:", error);
-    } finally {
-      setTranslatingKeys(prev => {
-        const next = new Set(prev);
-        next.delete(key);
-        return next;
-      });
-    }
-  };
 
 const handlePostpone = async (e: React.MouseEvent, id: number) => {
   e.stopPropagation();
@@ -1399,26 +1362,9 @@ return (
                   </td>
                   <td className="p-5 align-top max-w-[150px]">
                     {item.simply_reason ? (
-                      <div className="flex flex-col gap-1.5 items-start">
-                        <div className={`px-2.5 py-1.5 rounded-lg border text-[9px] font-black uppercase tracking-[0.15em] inline-block leading-normal transition-all
- ${isDarkMode ? 'bg-blue-500/[0.05] border-blue-500/20 text-blue-400 group-hover:bg-blue-500/10 group-hover:border-blue-500/40' : 'bg-blue-50 border-blue-100 text-blue-600 group-hover:bg-blue-100 group-hover:border-blue-200 shadow-sm'}`}>
-                          {viewTranslation[`${item.id}_simply`] === 'es' ? (translatedTexts[`${item.id}_simply`] || <Loader2 size={10} className="inline animate-spin" />) : item.simply_reason}
-                        </div>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            const key = `${item.id}_simply`;
-                            const currentLang = viewTranslation[key] === 'es' ? 'pt' : 'es';
-                            if (currentLang === 'es' && !translatedTexts[key]) {
-                              handleTranslate(item.simply_reason!, 'es', key);
-                            } else {
-                              setViewTranslation(prev => ({ ...prev, [key]: currentLang }));
-                            }
-                          }}
-                          className="text-[8px] opacity-40 hover:opacity-100 uppercase tracking-widest font-black transition-all flex items-center gap-1 text-blue-500"
-                        >
-                          <RefreshCcw size={8} /> {viewTranslation[`${item.id}_simply`] === 'es' ? 'PT-BR' : 'Traduzir ES'}
-                        </button>
+                      <div className={`px-2.5 py-1.5 rounded-lg border text-[9px] font-black uppercase tracking-[0.15em] inline-block leading-none transition-all
+  ${isDarkMode ? 'bg-blue-500/[0.05] border-blue-500/20 text-blue-400 group-hover:bg-blue-500/10 group-hover:border-blue-500/40' : 'bg-blue-50 border-blue-100 text-blue-600 group-hover:bg-blue-100 group-hover:border-blue-200 shadow-sm'}`}>
+                        {item.simply_reason}
                       </div>
                     ) : (
                       <div className="flex items-center gap-2 opacity-20 text-[10px] font-black uppercase tracking-[0.2em] animate-pulse">
@@ -1557,29 +1503,7 @@ return (
               </div>
               <h2 className="text-xl font-bold tracking-tight">{t.analysisTitle}</h2>
             </div>
-            <div className="flex items-center gap-3">
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  const rKey = `${selectedItem.id}_reason`;
-                  const sKey = `${selectedItem.id}_simply`;
-                  const currentLang = viewTranslation[rKey] === 'es' ? 'pt' : 'es';
-
-                  if (currentLang === 'es') {
-                    if (selectedItem.reason && !translatedTexts[rKey]) handleTranslate(selectedItem.reason, 'es', rKey);
-                    if (selectedItem.simply_reason && !translatedTexts[sKey]) handleTranslate(selectedItem.simply_reason, 'es', sKey);
-                  }
-                  setViewTranslation(prev => ({ ...prev, [rKey]: currentLang, [sKey]: currentLang }));
-                }}
-                className={`px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-widest transition-all flex items-center gap-2 border
- ${viewTranslation[`${selectedItem.id}_reason`] === 'es'
-                    ? 'bg-amber-500/10 border-amber-500/30 text-amber-600'
-                    : 'bg-blue-500/10 border-blue-500/20 text-blue-600'}`}
-              >
-                <RefreshCcw size={12} /> {viewTranslation[`${selectedItem.id}_reason`] === 'es' ? 'Ver PT-BR' : 'Traduzir ES'}
-              </button>
-              <Button variant="ghost" size="sm" onClick={() => setSelectedItem(null)} className="rounded-lg h-8 w-8 p-0"><X className="w-5 h-5" /></Button>
-            </div>
+            <Button variant="ghost" size="sm" onClick={() => setSelectedItem(null)} className="rounded-lg h-8 w-8 p-0"><X className="w-5 h-5" /></Button>
           </div>
 
           <div className="p-8 space-y-6 overflow-y-auto max-h-[70vh] custom-scrollbar">
@@ -1667,9 +1591,7 @@ return (
                   <Sparkles className="w-4 h-4" />
                   <span className="text-[10px] font-black uppercase tracking-widest">{t.shortSummary}</span>
                 </div>
-                <p className="text-sm font-bold leading-relaxed">
-                  {viewTranslation[`${selectedItem.id}_simply`] === 'es' ? (translatedTexts[`${selectedItem.id}_simply`] || <Loader2 size={14} className="inline animate-spin" />) : selectedItem.simply_reason}
-                </p>
+                <p className="text-sm font-bold leading-relaxed">{selectedItem.simply_reason}</p>
               </div>
             )}
 
@@ -1679,9 +1601,7 @@ return (
                   <Zap className="w-4 h-4" />
                   <span className="text-[10px] font-black uppercase tracking-widest">{t.techReason}</span>
                 </div>
-                <p className="text-sm leading-relaxed opacity-80 whitespace-pre-wrap">
-                  {viewTranslation[`${selectedItem.id}_reason`] === 'es' ? (translatedTexts[`${selectedItem.id}_reason`] || <Loader2 size={14} className="inline animate-spin" />) : selectedItem.reason}
-                </p>
+                <p className="text-sm leading-relaxed opacity-80 whitespace-pre-wrap">{selectedItem.reason}</p>
               </div>
             )}
           </div>
