@@ -589,6 +589,22 @@ def get_dynamic_rules(key, en_content, pt_content, en_comment, pt_comment, targe
     if re.search(r'\b[A-Za-zÀ-ÿ0-9_]{2,}\.', pt_content):
         add_section_by_keyword(["abreviação"], add_all_matches=True)
 
+    # Injetar feedback de erros anteriores reportados pelo usuário
+    try:
+        feedback_filename = f"feedback_{target_lang}.txt"
+        feedback_path = os.path.join(os.path.dirname(__file__), 'knowledge_base', feedback_filename)
+        if os.path.exists(feedback_path):
+            with open(feedback_path, 'r', encoding='utf-8') as f:
+                feedback_content = f.read().strip()
+            if feedback_content:
+                # Limitar para os últimos 50 feedbacks para não sobrecarregar o prompt
+                feedback_entries = feedback_content.split("--- FEEDBACK")
+                recent_entries = feedback_entries[-50:] if len(feedback_entries) > 50 else feedback_entries
+                trimmed_feedback = "--- FEEDBACK".join(recent_entries).strip()
+                relevant_rules += f"\n\n[ERROS ANTERIORES REPORTADOS PELO USUÁRIO — NÃO REPITA ESTES ERROS:]\n{trimmed_feedback}\n"
+    except Exception as e:
+        print(f"Aviso: Não foi possível carregar feedback: {e}")
+
     return relevant_rules.strip(), design_type
 
 # --- INTEGRAÇÃO COM A API DA IA (Não altere a lógica) ---
@@ -1074,6 +1090,101 @@ def reject_stms_string(data: STMSApproveRequest, db: Session = Depends(get_db)):
     except Exception as e:
         db.rollback()
         print(f"Erro ao rejeitar string {data.id}: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+class STMSFeedbackRequest(BaseModel):
+    id: int
+    feedback: str
+    ai_reason: Optional[str] = ""
+    source_text: Optional[str] = ""
+    target_text: Optional[str] = ""
+    suggested_text: Optional[str] = ""
+    target_lang: Optional[str] = "pt"
+    action: Optional[str] = "reject"  # "reject" or "re_review"
+
+@app.post("/stms/feedback")
+def submit_stms_feedback(data: STMSFeedbackRequest, db: Session = Depends(get_db)):
+    """Recebe feedback do usuário sobre erro da IA e salva na base de conhecimento."""
+    try:
+        # 1. Salvar feedback no arquivo de conhecimento
+        feedback_filename = f"feedback_{data.target_lang}.txt"
+        kb_dir = os.path.join(os.path.dirname(__file__), "knowledge_base")
+        os.makedirs(kb_dir, exist_ok=True)
+        feedback_path = os.path.join(kb_dir, feedback_filename)
+        
+        from datetime import datetime
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M")
+        
+        feedback_entry = f"\n--- FEEDBACK ({timestamp}) ---\n"
+        feedback_entry += f"EN: {data.source_text}\n"
+        lang_code = "ES" if data.target_lang == "es" else "PT"
+        feedback_entry += f"{lang_code}: {data.target_text}\n"
+        feedback_entry += f"Sugestão da IA: {data.suggested_text}\n"
+        feedback_entry += f"Motivo da IA: {data.ai_reason}\n"
+        feedback_entry += f"ERRO REPORTADO PELO USUÁRIO: {data.feedback}\n"
+        feedback_entry += f"---\n"
+        
+        with open(feedback_path, "a", encoding="utf-8") as f:
+            f.write(feedback_entry)
+        
+        print(f"[FEEDBACK] Salvo em {feedback_filename}: {data.feedback[:80]}...")
+        
+        # 2. Executar a ação (rejeitar ou re-revisar)
+        db_item = db.query(STMSTranslation).filter(STMSTranslation.id == data.id).first()
+        if not db_item:
+            raise HTTPException(status_code=404, detail="Item não encontrado")
+        
+        if data.action == "reject":
+            db_item.status = "rejected"
+            db.commit()
+            return {"status": "success", "action": "rejected"}
+        
+        elif data.action == "re_review":
+            # Re-revisar: chamar a IA novamente com o feedback já salvo na base
+            mapping_item = {
+                "string_name": f"ROW_{data.id}",
+                "en": data.source_text or db_item.source_text,
+                "pt": data.target_text or db_item.target_text,
+                "en_comment": db_item.context or "",
+                "pt_comment": ""
+            }
+            
+            if db_item.char_limit:
+                mapping_item["en_comment"] += f" (MAX: {db_item.char_limit})"
+            
+            result = fetch_translation(mapping_item, target_lang=data.target_lang)
+            
+            advice = result.get('advice', db_item.target_text)
+            reason = result.get('reason', 'Revisão automática realizada.')
+            simply = result.get('simplyReason', 'Revisão OK')
+            
+            if advice == "ERRO":
+                return {"status": "error", "action": "re_review", "suggestion": db_item.target_text, "reasoning": f"Erro na API: {reason}", "simplyReason": simply}
+            
+            if advice == "Mantido":
+                advice = db_item.target_text
+            
+            db_item.suggested_text = advice
+            db_item.reason = reason
+            db_item.simply_reason = simply
+            db_item.status = "reviewing"
+            db.commit()
+            
+            return {
+                "status": "success",
+                "action": "re_reviewed",
+                "suggestion": advice,
+                "reasoning": reason,
+                "simplyReason": simply
+            }
+        
+        return {"status": "error", "detail": "Ação inválida"}
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        db.rollback()
+        print(f"Erro ao processar feedback {data.id}: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/stms/postpone_string")
@@ -2619,7 +2730,7 @@ class SuggestKnowledgeRequest(BaseModel):
 
 @app.get("/knowledge/{filename}")
 def get_knowledge_file(filename: str):
-    valid_files = ["bug_review.txt", "general_info.txt", "tone_of_voice.txt", "tone_of_voice_es.txt"]
+    valid_files = ["bug_review.txt", "general_info.txt", "tone_of_voice.txt", "tone_of_voice_es.txt", "feedback_pt.txt", "feedback_es.txt"]
     if filename not in valid_files:
         raise HTTPException(status_code=400, detail="Arquivo inválido")
     
@@ -2632,7 +2743,7 @@ def get_knowledge_file(filename: str):
 
 @app.post("/knowledge/{filename}")
 def update_knowledge_file(filename: str, data: KnowledgeUpdateRequest):
-    valid_files = ["bug_review.txt", "general_info.txt", "tone_of_voice.txt", "tone_of_voice_es.txt"]
+    valid_files = ["bug_review.txt", "general_info.txt", "tone_of_voice.txt", "tone_of_voice_es.txt", "feedback_pt.txt", "feedback_es.txt"]
     if filename not in valid_files:
         raise HTTPException(status_code=400, detail="Arquivo inválido")
     

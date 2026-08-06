@@ -1,0 +1,3 @@
+# Histórico de Feedback do Usuário - Português (PT-BR)
+# Este arquivo é atualizado automaticamente quando o usuário reporta erros da IA no STMS AI Assist.
+# A IA lê este arquivo para evitar repetir os mesmos erros.

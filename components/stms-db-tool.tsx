@@ -35,7 +35,9 @@ import {
  Hash,
  MessageSquare,
  AlertTriangle,
- CheckSquare
+ CheckSquare,
+ Send,
+ RefreshCcw
 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -122,7 +124,13 @@ const translations = {
  bulkApprove: 'Aprovar',
  bulkReject: 'Rejeitar',
  bulkPostpone: 'Adiar',
- bulkUndo: 'Desfazer'
+ bulkUndo: 'Desfazer',
+ feedbackTitle: 'Feedback para a IA',
+ feedbackAiExplanation: 'Explicação da IA',
+ feedbackPlaceholder: 'Descreva o que a IA errou nesta sugestão...',
+ feedbackRejectBtn: 'Aplicar Feedback e Rejeitar',
+ feedbackReReviewBtn: 'Aplicar Feedback e Revisar Novamente',
+ reReviewBtn: 'Revisar Novamente'
  },
  en: {
  total: 'Total',
@@ -180,7 +188,13 @@ const translations = {
  bulkApprove: 'Approve',
  bulkReject: 'Reject',
  bulkPostpone: 'Postpone',
- bulkUndo: 'Undo'
+ bulkUndo: 'Undo',
+ feedbackTitle: 'AI Feedback',
+ feedbackAiExplanation: 'AI Explanation',
+ feedbackPlaceholder: 'Describe what the AI got wrong...',
+ feedbackRejectBtn: 'Apply Feedback & Reject',
+ feedbackReReviewBtn: 'Apply Feedback & Re-Review',
+ reReviewBtn: 'Re-Review'
  },
  ko: {
  total: '전체',
@@ -238,8 +252,14 @@ const translations = {
  bulkApprove: '승인',
  bulkReject: '거절',
  bulkPostpone: '연기하다',
- bulkUndo: '되돌리기'
- }
+ bulkUndo: '되돌리기',
+ feedbackTitle: 'AI 피드백',
+ feedbackAiExplanation: 'AI 설명',
+ feedbackPlaceholder: 'AI가 잘못한 점을 설명하세요...',
+ feedbackRejectBtn: '피드백 적용 후 거절',
+ feedbackReReviewBtn: '피드백 적용 후 재검토',
+ reReviewBtn: '재검토'
+  }
 };
 
 const getCharLimit = (limitStr: string): number | null => {
@@ -251,8 +271,7 @@ const getCharLimit = (limitStr: string): number | null => {
  export function STMSDBTool({ onFocusChange }: { onFocusChange?: (focused: boolean) => void }) {
   const { isDarkMode } = useTheme();
   const [lang, setLanguage] = useState<'pt' | 'en' | 'ko'>('pt');
-  const [targetLang, setTargetLang] = useState<'pt' | 'es'>('pt');
- const t = translations[lang];
+  const t = translations[lang];
 
  const [items, setItems] = useState<STMSString[]>([]);
  const [loadingIds, setLoadingIds] = useState<Set<number>>(new Set());
@@ -290,6 +309,13 @@ const getCharLimit = (limitStr: string): number | null => {
  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
  const [tempEditItem, setTempEditItem] = useState<STMSString | null>(null);
  const [editValue, setEditValue] = useState('');
+
+ // Feedback modal state
+ const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState(false);
+ const [feedbackItem, setFeedbackItem] = useState<STMSString | null>(null);
+ const [feedbackText, setFeedbackText] = useState('');
+ const [feedbackAction, setFeedbackAction] = useState<'reject' | 're_review'>('reject');
+ const [isFeedbackLoading, setIsFeedbackLoading] = useState(false);
 
  useEffect(() => {
  if (selectedItem) {
@@ -460,13 +486,18 @@ const getCharLimit = (limitStr: string): number | null => {
  try {
  await Promise.all(batch.map(async (item) => {
  try {
+ const isSpanish = item.source_filename?.toLowerCase().includes('_es') || 
+                   item.source_filename?.toLowerCase().includes('-es') || 
+                   item.source_filename?.toLowerCase().includes('spanish');
+ const detectedLang = isSpanish ? 'es' : 'pt';
+
  const payload = {
  id: item.id,
  context: item.context,
  source_text: item.source_text,
  target_text: item.target_text,
  char_limit: item.char_limit,
- target_lang: targetLang
+ target_lang: detectedLang
  };
 
  const response = await fetch(`${API_URL}/stms/review_ai`, {
@@ -541,24 +572,55 @@ const getCharLimit = (limitStr: string): number | null => {
 
  const handleReject = async (e: React.MouseEvent, id: number) => {
  e.stopPropagation();
+ const item = items.find(i => i.id === id);
+ if (item) {
+   setFeedbackItem(item);
+   setFeedbackText('');
+   setFeedbackAction('reject');
+   setIsFeedbackModalOpen(true);
+ }
+ };
+
+ const openFeedbackForReReview = (e: React.MouseEvent, id: number) => {
+ e.stopPropagation();
+ const item = items.find(i => i.id === id);
+ if (item) {
+   setFeedbackItem(item);
+   setFeedbackText('');
+   setFeedbackAction('re_review');
+   setIsFeedbackModalOpen(true);
+ }
+ };
+
+ const submitFeedback = async () => {
+ if (!feedbackItem || !feedbackText.trim()) return;
+ setIsFeedbackLoading(true);
+ const isSpanish = feedbackItem.source_filename?.toLowerCase().includes('_es') || feedbackItem.source_filename?.toLowerCase().includes('-es') || feedbackItem.source_filename?.toLowerCase().includes('spanish');
+ const detectedLang = isSpanish ? 'es' : 'pt';
  try {
- const response = await fetch(`${API_URL}/stms/reject_string`, {
- method: 'POST',
- headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ id })
- });
- if (response.ok) {
- setItems(prev => prev.map(item => 
- item.id === id 
- ? { ...item, status: 'rejected' } 
- : item
- ));
- } else {
- alert("Erro ao rejeitar no servidor.");
- }
+   const payload = {
+     id: feedbackItem.id, feedback: feedbackText.trim(), ai_reason: feedbackItem.reason || '',
+     source_text: feedbackItem.source_text, target_text: feedbackItem.target_text,
+     suggested_text: feedbackItem.suggested_text || '', target_lang: detectedLang, action: feedbackAction
+   };
+   const response = await fetch(`${API_URL}/stms/feedback`, {
+     method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
+   });
+   if (response.ok) {
+     const data = await response.json();
+     if (feedbackAction === 'reject') {
+       setItems(prev => prev.map(item => item.id === feedbackItem.id ? { ...item, status: 'rejected' as const } : item));
+     } else if (data.action === 're_reviewed') {
+       setItems(prev => prev.map(item => item.id === feedbackItem.id ? { ...item, suggested_text: data.suggestion, reason: data.reasoning, simply_reason: data.simplyReason, status: 'reviewing' as const } : item));
+     }
+     setIsFeedbackModalOpen(false);
+     setFeedbackItem(null);
+     setFeedbackText('');
+   } else { alert("Erro ao enviar feedback."); }
  } catch (error) {
- console.error("Erro ao rejeitar:", error);
- }
+   console.error("Erro ao enviar feedback:", error);
+   alert("Erro ao enviar feedback.");
+ } finally { setIsFeedbackLoading(false); }
  };
 
  const handlePostpone = async (e: React.MouseEvent, id: number) => {
@@ -797,18 +859,6 @@ const getCharLimit = (limitStr: string): number | null => {
  <Sparkles size={18} />
  )}
  </Button>
- 
- <div className={`relative flex items-center rounded-xl border px-3 h-12 transition-all ${isDarkMode ? 'bg-white/5 border-white/5' : 'bg-gray-50 border-black/5'}`}>
-   <span className="text-xs font-bold mr-2 opacity-50">Alvo:</span>
-   <select 
-     value={targetLang}
-     onChange={(e) => setTargetLang(e.target.value as 'pt' | 'es')}
-     className={`bg-transparent outline-none text-xs font-black cursor-pointer appearance-none pr-4`}
-   >
-     <option value="pt">PT-BR</option>
-     <option value="es">Espanhol</option>
-   </select>
- </div>
  </div>
 
  <div className="relative flex-1 w-full" ref={dropdownRef}>
@@ -1277,6 +1327,11 @@ const getCharLimit = (limitStr: string): number | null => {
  <Clock size={14} /> {t.postpone}
  </Button>
  )}
+ {item.status === 'reviewing' && (
+ <Button onClick={(e) => openFeedbackForReReview(e, item.id)} variant="ghost" className="h-8 rounded-xl px-4 text-[10px] font-black uppercase tracking-[0.15em] gap-2 w-full bg-amber-500/10 text-amber-600 dark:text-amber-400 hover:bg-amber-500/20 border-none transition-all ">
+ <RefreshCcw size={14} /> {t.reReviewBtn}
+ </Button>
+ )}
  </div>
  )}
  {(item.status === 'approved' || item.status === 'rejected' || item.status === 'postponed') && (
@@ -1562,6 +1617,94 @@ const getCharLimit = (limitStr: string): number | null => {
  </Card>
  </div>
  )}
+
+ {/* Feedback Modal */}
+ {isFeedbackModalOpen && feedbackItem && (
+ <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4" onClick={() => setIsFeedbackModalOpen(false)}>
+ <div className="absolute inset-0 bg-black/60 backdrop-blur-md animate-in fade-in duration-300" />
+ <Card className={`relative z-10 w-full max-w-2xl overflow-hidden rounded-2xl border shadow-2xl animate-in zoom-in-95 fade-in duration-500
+ ${isDarkMode ? 'bg-[#0c0c0c] border-white/10 text-gray-100' : 'bg-white border-gray-200 text-gray-900'}`}
+ onClick={(e: React.MouseEvent) => e.stopPropagation()}>
+ 
+ <div className={`p-6 border-b ${isDarkMode ? 'border-white/10' : 'border-gray-100'}`}>
+ <div className="flex items-center gap-3">
+ <div className={`p-2.5 rounded-xl ${feedbackAction === 'reject' ? 'bg-red-500/10' : 'bg-amber-500/10'}`}>
+ {feedbackAction === 'reject' ? <X size={20} className="text-red-500" /> : <RefreshCcw size={20} className="text-amber-500" />}
+ </div>
+ <div>
+ <h3 className="text-lg font-black tracking-tight">{t.feedbackTitle}</h3>
+ <p className="text-xs opacity-50 mt-0.5">
+ {feedbackAction === 'reject' ? t.feedbackRejectBtn : t.feedbackReReviewBtn}
+ </p>
+ </div>
+ </div>
+ </div>
+
+ <div className="p-6 space-y-5">
+ {/* Source and Target texts */}
+ <div className="grid grid-cols-2 gap-3 opacity-60">
+ <div className={`p-3 rounded-xl border ${isDarkMode ? 'bg-white/5 border-white/5' : 'bg-gray-50 border-black/5'}`}>
+ <span className="text-[9px] font-black uppercase tracking-widest block mb-1 opacity-50">{t.sourceLabel}</span>
+ <p className="text-xs font-medium">{feedbackItem.source_text}</p>
+ </div>
+ <div className={`p-3 rounded-xl border ${isDarkMode ? 'bg-white/5 border-white/5' : 'bg-gray-50 border-black/5'}`}>
+ <span className="text-[9px] font-black uppercase tracking-widest block mb-1 opacity-50">{t.targetLabel}</span>
+ <p className="text-xs font-medium">{feedbackItem.target_text}</p>
+ </div>
+ </div>
+
+ {/* AI Suggestion */}
+ {feedbackItem.suggested_text && (
+ <div className={`p-3 rounded-xl border ${isDarkMode ? 'bg-blue-500/5 border-blue-500/20' : 'bg-blue-50 border-blue-100'}`}>
+ <span className="text-[9px] font-black uppercase tracking-widest block mb-1 text-blue-500">{t.aiResultLabel}</span>
+ <p className="text-xs font-bold">{feedbackItem.suggested_text}</p>
+ </div>
+ )}
+
+ {/* AI Explanation */}
+ {feedbackItem.reason && (
+ <div className={`p-3 rounded-xl border ${isDarkMode ? 'bg-white/[0.03] border-white/5' : 'bg-gray-50 border-gray-100'}`}>
+ <span className="text-[9px] font-black uppercase tracking-widest block mb-1 opacity-50">{t.feedbackAiExplanation}</span>
+ <p className="text-xs leading-relaxed opacity-80">{feedbackItem.reason}</p>
+ </div>
+ )}
+
+ {/* User Feedback Input */}
+ <div className="space-y-2">
+ <label className={`text-[10px] font-black uppercase tracking-widest ${feedbackAction === 'reject' ? 'text-red-500' : 'text-amber-500'}`}>
+ O que a IA errou?
+ </label>
+ <textarea
+ value={feedbackText}
+ onChange={(e) => setFeedbackText(e.target.value)}
+ placeholder={t.feedbackPlaceholder}
+ className={`w-full p-4 text-sm rounded-xl border-2 focus:ring-4 outline-none transition-all min-h-[100px] resize-none
+ ${isDarkMode ? 'bg-black/40 border-white/10 text-white placeholder:text-white/20' : 'bg-gray-50 border-gray-200 placeholder:text-gray-300'}
+ ${feedbackAction === 'reject' ? 'focus:ring-red-500/20 focus:border-red-500/50' : 'focus:ring-amber-500/20 focus:border-amber-500/50'}`}
+ autoFocus
+ />
+ </div>
+ </div>
+
+ <div className={`p-6 border-t flex justify-end gap-3 ${isDarkMode ? 'border-white/10' : 'border-gray-100'}`}>
+ <Button variant="ghost" onClick={() => { setIsFeedbackModalOpen(false); setFeedbackItem(null); }} className="rounded-xl px-6">{t.cancelBtn}</Button>
+ <Button 
+ onClick={submitFeedback} 
+ disabled={!feedbackText.trim() || isFeedbackLoading}
+ className={`rounded-xl px-6 text-white font-bold shadow-lg transition-all gap-2
+ ${feedbackAction === 'reject' 
+   ? 'bg-red-600 hover:bg-red-500 shadow-red-600/20 disabled:bg-red-600/30' 
+   : 'bg-amber-600 hover:bg-amber-500 shadow-amber-600/20 disabled:bg-amber-600/30'}`}
+ >
+ {isFeedbackLoading ? <Loader2 size={14} className="animate-spin" /> : <Send size={14} />}
+ {feedbackAction === 'reject' ? t.feedbackRejectBtn : t.feedbackReReviewBtn}
+ </Button>
+ </div>
+
+ </Card>
+ </div>
+ )}
+
  </div>
  );
 }
