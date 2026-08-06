@@ -605,6 +605,8 @@ def get_dynamic_rules(key, en_content, pt_content, en_comment, pt_comment, targe
     except Exception as e:
         print(f"Aviso: Não foi possível carregar feedback: {e}")
 
+    relevant_rules += "\n\n[REGRA DE REDUNDÂNCIA]\nNÃO corrija ou relate redundâncias. Se a tradução alvo parecer redundante, IGNORE. A redundância deve ser mantida como correta. Nenhuma alteração deve ser feita por motivo de redundância.\n"
+
     return relevant_rules.strip(), design_type
 
 # --- INTEGRAÇÃO COM A API DA IA (Não altere a lógica) ---
