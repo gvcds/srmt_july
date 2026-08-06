@@ -67,6 +67,29 @@ interface AIReviewResponse {
  simplyReason: string;
 }
 
+const detectLanguageFromTexts = (texts: string[]): 'es' | 'pt' => {
+ const validTexts = texts.filter(t => typeof t === 'string' && t.trim().length > 0);
+ if (validTexts.length === 0) return 'pt';
+
+ const combinedText = validTexts.slice(0, 50).join(' ').toLowerCase();
+ 
+ if (/[ñ¿¡]/.test(combinedText)) return 'es';
+ 
+ const esWords = [' y ', ' el ', ' la ', ' los ', ' las ', ' un ', ' una ', ' del ', ' al ', ' con ', ' guardar ', ' atrás ', ' ajustes ', ' pantalla ', ' aplicación ', ' teléfono ', ' ubicación ', ' aceptar ', ' sí ', ' más '];
+ const ptWords = [' e ', ' o ', ' a ', ' os ', ' as ', ' um ', ' uma ', ' do ', ' da ', ' ao ', ' com ', ' salvar ', ' voltar ', ' configurações ', ' tela ', ' aplicativo ', ' telefone ', ' localização ', ' sim ', ' não ', ' mais '];
+ 
+ let esScore = 0;
+ let ptScore = 0;
+ 
+ esWords.forEach(w => esScore += (combinedText.match(new RegExp(w, 'g')) || []).length);
+ ptWords.forEach(w => ptScore += (combinedText.match(new RegExp(w, 'g')) || []).length);
+ 
+ if (combinedText.includes('ción') || combinedText.includes('dad ') || combinedText.includes('móvil')) esScore += 2;
+ if (combinedText.includes('ção') || combinedText.includes('dade ') || combinedText.includes('móvel')) ptScore += 2;
+ 
+ return esScore > ptScore ? 'es' : 'pt';
+ };
+
 const translations = {
  pt: {
  total: 'Total',
@@ -486,10 +509,9 @@ const getCharLimit = (limitStr: string): number | null => {
  try {
  await Promise.all(batch.map(async (item) => {
  try {
- const isSpanish = item.source_filename?.toLowerCase().includes('_es') || 
-                   item.source_filename?.toLowerCase().includes('-es') || 
-                   item.source_filename?.toLowerCase().includes('spanish');
- const detectedLang = isSpanish ? 'es' : 'pt';
+ const fileItems = itemsRef.current.filter(i => i.source_filename === item.source_filename);
+ const fileTexts = fileItems.map(i => i.target_text).filter(Boolean) as string[];
+ const detectedLang = detectLanguageFromTexts(fileTexts);
 
  const payload = {
  id: item.id,
@@ -620,8 +642,9 @@ const getCharLimit = (limitStr: string): number | null => {
  setLoadingIds(prev => new Set(prev).add(currentItemId));
  setItems(prev => prev.map(item => item.id === currentItemId ? { ...item, status: 'pending' as const } : item));
 
- const isSpanish = currentFeedbackItem.source_filename?.toLowerCase().includes('_es') || currentFeedbackItem.source_filename?.toLowerCase().includes('-es') || currentFeedbackItem.source_filename?.toLowerCase().includes('spanish');
- const detectedLang = isSpanish ? 'es' : 'pt';
+ const fileItems = itemsRef.current.filter(i => i.source_filename === currentFeedbackItem.source_filename);
+ const fileTexts = fileItems.map(i => i.target_text).filter(Boolean) as string[];
+ const detectedLang = detectLanguageFromTexts(fileTexts);
 
  try {
    const payload = {
