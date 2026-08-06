@@ -1202,6 +1202,10 @@ def translate_stms_text(data: STMSTranslateRequest):
         
         messages = [{"role": "user", "content": prompt}]
         payload = {"model": MODEL_ID, "messages": messages, "stream": False}
+        headers = {
+            "Authorization": f"Bearer {API_KEY}",
+            "Content-Type": "application/json"
+        }
         
         response = requests.post(PROXY_URL, json=payload, headers=headers, timeout=20, verify=False)
         if response.status_code == 200:
