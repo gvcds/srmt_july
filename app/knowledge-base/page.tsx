@@ -1131,17 +1131,26 @@ export default function KnowledgeBasePage() {
                                   ) : <span className="opacity-20 text-xs font-bold">-</span>}
                                 </td>
                                 <td className="p-5 align-top text-right">
-                        {filteredGlossary.length === 0 && (
-                          <div className="py-20 text-center opacity-40">
-                            <Database size={48} className="mx-auto mb-4 opacity-50" />
-                            <p className="text-lg font-bold">Nenhum resultado encontrado.</p>
-                          </div>
-                        )}
+                                  <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <Button variant="ghost" size="sm" onClick={() => setEditingItem(item)} className="h-8 w-8 p-0 rounded-lg text-blue-500 hover:bg-blue-500/10"><Edit2 size={14}/></Button>
+                                    <Button variant="ghost" size="sm" onClick={() => handleDeleteGlossary(item.id!)} className="h-8 w-8 p-0 rounded-lg text-red-500 hover:bg-red-500/10"><Trash2 size={14}/></Button>
+                                  </div>
+                                </td>
+                              </tr>
+                            )) : (
+                              <tr>
+                                <td colSpan={5} className="p-10 text-center opacity-40 font-bold text-sm">
+                                  Nenhum item no glossário.
+                                </td>
+                              </tr>
+                            )}
+                          </tbody>
+                        </table>
                       </div>
                       
                       {/* Paginação do Glossário */}
                       {glossaryTotalPages > 1 && (
-                        <div className="pt-6 flex items-center justify-between">
+                        <div className={`p-5 border-t flex items-center justify-between ${isDarkMode ? 'border-white/5 bg-white/[0.01]' : 'border-black/5 bg-black/[0.01]'}`}>
                           <span className="text-[10px] font-black uppercase tracking-widest opacity-40">
                             Mostrando {(currentPage - 1) * itemsPerPage + 1} - {Math.min(currentPage * itemsPerPage, filteredGlossary.length)} de {filteredGlossary.length}
                           </span>
