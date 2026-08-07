@@ -1168,6 +1168,102 @@ export default function KnowledgeBasePage() {
                 </div>
               )}
 
+              {/* FEEDBACKS DA IA (PT-BR / ES) INTERFACE */}
+              {(activeTab === 'feedback_pt' || activeTab === 'feedback_es') && (
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                  {/* Formulário Esquerdo */}
+                  <div className="lg:col-span-1">
+                    <Card className={`p-8 rounded-[2.5rem] border shadow-2xl sticky top-24 ${isDarkMode ? 'bg-indigo-600/5 border-indigo-500/20' : 'bg-indigo-50 border-indigo-200'}`}>
+                      <h3 className="text-lg font-black uppercase tracking-widest text-indigo-600 dark:text-indigo-400 mb-6 flex items-center gap-2">
+                        {editingFeedback.id ? <Edit2 size={20}/> : <Plus size={20}/>}
+                        {editingFeedback.id ? 'Editar Feedback' : 'Adicionar Feedback'}
+                      </h3>
+                      <div className="space-y-4">
+                        <div className="space-y-1">
+                          <label className="text-[10px] font-black uppercase opacity-60 ml-1">Regra de Correção / Feedback</label>
+                          <Textarea 
+                            value={editingFeedback.text} 
+                            onChange={e => setEditingFeedback({...editingFeedback, text: e.target.value})} 
+                            className={`rounded-xl border-none font-medium min-h-[150px] p-4 ${isDarkMode ? 'bg-black/40 text-white' : 'bg-white text-gray-900'}`} 
+                            placeholder="Ex: Nunca traduza a palavra 'Display' em nenhum contexto." 
+                          />
+                        </div>
+                      </div>
+                      <div className="mt-8 flex flex-col gap-3">
+                        <Button onClick={handleSaveFeedback} disabled={saving || !editingFeedback.text} className="w-full rounded-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold h-12 shadow-lg shadow-indigo-600/20">
+                          {saving ? <Loader2 className="animate-spin w-5 h-5 mr-2" /> : <Save className="w-5 h-5 mr-2" />}
+                          Salvar Feedback
+                        </Button>
+                        {editingFeedback.id && (
+                          <Button variant="ghost" onClick={() => setEditingFeedback({ text: '' })} className="w-full rounded-full font-bold h-12">
+                            Cancelar Edição
+                          </Button>
+                        )}
+                      </div>
+                    </Card>
+                  </div>
+
+                  {/* Tabela de Feedbacks com Pesquisa */}
+                  <div className="lg:col-span-2 space-y-6">
+                    <Card className={`p-6 rounded-[2.5rem] border shadow-2xl flex flex-col xl:flex-row gap-4 items-center ${isDarkMode ? 'bg-[#111]/80 border-white/10 backdrop-blur-3xl' : 'bg-white border-black/5'}`}>
+                      <div className="relative flex-1 w-full">
+                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                        <Input 
+                          placeholder="Buscar nos feedbacks..." 
+                          value={feedbackSearch}
+                          onChange={e => setFeedbackSearch(e.target.value)}
+                          className={`pl-12 rounded-full border-none h-12 font-medium ${isDarkMode ? 'bg-white/10' : 'bg-gray-100'}`}
+                        />
+                      </div>
+                    </Card>
+
+                    <Card className={`rounded-[2.5rem] border shadow-2xl overflow-hidden ${isDarkMode ? 'bg-[#111]/80 border-white/10 backdrop-blur-3xl' : 'bg-white border-black/5'}`}>
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-left border-collapse">
+                          <thead>
+                            <tr className={`border-b ${isDarkMode ? 'border-white/5 bg-white/[0.02]' : 'border-black/5 bg-black/[0.02]'}`}>
+                              <th className="p-5 text-[10px] font-black uppercase tracking-widest opacity-40">Regra de Feedback</th>
+                              <th className="p-5 text-[10px] font-black uppercase tracking-widest opacity-40 text-right w-24">Ações</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {paginatedFeedbacks.length > 0 ? paginatedFeedbacks.map((item) => (
+                              <tr key={item.id} className={`border-b last:border-0 transition-colors group ${isDarkMode ? 'border-white/5 hover:bg-white/5' : 'border-black/5 hover:bg-black/5'}`}>
+                                <td className="p-5 align-top">
+                                  <p className="font-bold text-sm leading-relaxed text-gray-900 dark:text-white">{item.text}</p>
+                                </td>
+                                <td className="p-5 align-top text-right w-24">
+                                  <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <Button variant="ghost" size="sm" onClick={() => setEditingFeedback(item)} className="h-8 w-8 p-0 rounded-lg text-blue-500 hover:bg-blue-500/10"><Edit2 size={14}/></Button>
+                                    <Button variant="ghost" size="sm" onClick={() => handleDeleteFeedback(item.id)} className="h-8 w-8 p-0 rounded-lg text-red-500 hover:bg-red-500/10"><Trash2 size={14}/></Button>
+                                  </div>
+                                </td>
+                              </tr>
+                            )) : (
+                              <tr>
+                                <td colSpan={2} className="p-10 text-center opacity-40 font-bold text-sm">
+                                  Nenhum feedback encontrado.
+                                </td>
+                              </tr>
+                            )}
+                          </tbody>
+                        </table>
+                      </div>
+                      {feedbackTotalPages > 1 && (
+                        <div className={`p-5 border-t flex items-center justify-between ${isDarkMode ? 'border-white/5 bg-white/[0.01]' : 'border-black/5 bg-black/[0.01]'}`}>
+                          <span className="text-[10px] font-black uppercase tracking-widest opacity-40">
+                            Mostrando {(feedbackCurrentPage - 1) * itemsPerPage + 1} - {Math.min(feedbackCurrentPage * itemsPerPage, filteredFeedbacks.length)} de {filteredFeedbacks.length}
+                          </span>
+                          <div className="flex gap-2">
+                            <Button variant="outline" size="sm" onClick={() => setFeedbackCurrentPage(p => Math.max(1, p - 1))} disabled={feedbackCurrentPage === 1} className="rounded-full h-8 px-4 font-bold">Anterior</Button>
+                            <Button variant="outline" size="sm" onClick={() => setFeedbackCurrentPage(p => Math.min(feedbackTotalPages, p + 1))} disabled={feedbackCurrentPage === feedbackTotalPages} className="rounded-full h-8 px-4 font-bold">Próxima</Button>
+                          </div>
+                        </div>
+                      )}
+                    </Card>
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>
