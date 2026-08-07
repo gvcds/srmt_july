@@ -140,6 +140,14 @@ export default function KanbanPage() {
   const [modalAssignedId, setModalAssignedId] = useState<number>(0);
   const [modalDeadline, setModalDeadline] = useState<string>('');
   const [searchQuery, setSearchQuery] = useState('');
+  const [visibleCardsPerColumn, setVisibleCardsPerColumn] = useState<Record<string, number>>({});
+
+  const handleLoadMore = (status: string) => {
+    setVisibleCardsPerColumn(prev => ({
+      ...prev,
+      [status]: (prev[status] || 5) + 5
+    }));
+  };
 
   const API_URL = typeof window !== 'undefined'
     ? `${window.location.protocol}//${window.location.hostname}:8001`
@@ -754,6 +762,8 @@ export default function KanbanPage() {
                   }
                   return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
                 });
+              const limit = visibleCardsPerColumn[status] || 5;
+              const cardsToShow = statusCards.slice(0, limit);
               const isOver = dragOverStatus === status;
               
               // Map colors for headers
@@ -819,11 +829,12 @@ export default function KanbanPage() {
                         <span className="text-[8px] font-bold uppercase tracking-widest opacity-20">Solte cards aqui</span>
                       </div>
                     ) : (
-                      statusCards.map((card) => {
-                        // Find assigned member details if any
-                        const assignedMember = activeTab === 'time' && squad
-                          ? squad.members.find(m => m.id === card.assigned_member_id)
-                          : null;
+                      <>
+                        {cardsToShow.map((card) => {
+                          // Find assigned member details if any
+                          const assignedMember = activeTab === 'time' && squad
+                            ? squad.members.find(m => m.id === card.assigned_member_id)
+                            : null;
 
                         const isDraggedOver = draggedOverCardId === card.id && card.id !== draggedCardId;
 
@@ -842,7 +853,7 @@ export default function KanbanPage() {
                             onDragLeave={() => setDraggedOverCardId(null)}
                             onDrop={(e) => handleDropOnCard(e, card.id, status)}
                             onDoubleClick={() => openEditModal(card)}
-                            className={`group relative cursor-grab active:cursor-grabbing hover:scale-[1.02] transition-all duration-300 overflow-hidden rounded-xl border backdrop-blur-md
+                            className={`group relative cursor-grab active:cursor-grabbing hover:scale-[1.02] transition-all duration-300 overflow-hidden rounded-xl border backdrop-blur-md shrink-0
                               ${isDraggedOver ? 'scale-[1.02] shadow-[0_10px_30px_rgba(59,130,246,0.2)]' : 'hover:shadow-2xl'}
                               ${isPastDue 
                                 ? (isDarkMode ? 'bg-red-950/80 border-red-500/50 shadow-[0_0_20px_rgba(239,68,68,0.3)]' : 'bg-red-100/90 border-red-500 shadow-[0_0_20px_rgba(239,68,68,0.4)]') 
@@ -940,7 +951,17 @@ export default function KanbanPage() {
                             </div>
                           </div>
                         );
-                      })
+                      })}
+                      {statusCards.length > limit && (
+                          <button
+                            onClick={() => handleLoadMore(status)}
+                            className={`w-full py-2.5 rounded-xl border border-dashed text-xs font-bold transition-all shrink-0
+                              ${isDarkMode ? 'border-white/20 text-white/60 hover:bg-white/5 hover:text-white' : 'border-blue-500/30 text-blue-500 hover:bg-blue-500/10'}`}
+                          >
+                            Carregar mais ({statusCards.length - limit} restantes)
+                          </button>
+                        )}
+                      </>
                     )}
                   </div>
                 </div>
