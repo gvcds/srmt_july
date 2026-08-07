@@ -620,7 +620,7 @@ export default function KnowledgeBasePage() {
   const syncFeedbacks = async (updatedFeedbacks: {id: string, text: string}[]) => {
       setSaving(true);
       const lang = activeTab === 'feedback_pt' ? 'pt' : 'es';
-      const textToSave = [...feedbackRawHeaders, ...updatedFeedbacks.map(f => f.text)].join('\n');
+      const textToSave = [...feedbackRawHeaders, ...updatedFeedbacks.map(f => f.text.replace(/\n/g, ' ').trim())].join('\n');
       try {
           const res = await fetch(`${API_URL}/knowledge-base/feedback/${lang}`, {
              method: 'PUT',
@@ -1181,10 +1181,10 @@ export default function KnowledgeBasePage() {
                       <div className="space-y-4">
                         <div className="space-y-1">
                           <label className="text-[10px] font-black uppercase opacity-60 ml-1">Regra de Correção / Feedback</label>
-                          <Textarea 
+                          <Input 
                             value={editingFeedback.text} 
                             onChange={e => setEditingFeedback({...editingFeedback, text: e.target.value})} 
-                            className={`rounded-xl border-none font-medium min-h-[150px] p-4 ${isDarkMode ? 'bg-black/40 text-white' : 'bg-white text-gray-900'}`} 
+                            className={`rounded-xl border-none h-12 font-bold ${isDarkMode ? 'bg-black/40 text-white' : 'bg-white text-gray-900'}`} 
                             placeholder="Ex: Nunca traduza a palavra 'Display' em nenhum contexto." 
                           />
                         </div>
