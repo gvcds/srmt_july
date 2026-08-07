@@ -607,6 +607,7 @@ export function STMSDBTool({ onFocusChange }: { onFocusChange?: (focused: boolea
       if (!item) return;
 
       setLoadingIds(prev => new Set(prev).add(id));
+      setItems(prev => prev.map(p => p.id === id ? { ...p, status: 'pending' as const, suggested_text: '', simply_reason: '', reason: '' } : p));
       
       try {
           const fileItems = itemsRef.current.filter(i => i.source_filename === item.source_filename);

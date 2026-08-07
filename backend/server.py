@@ -2545,10 +2545,35 @@ class KBEntry(BaseModel):
     field: str
     value: str
 
+def load_txt_lines(file_path):
+    if not os.path.exists(file_path):
+        return []
+    with open(file_path, "r", encoding="utf-8") as f:
+        lines = f.read().splitlines()
+    return [l for l in lines if l.strip() and not l.strip().startswith('#')]
+
+def save_txt_lines(file_path, new_lines):
+    headers = []
+    if os.path.exists(file_path):
+        with open(file_path, "r", encoding="utf-8") as f:
+            for l in f.read().splitlines():
+                if l.strip().startswith('#'):
+                    headers.append(l)
+    with open(file_path, "w", encoding="utf-8") as f:
+        for h in headers:
+            f.write(h + "\n")
+        for line in new_lines:
+            f.write(line + "\n")
+
 @app.get("/knowledge-base/remarks")
 def get_kb_remarks(db: Session = Depends(get_db)):
     kb_data = load_kb_data()
-    # Merge suggestions from the DB (Suggestion table) into the KB data
+    
+    pt_path = os.path.join(os.path.dirname(__file__), "knowledge_base", "feedback_pt.txt")
+    es_path = os.path.join(os.path.dirname(__file__), "knowledge_base", "feedback_es.txt")
+    kb_data["feedback_pt"] = load_txt_lines(pt_path)
+    kb_data["feedback_es"] = load_txt_lines(es_path)
+    
     try:
         all_suggestions = db.query(Suggestion).all()
         for s in all_suggestions:
@@ -2564,11 +2589,18 @@ def get_kb_remarks(db: Session = Depends(get_db)):
 
 @app.post("/knowledge-base/remarks")
 def add_kb_remark(entry: KBEntry):
+    if entry.field in ["feedback_pt", "feedback_es"]:
+        lang = entry.field.split('_')[1]
+        path = os.path.join(os.path.dirname(__file__), "knowledge_base", f"feedback_{lang}.txt")
+        lines = load_txt_lines(path)
+        if not any(val.lower() == entry.value.lower() for val in lines):
+            lines.append(entry.value)
+            save_txt_lines(path, lines)
+        return {"message": "Adicionado com sucesso"}
+
     data = load_kb_data()
     if entry.field not in data:
         data[entry.field] = []
-    
-    # Case-insensitive check
     if not any(val.lower() == entry.value.lower() for val in data[entry.field]):
         data[entry.field].append(entry.value)
         save_kb_data(data)
@@ -2576,33 +2608,20 @@ def add_kb_remark(entry: KBEntry):
 
 @app.delete("/knowledge-base/remarks")
 def delete_kb_remark(field: str, value: str):
+    if field in ["feedback_pt", "feedback_es"]:
+        lang = field.split('_')[1]
+        path = os.path.join(os.path.dirname(__file__), "knowledge_base", f"feedback_{lang}.txt")
+        lines = load_txt_lines(path)
+        if value in lines:
+            lines.remove(value)
+            save_txt_lines(path, lines)
+        return {"message": "Removido com sucesso"}
+
     data = load_kb_data()
     if field in data and value in data[field]:
         data[field].remove(value)
         save_kb_data(data)
     return {"message": "Removido com sucesso", "data": data}
-
-class FeedbackUpdate(BaseModel):
-    content: str
-
-@app.get("/knowledge-base/feedback/{lang}")
-def get_feedback(lang: str):
-    if lang not in ["pt", "es"]:
-        raise HTTPException(status_code=400, detail="Language must be pt or es")
-    file_path = os.path.join(os.path.dirname(__file__), "knowledge_base", f"feedback_{lang}.txt")
-    if not os.path.exists(file_path):
-        return {"content": ""}
-    with open(file_path, "r", encoding="utf-8") as f:
-        return {"content": f.read()}
-
-@app.put("/knowledge-base/feedback/{lang}")
-def update_feedback(lang: str, data: FeedbackUpdate):
-    if lang not in ["pt", "es"]:
-        raise HTTPException(status_code=400, detail="Language must be pt or es")
-    file_path = os.path.join(os.path.dirname(__file__), "knowledge_base", f"feedback_{lang}.txt")
-    with open(file_path, "w", encoding="utf-8") as f:
-        f.write(data.content)
-    return {"status": "success"}
 
 @app.get("/search")
 def search(field: str, query: str = "", db: Session = Depends(get_db)):
