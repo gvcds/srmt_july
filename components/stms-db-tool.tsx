@@ -102,6 +102,8 @@ const translations = {
     startReviewBtn: 'Iniciar Revisão IA',
     stopReviewBtn: 'Parar Revisão',
     reviewingBtn: 'Revisando Lote...',
+    runAllAgainBtn: 'Rodar Tudo Novamente',
+    reRunBtn: 'Rodar Novamente',
     searchPlaceholder: 'Buscar globalmente...',
     fileFilterPlaceholder: 'Filtrar por arquivo ou data...',
     noStrings: 'Nenhuma string encontrada no Banco.',
@@ -166,6 +168,8 @@ const translations = {
     startReviewBtn: 'Start AI Review',
     stopReviewBtn: 'Stop Review',
     reviewingBtn: 'Reviewing...',
+    runAllAgainBtn: 'Run All Again',
+    reRunBtn: 'Re-run',
     searchPlaceholder: 'Search globally...',
     fileFilterPlaceholder: 'Filter by file or date...',
     noStrings: 'No strings found in Database.',
@@ -230,6 +234,8 @@ const translations = {
     startReviewBtn: 'AI 리뷰 시작',
     stopReviewBtn: '리뷰 중지',
     reviewingBtn: '리뷰 중...',
+    runAllAgainBtn: '모두 다시 실행',
+    reRunBtn: '다시 실행',
     searchPlaceholder: '전체 검색...',
     fileFilterPlaceholder: '파일 또는 날짜별 필터링...',
     noStrings: '데이터베이스에서 문자열을 찾을 수 없습니다.',
@@ -576,6 +582,71 @@ export function STMSDBTool({ onFocusChange }: { onFocusChange?: (focused: boolea
     processBatch();
   };
 
+  const runAllAgain = () => {
+    if (filteredAndSortedItems.length === 0 || isBatchProcessing) return;
+
+    const ids = new Set(filteredAndSortedItems.map(i => i.id));
+    setItems(prev => {
+        const newItems = prev.map(p => ids.has(p.id) ? { ...p, status: 'pending' as const, suggested_text: '', simply_reason: '', reason: '' } : p);
+        itemsRef.current = newItems;
+        return newItems;
+    });
+
+    setTimeout(() => {
+        if (!isBatchProcessing) {
+            setIsBatchProcessing(true);
+            isProcessingRef.current = true;
+            processBatch();
+        }
+    }, 50);
+  };
+
+  const reRunAI = async (e: React.MouseEvent, id: number) => {
+      e.stopPropagation();
+      const item = items.find(i => i.id === id);
+      if (!item) return;
+
+      setLoadingIds(prev => new Set(prev).add(id));
+      
+      try {
+          const fileItems = itemsRef.current.filter(i => i.source_filename === item.source_filename);
+          const fileTexts = fileItems.map(i => i.target_text).filter(Boolean) as string[];
+          const detectedLang = detectLanguageFromTexts(fileTexts);
+
+          const payload = {
+            id: item.id,
+            context: item.context,
+            source_text: item.source_text,
+            target_text: item.target_text,
+            char_limit: item.char_limit,
+            target_lang: detectedLang
+          };
+
+          const response = await fetch(`${API_URL}/stms/review_ai`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+
+          if (response.ok) {
+            const data = await response.json();
+            setItems(prev => prev.map(p =>
+              p.id === id
+                ? { ...p, suggested_text: data.suggestion, reason: data.reasoning, simply_reason: data.simplyReason, status: 'reviewing' }
+                : p
+            ));
+          }
+      } catch (error) {
+          console.error("Erro ao rodar IA novamente:", error);
+      } finally {
+          setLoadingIds(prev => {
+              const next = new Set(prev);
+              next.delete(id);
+              return next;
+          });
+      }
+  };
+
   const handleApprove = async (e: React.MouseEvent, id: number) => {
     e.stopPropagation();
     try {
@@ -916,6 +987,14 @@ return (
             ) : (
               <Sparkles size={18} />
             )}
+          </Button>
+          <Button
+            onClick={runAllAgain}
+            disabled={isGlobalLoading || isBatchProcessing || filteredAndSortedItems.length === 0}
+            title={t.runAllAgainBtn}
+            className={`rounded-xl h-12 w-12 p-0 flex items-center justify-center transition-all bg-purple-600 hover:bg-purple-500 text-white shadow-purple-600/40`}
+          >
+            <RefreshCcw size={18} />
           </Button>
         </div>
 
@@ -1417,6 +1496,13 @@ return (
                           <RotateCcw size={10} /> {t.undo}
                         </Button>
                       </div>
+                    )}
+                    {item.status !== 'pending' && (
+                        <div className="mt-2">
+                           <Button onClick={(e) => reRunAI(e, item.id)} variant="outline" className="h-7 rounded-xl px-4 text-[9px] font-black uppercase tracking-[0.2em] gap-1.5 w-full border-purple-500/20 hover:bg-purple-500/10 text-purple-600 dark:text-purple-400 transition-all opacity-40 hover:opacity-100">
+                             <RefreshCcw size={10} /> {t.reRunBtn}
+                           </Button>
+                        </div>
                     )}
                     {item.status === 'pending' && (
                       <div className={`flex items-center justify-end gap-1.5 text-[11px] font-black uppercase tracking-widest ${loadingIds.has(item.id) ? 'text-blue-600 dark:text-blue-400' : 'opacity-40'}`}>

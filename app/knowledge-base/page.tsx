@@ -76,6 +76,47 @@ const KnowledgeBaseManager = ({ isDarkMode, API_URL }: any) => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 20;
 
+  const [activeTab, setActiveTab] = useState<'glossario' | 'feedback_pt' | 'feedback_es'>('glossario');
+  const [feedbackContent, setFeedbackContent] = useState('');
+  const [savingFeedback, setSavingFeedback] = useState(false);
+  const [loadingFeedback, setLoadingFeedback] = useState(false);
+
+  const fetchFeedback = async (lang: string) => {
+    setLoadingFeedback(true);
+    try {
+      const res = await fetch(`${API_URL}/knowledge-base/feedback/${lang}`);
+      if (res.ok) {
+        const { content } = await res.json();
+        setFeedbackContent(content);
+      }
+    } catch (e) {
+      console.error(e);
+    }
+    setLoadingFeedback(false);
+  };
+
+  const saveFeedback = async () => {
+    setSavingFeedback(true);
+    try {
+      const lang = activeTab === 'feedback_pt' ? 'pt' : 'es';
+      const res = await fetch(`${API_URL}/knowledge-base/feedback/${lang}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content: feedbackContent })
+      });
+      if (res.ok) alert('Feedback salvo com sucesso!');
+      else alert('Erro ao salvar feedback');
+    } catch (e) {
+      alert('Erro de conexão ao salvar feedback');
+    }
+    setSavingFeedback(false);
+  };
+
+  useEffect(() => {
+    if (activeTab === 'feedback_pt') fetchFeedback('pt');
+    else if (activeTab === 'feedback_es') fetchFeedback('es');
+  }, [activeTab]);
+
   const sections = [
     { id: 'testerId', label: 'Testador', icon: <User className="w-4 h-4" />, color: 'blue' },
     { id: 'sampleId', label: 'Sample ID', icon: <Beaker className="w-4 h-4" />, color: 'indigo' },
@@ -162,8 +203,41 @@ const KnowledgeBaseManager = ({ isDarkMode, API_URL }: any) => {
   return (
     <div className="flex flex-col gap-8 w-full animate-in fade-in slide-in-from-bottom-4 duration-500">
 
-      {/* Stats Row */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3">
+      {/* Tabs */}
+      <div className={`flex flex-wrap items-center gap-3 p-2 rounded-3xl w-fit ${isDarkMode ? 'bg-black/30 border border-white/10' : 'bg-gray-100/50 border border-black/5'}`}>
+        <button
+          onClick={() => setActiveTab('glossario')}
+          className={`px-6 py-2.5 rounded-2xl text-[11px] font-black uppercase tracking-widest transition-all
+            ${activeTab === 'glossario' 
+              ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20 scale-105' 
+              : isDarkMode ? 'text-gray-400 hover:bg-white/5' : 'text-gray-600 hover:bg-white'}`}
+        >
+          Base de Remarks
+        </button>
+        <button
+          onClick={() => setActiveTab('feedback_pt')}
+          className={`px-6 py-2.5 rounded-2xl text-[11px] font-black uppercase tracking-widest transition-all
+            ${activeTab === 'feedback_pt' 
+              ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20 scale-105' 
+              : isDarkMode ? 'text-gray-400 hover:bg-white/5' : 'text-gray-600 hover:bg-white'}`}
+        >
+          Feedback IA (PT-BR)
+        </button>
+        <button
+          onClick={() => setActiveTab('feedback_es')}
+          className={`px-6 py-2.5 rounded-2xl text-[11px] font-black uppercase tracking-widest transition-all
+            ${activeTab === 'feedback_es' 
+              ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20 scale-105' 
+              : isDarkMode ? 'text-gray-400 hover:bg-white/5' : 'text-gray-600 hover:bg-white'}`}
+        >
+          Feedback IA (ES)
+        </button>
+      </div>
+
+      {activeTab === 'glossario' ? (
+        <>
+          {/* Stats Row */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3">
         <div className={`col-span-2 sm:col-span-4 lg:col-span-1 p-4 rounded-2xl border text-center transition-all ${isDarkMode ? 'bg-white/5 border-white/10' : 'bg-white border-black/5 shadow-sm'}`}>
           <p className="text-[7px] font-black uppercase tracking-[0.2em] opacity-40">Total</p>
           <p className={`text-2xl font-black tracking-tighter ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{totalRecords}</p>
@@ -298,20 +372,63 @@ const KnowledgeBaseManager = ({ isDarkMode, API_URL }: any) => {
         {/* Pagination */}
         {totalPages > 1 && (
           <div className={`p-6 border-t flex items-center justify-between ${isDarkMode ? 'border-white/5 bg-white/[0.01]' : 'border-black/5 bg-black/[0.01]'}`}>
-            <span className="text-[10px] font-black uppercase tracking-widest opacity-40">
-              {(currentPage - 1) * itemsPerPage + 1} – {Math.min(currentPage * itemsPerPage, filtered.length)} de {filtered.length}
-            </span>
+            <p className="text-[10px] font-black uppercase tracking-widest opacity-40">
+              Página {currentPage} de {totalPages}
+            </p>
             <div className="flex gap-2">
-              <Button variant="outline" size="sm" onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1} className="rounded-full h-8 px-4 font-bold">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                disabled={currentPage === 1}
+                className="h-10 px-5 rounded-xl text-[9px] font-black uppercase tracking-widest"
+              >
                 Anterior
               </Button>
-              <Button variant="outline" size="sm" onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages} className="rounded-full h-8 px-4 font-bold">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                disabled={currentPage === totalPages}
+                className="h-10 px-5 rounded-xl text-[9px] font-black uppercase tracking-widest"
+              >
                 Próxima
               </Button>
             </div>
           </div>
         )}
       </Card>
+        </>
+      ) : (
+        <Card className={`rounded-[2.5rem] border shadow-2xl p-6 flex flex-col gap-4 ${isDarkMode ? 'bg-[#111]/80 border-white/10 backdrop-blur-3xl' : 'bg-white border-black/5'}`}>
+          <div className="flex justify-between items-center mb-2">
+            <h3 className={`text-xl font-black tracking-tighter ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+              Edição de Feedback da IA ({activeTab === 'feedback_pt' ? 'PT-BR' : 'ES'})
+            </h3>
+            <Button
+              onClick={saveFeedback}
+              disabled={savingFeedback}
+              className="px-8 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-black text-[10px] uppercase tracking-widest shadow-lg shadow-blue-600/20 transition-all active:scale-95"
+            >
+              {savingFeedback ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
+              Salvar Alterações
+            </Button>
+          </div>
+          {loadingFeedback ? (
+            <div className="flex items-center justify-center py-20">
+              <Loader2 className="w-8 h-8 animate-spin text-blue-500 opacity-30" />
+            </div>
+          ) : (
+            <Textarea
+              value={feedbackContent}
+              onChange={(e) => setFeedbackContent(e.target.value)}
+              className={`min-h-[500px] p-6 font-mono text-sm rounded-2xl ${isDarkMode ? 'bg-black/50 border-white/10 text-gray-300' : 'bg-gray-50 border-black/10 text-gray-800'}`}
+              placeholder="Digite o histórico de erros para a IA não repetir..."
+            />
+          )}
+        </Card>
+      )}
+
     </div>
   );
 };

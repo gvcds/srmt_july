@@ -2582,6 +2582,28 @@ def delete_kb_remark(field: str, value: str):
         save_kb_data(data)
     return {"message": "Removido com sucesso", "data": data}
 
+class FeedbackUpdate(BaseModel):
+    content: str
+
+@app.get("/knowledge-base/feedback/{lang}")
+def get_feedback(lang: str):
+    if lang not in ["pt", "es"]:
+        raise HTTPException(status_code=400, detail="Language must be pt or es")
+    file_path = os.path.join(os.path.dirname(__file__), "knowledge_base", f"feedback_{lang}.txt")
+    if not os.path.exists(file_path):
+        return {"content": ""}
+    with open(file_path, "r", encoding="utf-8") as f:
+        return {"content": f.read()}
+
+@app.put("/knowledge-base/feedback/{lang}")
+def update_feedback(lang: str, data: FeedbackUpdate):
+    if lang not in ["pt", "es"]:
+        raise HTTPException(status_code=400, detail="Language must be pt or es")
+    file_path = os.path.join(os.path.dirname(__file__), "knowledge_base", f"feedback_{lang}.txt")
+    with open(file_path, "w", encoding="utf-8") as f:
+        f.write(data.content)
+    return {"status": "success"}
+
 @app.get("/search")
 def search(field: str, query: str = "", db: Session = Depends(get_db)):
     if not query: return []
