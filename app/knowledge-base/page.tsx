@@ -83,10 +83,9 @@ const KnowledgeBaseManager = ({ isDarkMode, API_URL }: any) => {
     { id: 'account', label: 'Google', icon: <Mail className="w-4 h-4" />, color: 'emerald' },
     { id: 'samsungAccount', label: 'Samsung', icon: <Smartphone className="w-4 h-4" />, color: 'sky' },
     { id: 'simCard', label: 'SIM Card', icon: <Signal className="w-4 h-4" />, color: 'amber' },
+    { id: 'simCard', label: 'SIM Card', icon: <Signal className="w-4 h-4" />, color: 'amber' },
     { id: 'appName', label: 'App', icon: <Box className="w-4 h-4" />, color: 'purple' },
-    { id: 'deviceId', label: 'Device ID', icon: <Monitor className="w-4 h-4" />, color: 'rose' },
-    { id: 'feedback_pt', label: 'Feedback IA (PT-BR)', icon: <MessageSquare className="w-4 h-4" />, color: 'emerald' },
-    { id: 'feedback_es', label: 'Feedback IA (ES)', icon: <MessageSquare className="w-4 h-4" />, color: 'amber' }
+    { id: 'deviceId', label: 'Device ID', icon: <Monitor className="w-4 h-4" />, color: 'rose' }
   ];
 
   const sectionMap = Object.fromEntries(sections.map(s => [s.id, s]));
@@ -332,7 +331,7 @@ const KnowledgeBaseManager = ({ isDarkMode, API_URL }: any) => {
   );
 };
 
-type TabType = 'bug_review' | 'general_info' | 'tone_of_voice' | 'glossary' | 'remarks' | 'system_notices' | 'tone_of_voice_es' | 'glossary_es';
+type TabType = 'bug_review' | 'general_info' | 'tone_of_voice' | 'glossary' | 'remarks' | 'system_notices' | 'tone_of_voice_es' | 'glossary_es' | 'feedback_pt' | 'feedback_es';
 
 export default function KnowledgeBasePage() {
   const { isDarkMode } = useTheme();
@@ -347,6 +346,13 @@ export default function KnowledgeBasePage() {
   const [editingSection, setEditingSection] = useState<TextSection | null>(null);
   const [isSectionModalOpen, setIsSectionModalOpen] = useState(false);
   const [sectionCurrentPage, setSectionCurrentPage] = useState(1);
+
+  // Estados para Feedbacks (Interface tipo Glossário)
+  const [feedbacks, setFeedbacks] = useState<{ id: string, text: string }[]>([]);
+  const [feedbackRawHeaders, setFeedbackRawHeaders] = useState<string[]>([]);
+  const [feedbackSearch, setFeedbackSearch] = useState('');
+  const [editingFeedback, setEditingFeedback] = useState<{ id?: string, text: string }>({ text: '' });
+  const [feedbackCurrentPage, setFeedbackCurrentPage] = useState(1);
 
   // Estados para Glossário
   const [glossaryItems, setGlossaryItems] = useState<GlossaryItem[]>([]);
@@ -427,6 +433,7 @@ export default function KnowledgeBasePage() {
     setLoading(true);
     setSearchSection('');
     setGlossarySearch('');
+    setFeedbackSearch('');
     try {
       if (activeTab === 'system_notices') {
         const res = await fetch(`${API_URL}/system-notices`);
@@ -437,6 +444,19 @@ export default function KnowledgeBasePage() {
         if (res.ok) {
           const data = await res.json();
           setGlossaryItems(data);
+        }
+      } else if (activeTab === 'feedback_pt' || activeTab === 'feedback_es') {
+        const lang = activeTab === 'feedback_pt' ? 'pt' : 'es';
+        const res = await fetch(`${API_URL}/knowledge-base/feedback/${lang}`);
+        if (res.ok) {
+          const { content } = await res.json();
+          const lines = content.split('\n');
+          const headers = lines.filter((l: string) => l.trim().startsWith('#'));
+          const parsed = lines
+            .filter((l: string) => l.trim() && !l.trim().startsWith('#'))
+            .map((text: string) => ({ id: (Date.now() + Math.random()).toString(), text }));
+          setFeedbackRawHeaders(headers);
+          setFeedbacks(parsed);
         }
       } else {
         const filename = `${activeTab}.txt`;
@@ -598,6 +618,51 @@ export default function KnowledgeBasePage() {
     } catch (e) {}
   };
 
+  const syncFeedbacks = async (updatedFeedbacks: {id: string, text: string}[]) => {
+      setSaving(true);
+      const lang = activeTab === 'feedback_pt' ? 'pt' : 'es';
+      const textToSave = [...feedbackRawHeaders, ...updatedFeedbacks.map(f => f.text)].join('\n');
+      try {
+          const res = await fetch(`${API_URL}/knowledge-base/feedback/${lang}`, {
+             method: 'PUT',
+             headers: { 'Content-Type': 'application/json' },
+             body: JSON.stringify({ content: textToSave })
+          });
+          if (res.ok) {
+             setFeedbacks(updatedFeedbacks);
+             setMessage({ type: 'success', text: 'Feedback salvo!' });
+             setEditingFeedback({ text: '' });
+          } else {
+             setMessage({ type: 'error', text: 'Erro ao salvar.' });
+          }
+      } catch (e) {
+          setMessage({ type: 'error', text: 'Erro de conexão.' });
+      } finally {
+          setSaving(false);
+          setTimeout(() => setMessage(null), 3000);
+      }
+  };
+
+  const handleSaveFeedback = async () => {
+     if (!editingFeedback.text.trim()) {
+         setMessage({ type: 'error', text: 'O texto do feedback não pode estar vazio.' });
+         return;
+     }
+     let updatedFeedbacks = [...feedbacks];
+     if (editingFeedback.id) {
+         updatedFeedbacks = updatedFeedbacks.map(f => f.id === editingFeedback.id ? { ...f, text: editingFeedback.text } : f);
+     } else {
+         updatedFeedbacks.unshift({ id: (Date.now() + Math.random()).toString(), text: editingFeedback.text });
+     }
+     await syncFeedbacks(updatedFeedbacks);
+  };
+
+  const handleDeleteFeedback = async (id: string) => {
+     if (!confirm('Excluir este feedback da IA?')) return;
+     const updated = feedbacks.filter(f => f.id !== id);
+     await syncFeedbacks(updated);
+  };
+
   // --- MOTOR DE ANÁLISE DE IA EM LOTES (15 EM 15) ---
   const startBatchAIAnalysis = async (specificItems?: any[]) => {
     let itemsToAnalyze: any[] = [];
@@ -695,6 +760,15 @@ export default function KnowledgeBasePage() {
 
   useEffect(() => { setSectionCurrentPage(1); }, [searchSection]);
 
+  // --- FILTROS E PAGINAÇÃO (FEEDBACKS) ---
+  const filteredFeedbacks = feedbacks.filter(f => 
+    f.text.toLowerCase().includes(feedbackSearch.toLowerCase())
+  );
+  const feedbackTotalPages = Math.ceil(filteredFeedbacks.length / itemsPerPage);
+  const paginatedFeedbacks = filteredFeedbacks.slice((feedbackCurrentPage - 1) * itemsPerPage, feedbackCurrentPage * itemsPerPage);
+
+  useEffect(() => { setFeedbackCurrentPage(1); }, [feedbackSearch]);
+
   return (
     <div className={`min-h-screen ${isDarkMode ? 'bg-[#0a0a0a] text-white' : 'bg-gray-50 text-gray-900'}`}>
       <Navbar />
@@ -740,6 +814,12 @@ export default function KnowledgeBasePage() {
           </button>
           <button onClick={() => setActiveTab('remarks')} className={`px-6 py-3 rounded-2xl text-xs font-black uppercase tracking-widest transition-all ${activeTab === 'remarks' ? 'bg-amber-600 text-white shadow-lg shadow-amber-600/20' : 'hover:bg-black/5 dark:hover:bg-white/10 opacity-60'}`}>
             Remarks (Autocomplete)
+          </button>
+          <button onClick={() => setActiveTab('feedback_pt')} className={`px-6 py-3 rounded-2xl text-xs font-black uppercase tracking-widest transition-all ${activeTab === 'feedback_pt' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/20' : 'hover:bg-black/5 dark:hover:bg-white/10 opacity-60'}`}>
+            <span className="flex items-center gap-2"><MessageSquare size={14}/> Feedback IA (PT)</span>
+          </button>
+          <button onClick={() => setActiveTab('feedback_es')} className={`px-6 py-3 rounded-2xl text-xs font-black uppercase tracking-widest transition-all ${activeTab === 'feedback_es' ? 'bg-rose-600 text-white shadow-lg shadow-rose-600/20' : 'hover:bg-black/5 dark:hover:bg-white/10 opacity-60'}`}>
+            <span className="flex items-center gap-2"><MessageSquare size={14}/> Feedback IA (ES)</span>
           </button>
           <button onClick={() => setActiveTab('system_notices')} className={`px-6 py-3 rounded-2xl text-xs font-black uppercase tracking-widest transition-all ${activeTab === 'system_notices' ? 'bg-red-600 text-white shadow-lg shadow-red-600/20' : 'hover:bg-black/5 dark:hover:bg-white/10 opacity-60'}`}>
             <span className="flex items-center gap-2"><AlertCircle size={14}/> Avisos do Sistema</span>
@@ -1001,69 +1081,56 @@ export default function KnowledgeBasePage() {
                             onChange={e => setGlossaryDntFilter(e.target.value)}
                             className={`w-full px-4 h-12 rounded-full border-none font-bold text-xs outline-none appearance-none cursor-pointer ${isDarkMode ? 'bg-white/10 text-white' : 'bg-gray-100 text-gray-900'}`}
                           >
-                            <option value="ALL">DNT: Ambos</option>
+                            <option value="ALL">DNT: Todos</option>
                             <option value="Yes">DNT: Sim</option>
                             <option value="No">DNT: Não</option>
                           </select>
                         </div>
+                        <Button 
+                          onClick={() => setIsAiSelectionModalOpen(true)}
+                          className="h-12 w-12 rounded-full bg-blue-600 hover:bg-blue-500 text-white p-0 shrink-0 shadow-lg shadow-blue-600/20" 
+                          title="Análise IA em Lote (Glossário)"
+                        >
+                          <Sparkles size={18} />
+                        </Button>
                       </div>
                     </Card>
 
-                    <Card className={`p-8 flex flex-col justify-between overflow-hidden rounded-[2.5rem] border shadow-2xl min-h-[600px] ${isDarkMode ? 'bg-[#111]/80 border-white/10 backdrop-blur-3xl' : 'bg-white border-black/5'}`}>
-                      <div className="flex justify-between items-center mb-6">
-                         <h3 className="text-xl font-bold tracking-tight">Tabela DB</h3>
-                         <Button onClick={() => setIsAiSelectionModalOpen(true)} className="rounded-full bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-600/20 font-bold px-6">
-                            <Sparkles className="w-4 h-4 mr-2" /> Analisar Glossário (Lotes)
-                         </Button>
-                      </div>
-
-                      <div className="overflow-x-auto custom-scrollbar border rounded-[2rem] border-black/5 dark:border-white/10 flex-1">
+                    <Card className={`rounded-[2.5rem] border shadow-2xl overflow-hidden ${isDarkMode ? 'bg-[#111]/80 border-white/10 backdrop-blur-3xl' : 'bg-white border-black/5'}`}>
+                      <div className="overflow-x-auto">
                         <table className="w-full text-left border-collapse">
                           <thead>
-                            <tr className="bg-black/5 dark:bg-white/5">
-                              <th className="p-5 text-[10px] font-black uppercase tracking-widest opacity-50 w-[15%]">App</th>
-                              <th className="p-5 text-[10px] font-black uppercase tracking-widest opacity-50 w-[30%]">Termo (EN)</th>
-                              <th className="p-5 text-[10px] font-black uppercase tracking-widest opacity-50 w-[30%]">
-                                {activeTab === 'glossary_es' ? 'Sugestão (ES)' : 'Sugestão (PT)'}
-                              </th>
-                              <th className="p-5 text-[10px] font-black uppercase tracking-widest opacity-50 w-[10%] text-center">DNT</th>
-                              <th className="p-5 text-[10px] font-black uppercase tracking-widest opacity-50 w-[15%] text-right">Ações</th>
+                            <tr className={`border-b ${isDarkMode ? 'border-white/5 bg-white/[0.02]' : 'border-black/5 bg-black/[0.02]'}`}>
+                              <th className="p-5 text-[10px] font-black uppercase tracking-widest opacity-40">App</th>
+                              <th className="p-5 text-[10px] font-black uppercase tracking-widest opacity-40">Termo Original</th>
+                              <th className="p-5 text-[10px] font-black uppercase tracking-widest opacity-40">Tradução</th>
+                              <th className="p-5 text-[10px] font-black uppercase tracking-widest opacity-40">DNT</th>
+                              <th className="p-5 text-[10px] font-black uppercase tracking-widest opacity-40 text-right">Ações</th>
                             </tr>
                           </thead>
-                          <tbody className="divide-y divide-black/5 dark:divide-white/5">
-                            {paginatedGlossary.map((item, idx) => (
-                              <tr key={item.id || idx} className="group hover:bg-blue-500/[0.03] transition-colors cursor-pointer" onClick={() => { setEditingItem(item); setIsEditingGlossary(true); window.scrollTo({top: 0, behavior: 'smooth'}); }}>
-                                <td className="p-5 align-top">
-                                  <span className={`inline-block px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-wider ${isDarkMode ? 'bg-white/10 text-gray-300' : 'bg-gray-200 text-gray-700'}`}>
+                          <tbody>
+                            {paginatedGlossary.length > 0 ? paginatedGlossary.map((item) => (
+                              <tr key={item.id} className={`border-b last:border-0 transition-colors group ${isDarkMode ? 'border-white/5 hover:bg-white/5' : 'border-black/5 hover:bg-black/5'}`}>
+                                <td className="p-5 align-top max-w-[120px]">
+                                  <span className={`inline-block px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest border ${isDarkMode ? 'bg-white/10 text-gray-400 border-white/5' : 'bg-gray-100 text-gray-500 border-black/5'}`}>
                                     {item.app_name || 'Geral'}
                                   </span>
                                 </td>
-                                <td className="p-5 align-top font-bold text-gray-900 dark:text-white">{item.english}</td>
                                 <td className="p-5 align-top">
-                                  <div className="font-bold text-emerald-600 dark:text-emerald-400">{item.translation}</div>
-                                  {item.description && <div className="text-[11px] font-medium opacity-60 mt-1 italic">{item.description}</div>}
+                                  <p className="font-bold text-sm leading-tight text-gray-900 dark:text-white">{item.english}</p>
+                                  {item.description && <p className="text-xs text-gray-500 dark:text-gray-400 mt-2 font-medium leading-relaxed max-w-[200px]">{item.description}</p>}
                                 </td>
-                                <td className="p-5 align-top text-center">
+                                <td className="p-5 align-top">
+                                  <p className="font-bold text-sm text-emerald-600 dark:text-emerald-400 leading-tight">{item.translation}</p>
+                                </td>
+                                <td className="p-5 align-top">
                                   {item.dnt === 'Yes' ? (
-                                    <span className="inline-block px-2 py-1 bg-amber-500/10 text-amber-500 text-[10px] font-black rounded-lg border border-amber-500/20">SIM</span>
-                                  ) : (
-                                    <span className="opacity-20 text-[10px] font-black">-</span>
-                                  )}
+                                    <span className="inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-amber-500 bg-amber-500/10 px-2 py-1 rounded-md">
+                                      <AlertCircle size={12}/> Manter IN
+                                    </span>
+                                  ) : <span className="opacity-20 text-xs font-bold">-</span>}
                                 </td>
                                 <td className="p-5 align-top text-right">
-                                  <div className="flex justify-end gap-1 opacity-50 group-hover:opacity-100 transition-opacity">
-                                    <button onClick={(e) => { e.stopPropagation(); setEditingItem(item); setIsEditingGlossary(true); window.scrollTo({top: 0, behavior: 'smooth'}); }} className="p-2 rounded-full hover:bg-blue-500/10 text-blue-500 bg-blue-500/5">
-                                      <Edit2 size={14} />
-                                    </button>
-                                    <button onClick={(e) => { e.stopPropagation(); handleDeleteGlossary(item.id!); }} className="p-2 rounded-full hover:bg-rose-500/10 text-rose-500 bg-rose-500/5">
-                                      <Trash2 size={14} />
-                                    </button>
-                                  </div>
-                                </td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
                         {filteredGlossary.length === 0 && (
                           <div className="py-20 text-center opacity-40">
                             <Database size={48} className="mx-auto mb-4 opacity-50" />
