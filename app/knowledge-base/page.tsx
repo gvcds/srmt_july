@@ -83,7 +83,6 @@ const KnowledgeBaseManager = ({ isDarkMode, API_URL }: any) => {
     { id: 'account', label: 'Google', icon: <Mail className="w-4 h-4" />, color: 'emerald' },
     { id: 'samsungAccount', label: 'Samsung', icon: <Smartphone className="w-4 h-4" />, color: 'sky' },
     { id: 'simCard', label: 'SIM Card', icon: <Signal className="w-4 h-4" />, color: 'amber' },
-    { id: 'simCard', label: 'SIM Card', icon: <Signal className="w-4 h-4" />, color: 'amber' },
     { id: 'appName', label: 'App', icon: <Box className="w-4 h-4" />, color: 'purple' },
     { id: 'deviceId', label: 'Device ID', icon: <Monitor className="w-4 h-4" />, color: 'rose' }
   ];
