@@ -346,12 +346,12 @@ export default function KnowledgeBasePage() {
   const [isSectionModalOpen, setIsSectionModalOpen] = useState(false);
   const [sectionCurrentPage, setSectionCurrentPage] = useState(1);
 
-  // Estados para Feedbacks (Interface tipo Glossário)
-  const [feedbacks, setFeedbacks] = useState<{ id: string, text: string }[]>([]);
+  // Estados para Feedbacks (Interface tipo Capítulo)
+  const [feedbackSections, setFeedbackSections] = useState<{ id: string, title: string, content: string, isExpanded?: boolean }[]>([]);
   const [feedbackRawHeaders, setFeedbackRawHeaders] = useState<string[]>([]);
   const [feedbackSearch, setFeedbackSearch] = useState('');
-  const [editingFeedback, setEditingFeedback] = useState<{ id?: string, text: string }>({ text: '' });
-  const [feedbackCurrentPage, setFeedbackCurrentPage] = useState(1);
+  const [editingFeedbackSection, setEditingFeedbackSection] = useState<{ id: string, title: string, content: string } | null>(null);
+  const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState(false);
 
   // Estados para Glossário
   const [glossaryItems, setGlossaryItems] = useState<GlossaryItem[]>([]);
@@ -451,11 +451,23 @@ export default function KnowledgeBasePage() {
           const { content } = await res.json();
           const lines = content.split('\n');
           const headers = lines.filter((l: string) => l.trim().startsWith('#'));
-          const parsed = lines
-            .filter((l: string) => l.trim() && !l.trim().startsWith('#'))
-            .map((text: string) => ({ id: (Date.now() + Math.random()).toString(), text }));
           setFeedbackRawHeaders(headers);
-          setFeedbacks(parsed);
+          // Parse por blocos '--- FEEDBACK (...)'
+          const sections: { id: string, title: string, content: string, isExpanded: boolean }[] = [];
+          let currentSection: { id: string, title: string, content: string, isExpanded: boolean } | null = null;
+          for (const line of lines) {
+            if (line.trim().startsWith('#')) continue; // skip headers
+            if (line.trim().startsWith('--- FEEDBACK')) {
+              if (currentSection) sections.push({ ...currentSection, content: currentSection.content.trim() });
+              currentSection = { id: (Date.now() + Math.random()).toString(), title: line.trim(), content: '', isExpanded: false };
+            } else if (currentSection) {
+              currentSection.content += line + '\n';
+            }
+          }
+          if (currentSection && (currentSection.content.trim() || currentSection.title)) {
+            sections.push({ ...currentSection, content: currentSection.content.trim() });
+          }
+          setFeedbackSections(sections);
         }
       } else {
         const filename = `${activeTab}.txt`;
@@ -617,10 +629,11 @@ export default function KnowledgeBasePage() {
     } catch (e) {}
   };
 
-  const syncFeedbacks = async (updatedFeedbacks: {id: string, text: string}[]) => {
+  const syncFeedbackSections = async (updatedSections: {id: string, title: string, content: string, isExpanded?: boolean}[]) => {
       setSaving(true);
       const lang = activeTab === 'feedback_pt' ? 'pt' : 'es';
-      const textToSave = [...feedbackRawHeaders, ...updatedFeedbacks.map(f => f.text.replace(/\n/g, ' ').trim())].join('\n');
+      const blocks = updatedSections.map(s => `${s.title}\n${s.content}`).join('\n\n');
+      const textToSave = [...feedbackRawHeaders, '', blocks].join('\n');
       try {
           const res = await fetch(`${API_URL}/knowledge-base/feedback/${lang}`, {
              method: 'PUT',
@@ -628,9 +641,8 @@ export default function KnowledgeBasePage() {
              body: JSON.stringify({ content: textToSave })
           });
           if (res.ok) {
-             setFeedbacks(updatedFeedbacks);
+             setFeedbackSections(updatedSections.map(s => ({ ...s, isExpanded: s.isExpanded || false })));
              setMessage({ type: 'success', text: 'Feedback salvo!' });
-             setEditingFeedback({ text: '' });
           } else {
              setMessage({ type: 'error', text: 'Erro ao salvar.' });
           }
@@ -642,24 +654,33 @@ export default function KnowledgeBasePage() {
       }
   };
 
-  const handleSaveFeedback = async () => {
-     if (!editingFeedback.text.trim()) {
-         setMessage({ type: 'error', text: 'O texto do feedback não pode estar vazio.' });
+  const handleSaveFeedbackSection = async () => {
+     if (!editingFeedbackSection || !editingFeedbackSection.content.trim()) {
+         setMessage({ type: 'error', text: 'O conteúdo do feedback não pode estar vazio.' });
          return;
      }
-     let updatedFeedbacks = [...feedbacks];
-     if (editingFeedback.id) {
-         updatedFeedbacks = updatedFeedbacks.map(f => f.id === editingFeedback.id ? { ...f, text: editingFeedback.text } : f);
+     let updated = [...feedbackSections];
+     if (editingFeedbackSection.id.startsWith('new_')) {
+         const now = new Date();
+         const dateStr = now.toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+         const title = `--- FEEDBACK (${dateStr})`;
+         updated.unshift({ id: (Date.now() + Math.random()).toString(), title, content: editingFeedbackSection.content.trim(), isExpanded: false });
      } else {
-         updatedFeedbacks.unshift({ id: (Date.now() + Math.random()).toString(), text: editingFeedback.text });
+         updated = updated.map(s => s.id === editingFeedbackSection.id ? { ...s, content: editingFeedbackSection.content } : s);
      }
-     await syncFeedbacks(updatedFeedbacks);
+     await syncFeedbackSections(updated);
+     setIsFeedbackModalOpen(false);
+     setEditingFeedbackSection(null);
   };
 
-  const handleDeleteFeedback = async (id: string) => {
+  const handleDeleteFeedbackSection = async (id: string) => {
      if (!confirm('Excluir este feedback da IA?')) return;
-     const updated = feedbacks.filter(f => f.id !== id);
-     await syncFeedbacks(updated);
+     const updated = feedbackSections.filter(s => s.id !== id);
+     await syncFeedbackSections(updated);
+  };
+
+  const toggleFeedbackSection = (id: string) => {
+     setFeedbackSections(feedbackSections.map(s => s.id === id ? { ...s, isExpanded: !s.isExpanded } : s));
   };
 
   // --- MOTOR DE ANÁLISE DE IA EM LOTES (15 EM 15) ---
@@ -759,14 +780,11 @@ export default function KnowledgeBasePage() {
 
   useEffect(() => { setSectionCurrentPage(1); }, [searchSection]);
 
-  // --- FILTROS E PAGINAÇÃO (FEEDBACKS) ---
-  const filteredFeedbacks = feedbacks.filter(f => 
-    f.text.toLowerCase().includes(feedbackSearch.toLowerCase())
+  // --- FILTROS (FEEDBACKS) ---
+  const filteredFeedbackSections = feedbackSections.filter(s => 
+    s.title.toLowerCase().includes(feedbackSearch.toLowerCase()) || 
+    s.content.toLowerCase().includes(feedbackSearch.toLowerCase())
   );
-  const feedbackTotalPages = Math.ceil(filteredFeedbacks.length / itemsPerPage);
-  const paginatedFeedbacks = filteredFeedbacks.slice((feedbackCurrentPage - 1) * itemsPerPage, feedbackCurrentPage * itemsPerPage);
-
-  useEffect(() => { setFeedbackCurrentPage(1); }, [feedbackSearch]);
 
   return (
     <div className={`min-h-screen ${isDarkMode ? 'bg-[#0a0a0a] text-white' : 'bg-gray-50 text-gray-900'}`}>
@@ -1168,106 +1186,114 @@ export default function KnowledgeBasePage() {
                 </div>
               )}
 
-              {/* FEEDBACKS DA IA (PT-BR / ES) INTERFACE */}
+              {/* FEEDBACKS DA IA (PT-BR / ES) INTERFACE - Estilo Capítulo */}
               {(activeTab === 'feedback_pt' || activeTab === 'feedback_es') && (
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                  {/* Formulário Esquerdo */}
-                  <div className="lg:col-span-1">
-                    <Card className={`p-8 rounded-[2.5rem] border shadow-2xl sticky top-24 ${isDarkMode ? 'bg-indigo-600/5 border-indigo-500/20' : 'bg-indigo-50 border-indigo-200'}`}>
-                      <h3 className="text-lg font-black uppercase tracking-widest text-indigo-600 dark:text-indigo-400 mb-6 flex items-center gap-2">
-                        {editingFeedback.id ? <Edit2 size={20}/> : <Plus size={20}/>}
-                        {editingFeedback.id ? 'Editar Feedback' : 'Adicionar Feedback'}
-                      </h3>
-                      <div className="space-y-4">
-                        <div className="space-y-1">
-                          <label className="text-[10px] font-black uppercase opacity-60 ml-1">Regra de Correção / Feedback</label>
-                          <Input 
-                            value={editingFeedback.text} 
-                            onChange={e => setEditingFeedback({...editingFeedback, text: e.target.value})} 
-                            className={`rounded-xl border-none h-12 font-bold ${isDarkMode ? 'bg-black/40 text-white' : 'bg-white text-gray-900'}`} 
-                            placeholder="Ex: Nunca traduza a palavra 'Display' em nenhum contexto." 
-                          />
-                        </div>
-                      </div>
-                      <div className="mt-8 flex flex-col gap-3">
-                        <Button onClick={handleSaveFeedback} disabled={saving || !editingFeedback.text} className="w-full rounded-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold h-12 shadow-lg shadow-indigo-600/20">
-                          {saving ? <Loader2 className="animate-spin w-5 h-5 mr-2" /> : <Save className="w-5 h-5 mr-2" />}
-                          Salvar Feedback
-                        </Button>
-                        {editingFeedback.id && (
-                          <Button variant="ghost" onClick={() => setEditingFeedback({ text: '' })} className="w-full rounded-full font-bold h-12">
-                            Cancelar Edição
-                          </Button>
-                        )}
-                      </div>
-                    </Card>
+                <Card className={`p-8 rounded-[2.5rem] border shadow-2xl flex flex-col ${isDarkMode ? 'bg-[#111]/80 border-white/10 backdrop-blur-3xl' : 'bg-white border-black/5'}`}>
+                  
+                  {/* Cabeçalho e Filtros */}
+                  <div className="flex flex-col xl:flex-row items-center justify-between gap-6 mb-8">
+                    <div className="relative flex-1 w-full max-w-md">
+                      <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                      <Input 
+                        placeholder="Pesquisar nos feedbacks..."
+                        value={feedbackSearch}
+                        onChange={e => setFeedbackSearch(e.target.value)}
+                        className={`pl-12 rounded-full border-none h-12 font-medium ${isDarkMode ? 'bg-white/10' : 'bg-gray-100'}`}
+                      />
+                    </div>
+                    <div className="flex flex-wrap gap-3 w-full xl:w-auto">
+                      <Button onClick={() => { setEditingFeedbackSection({ id: 'new_' + Date.now(), title: '', content: '' }); setIsFeedbackModalOpen(true); }} className="rounded-full font-bold h-12 bg-indigo-600/10 text-indigo-600 hover:bg-indigo-600/20 shadow-none border-none">
+                        <Plus className="w-4 h-4 mr-2" /> Novo Feedback
+                      </Button>
+                    </div>
                   </div>
 
-                  {/* Tabela de Feedbacks com Pesquisa */}
-                  <div className="lg:col-span-2 space-y-6">
-                    <Card className={`p-6 rounded-[2.5rem] border shadow-2xl flex flex-col xl:flex-row gap-4 items-center ${isDarkMode ? 'bg-[#111]/80 border-white/10 backdrop-blur-3xl' : 'bg-white border-black/5'}`}>
-                      <div className="relative flex-1 w-full">
-                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                        <Input 
-                          placeholder="Buscar nos feedbacks..." 
-                          value={feedbackSearch}
-                          onChange={e => setFeedbackSearch(e.target.value)}
-                          className={`pl-12 rounded-full border-none h-12 font-medium ${isDarkMode ? 'bg-white/10' : 'bg-gray-100'}`}
-                        />
-                      </div>
-                    </Card>
-
-                    <Card className={`rounded-[2.5rem] border shadow-2xl overflow-hidden ${isDarkMode ? 'bg-[#111]/80 border-white/10 backdrop-blur-3xl' : 'bg-white border-black/5'}`}>
-                      <div className="overflow-x-auto">
-                        <table className="w-full text-left border-collapse">
-                          <thead>
-                            <tr className={`border-b ${isDarkMode ? 'border-white/5 bg-white/[0.02]' : 'border-black/5 bg-black/[0.02]'}`}>
-                              <th className="p-5 text-[10px] font-black uppercase tracking-widest opacity-40">Regra de Feedback</th>
-                              <th className="p-5 text-[10px] font-black uppercase tracking-widest opacity-40 text-right w-24">Ações</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {paginatedFeedbacks.length > 0 ? paginatedFeedbacks.map((item) => (
-                              <tr key={item.id} className={`border-b last:border-0 transition-colors group ${isDarkMode ? 'border-white/5 hover:bg-white/5' : 'border-black/5 hover:bg-black/5'}`}>
-                                <td className="p-5 align-top">
-                                  <p className="font-bold text-sm leading-relaxed text-gray-900 dark:text-white">{item.text}</p>
-                                </td>
-                                <td className="p-5 align-top text-right w-24">
-                                  <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                    <Button variant="ghost" size="sm" onClick={() => setEditingFeedback(item)} className="h-8 w-8 p-0 rounded-lg text-blue-500 hover:bg-blue-500/10"><Edit2 size={14}/></Button>
-                                    <Button variant="ghost" size="sm" onClick={() => handleDeleteFeedback(item.id)} className="h-8 w-8 p-0 rounded-lg text-red-500 hover:bg-red-500/10"><Trash2 size={14}/></Button>
-                                  </div>
-                                </td>
-                              </tr>
-                            )) : (
-                              <tr>
-                                <td colSpan={2} className="p-10 text-center opacity-40 font-bold text-sm">
-                                  Nenhum feedback encontrado.
-                                </td>
-                              </tr>
-                            )}
-                          </tbody>
-                        </table>
-                      </div>
-                      {feedbackTotalPages > 1 && (
-                        <div className={`p-5 border-t flex items-center justify-between ${isDarkMode ? 'border-white/5 bg-white/[0.01]' : 'border-black/5 bg-black/[0.01]'}`}>
-                          <span className="text-[10px] font-black uppercase tracking-widest opacity-40">
-                            Mostrando {(feedbackCurrentPage - 1) * itemsPerPage + 1} - {Math.min(feedbackCurrentPage * itemsPerPage, filteredFeedbacks.length)} de {filteredFeedbacks.length}
-                          </span>
-                          <div className="flex gap-2">
-                            <Button variant="outline" size="sm" onClick={() => setFeedbackCurrentPage(p => Math.max(1, p - 1))} disabled={feedbackCurrentPage === 1} className="rounded-full h-8 px-4 font-bold">Anterior</Button>
-                            <Button variant="outline" size="sm" onClick={() => setFeedbackCurrentPage(p => Math.min(feedbackTotalPages, p + 1))} disabled={feedbackCurrentPage === feedbackTotalPages} className="rounded-full h-8 px-4 font-bold">Próxima</Button>
+                  {/* Lista de Feedbacks (Accordion) */}
+                  <div className="space-y-4">
+                    {filteredFeedbackSections.map((section, idx) => (
+                      <div key={section.id || idx} className={`rounded-3xl border overflow-hidden transition-all duration-300 ${isDarkMode ? 'bg-white/[0.02] border-white/10' : 'bg-gray-50/50 border-black/5'}`}>
+                        {/* Header do Feedback */}
+                        <div 
+                          className={`p-6 flex items-center justify-between cursor-pointer hover:bg-indigo-500/5 transition-colors ${section.isExpanded ? (isDarkMode ? 'bg-white/5' : 'bg-indigo-50/50') : ''}`}
+                          onClick={() => toggleFeedbackSection(section.id)}
+                        >
+                          <div className="flex items-center gap-4">
+                            <div className={`p-2 rounded-full transition-transform duration-300 ${section.isExpanded ? 'rotate-90 text-indigo-500 bg-indigo-500/10' : 'text-gray-400'}`}>
+                              <ChevronRight size={20} />
+                            </div>
+                            <h3 className="font-bold text-lg text-indigo-600 dark:text-indigo-400">
+                              {section.title.replace('--- FEEDBACK ', '').replace('---', '').trim()}
+                            </h3>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <button className="p-2 rounded-full hover:bg-indigo-500/10 text-indigo-500 transition-colors" onClick={(e) => { e.stopPropagation(); setEditingFeedbackSection(section); setIsFeedbackModalOpen(true); }} title="Editar Feedback">
+                              <Edit2 size={16} />
+                            </button>
+                            <button className="p-2 rounded-full hover:bg-rose-500/10 text-rose-500 transition-colors" onClick={(e) => { e.stopPropagation(); handleDeleteFeedbackSection(section.id); }} title="Excluir Feedback">
+                              <Trash2 size={16} />
+                            </button>
                           </div>
                         </div>
-                      )}
-                    </Card>
+                        
+                        {/* Conteúdo Expandido */}
+                        {section.isExpanded && (
+                          <div className={`p-8 border-t ${isDarkMode ? 'border-white/10 bg-black/20' : 'border-black/5 bg-white'}`}>
+                            <p className={`text-sm leading-relaxed whitespace-pre-wrap ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                              {section.content || '(Feedback vazio)'}
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                    
+                    {filteredFeedbackSections.length === 0 && (
+                      <div className="py-20 text-center opacity-40">
+                        <MessageSquare size={48} className="mx-auto mb-4 opacity-50" />
+                        <p className="text-lg font-bold">Nenhum feedback encontrado.</p>
+                      </div>
+                    )}
                   </div>
-                </div>
+                </Card>
               )}
             </div>
           )}
         </div>
       </main>
+
+      {/* Modal de Edição de Feedback da IA */}
+      {isFeedbackModalOpen && editingFeedbackSection && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/60 backdrop-blur-md" onClick={() => { setIsFeedbackModalOpen(false); setEditingFeedbackSection(null); }}>
+          <Card className={`w-full max-w-3xl flex flex-col overflow-hidden rounded-[2.5rem] border shadow-2xl animate-in zoom-in-95 duration-200 ${isDarkMode ? 'bg-[#0a0a0a] border-white/10 text-white' : 'bg-white border-black/10 text-gray-900'}`} onClick={e => e.stopPropagation()}>
+            <div className={`p-6 border-b flex justify-between items-center ${isDarkMode ? 'border-white/10' : 'border-gray-100'}`}>
+              <h2 className="text-xl font-bold tracking-tight text-indigo-600 dark:text-indigo-400 flex items-center gap-2">
+                <MessageSquare size={20} />
+                {editingFeedbackSection.id.startsWith('new_') ? 'Novo Feedback' : 'Editar Feedback'}
+              </h2>
+              <Button variant="ghost" size="sm" onClick={() => { setIsFeedbackModalOpen(false); setEditingFeedbackSection(null); }} className="rounded-full h-8 w-8 p-0"><X className="w-5 h-5" /></Button>
+            </div>
+            
+            <div className="p-8 flex flex-col gap-4">
+              <div>
+                <label className="text-[10px] font-black uppercase opacity-60 ml-1">Conteúdo do Feedback (multilinha)</label>
+                <Textarea 
+                  value={editingFeedbackSection.content} 
+                  onChange={e => setEditingFeedbackSection({...editingFeedbackSection, content: e.target.value})} 
+                  className={`mt-1 min-h-[200px] rounded-xl border-none font-medium text-sm p-4 ${isDarkMode ? 'bg-white/5 text-white' : 'bg-gray-100 text-gray-900'}`}
+                  placeholder="Descreva o erro ou a regra que a IA deve seguir..."
+                />
+              </div>
+            </div>
+
+            <div className={`p-6 border-t flex justify-end gap-3 ${isDarkMode ? 'border-white/10' : 'border-gray-100'}`}>
+              <Button variant="ghost" onClick={() => { setIsFeedbackModalOpen(false); setEditingFeedbackSection(null); }} className="rounded-full px-6 font-bold">Cancelar</Button>
+              <Button onClick={handleSaveFeedbackSection} disabled={saving} className="rounded-full px-8 bg-indigo-600 hover:bg-indigo-500 text-white font-bold shadow-lg shadow-indigo-600/20">
+                {saving ? <Loader2 className="animate-spin w-4 h-4 mr-2" /> : <Save className="w-4 h-4 mr-2" />}
+                Salvar Feedback
+              </Button>
+            </div>
+          </Card>
+        </div>
+      )}
 
       {/* Modal de Edição de Seção de Texto (Bug Review / Infos) */}
       {isSectionModalOpen && editingSection && (
