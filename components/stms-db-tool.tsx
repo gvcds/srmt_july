@@ -587,7 +587,11 @@ export function STMSDBTool({ onFocusChange }: { onFocusChange?: (focused: boolea
 
     const ids = new Set(filteredAndSortedItems.map(i => i.id));
     setItems(prev => {
-        const newItems = prev.map(p => ids.has(p.id) ? { ...p, status: 'pending' as const, suggested_text: '', simply_reason: '', reason: '' } : p);
+        const newItems = prev.map(p => 
+          (ids.has(p.id) && (p.status === 'reviewing' || p.status === 'pending')) 
+            ? { ...p, status: 'pending' as const, suggested_text: '', simply_reason: '', reason: '' } 
+            : p
+        );
         itemsRef.current = newItems;
         return newItems;
     });
