@@ -352,6 +352,9 @@ export default function KnowledgeBasePage() {
   const [feedbackSearch, setFeedbackSearch] = useState('');
   const [editingFeedbackSection, setEditingFeedbackSection] = useState<{ id: string, title: string, content: string } | null>(null);
   const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState(false);
+  const [feedbackSortOrder, setFeedbackSortOrder] = useState<'newest' | 'oldest'>('newest');
+  const [feedbackCurrentPage, setFeedbackCurrentPage] = useState(1);
+  const feedbackPerPage = 10;
 
   // Estados para Glossário
   const [glossaryItems, setGlossaryItems] = useState<GlossaryItem[]>([]);
@@ -780,11 +783,16 @@ export default function KnowledgeBasePage() {
 
   useEffect(() => { setSectionCurrentPage(1); }, [searchSection]);
 
-  // --- FILTROS (FEEDBACKS) ---
+  // --- FILTROS E PAGINAÇÃO (FEEDBACKS) ---
   const filteredFeedbackSections = feedbackSections.filter(s => 
     s.title.toLowerCase().includes(feedbackSearch.toLowerCase()) || 
     s.content.toLowerCase().includes(feedbackSearch.toLowerCase())
   );
+  const sortedFeedbackSections = feedbackSortOrder === 'oldest' ? [...filteredFeedbackSections].reverse() : filteredFeedbackSections;
+  const feedbackTotalPages = Math.ceil(sortedFeedbackSections.length / feedbackPerPage);
+  const paginatedFeedbackSections = sortedFeedbackSections.slice((feedbackCurrentPage - 1) * feedbackPerPage, feedbackCurrentPage * feedbackPerPage);
+
+  useEffect(() => { setFeedbackCurrentPage(1); }, [feedbackSearch, feedbackSortOrder]);
 
   return (
     <div className={`min-h-screen ${isDarkMode ? 'bg-[#0a0a0a] text-white' : 'bg-gray-50 text-gray-900'}`}>
@@ -1202,15 +1210,18 @@ export default function KnowledgeBasePage() {
                       />
                     </div>
                     <div className="flex flex-wrap gap-3 w-full xl:w-auto">
-                      <Button onClick={() => { setEditingFeedbackSection({ id: 'new_' + Date.now(), title: '', content: '' }); setIsFeedbackModalOpen(true); }} className="rounded-full font-bold h-12 bg-indigo-600/10 text-indigo-600 hover:bg-indigo-600/20 shadow-none border-none">
-                        <Plus className="w-4 h-4 mr-2" /> Novo Feedback
+                      <Button 
+                        onClick={() => setFeedbackSortOrder(prev => prev === 'newest' ? 'oldest' : 'newest')} 
+                        className={`rounded-full font-bold h-12 shadow-none border-none ${isDarkMode ? 'bg-white/10 text-white hover:bg-white/20' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
+                      >
+                        {feedbackSortOrder === 'newest' ? '↓ Mais Recente' : '↑ Mais Antigo'}
                       </Button>
                     </div>
                   </div>
 
                   {/* Lista de Feedbacks (Accordion) */}
                   <div className="space-y-4">
-                    {filteredFeedbackSections.map((section, idx) => (
+                    {paginatedFeedbackSections.map((section, idx) => (
                       <div key={section.id || idx} className={`rounded-3xl border overflow-hidden transition-all duration-300 ${isDarkMode ? 'bg-white/[0.02] border-white/10' : 'bg-gray-50/50 border-black/5'}`}>
                         {/* Header do Feedback */}
                         <div 
@@ -1253,6 +1264,23 @@ export default function KnowledgeBasePage() {
                       </div>
                     )}
                   </div>
+
+                  {/* Paginação */}
+                  {feedbackTotalPages > 1 && (
+                    <div className="mt-8 pt-6 border-t border-black/5 dark:border-white/10 flex items-center justify-between">
+                      <span className="text-[10px] font-black uppercase tracking-widest opacity-40">
+                        Mostrando {(feedbackCurrentPage - 1) * feedbackPerPage + 1} - {Math.min(feedbackCurrentPage * feedbackPerPage, sortedFeedbackSections.length)} de {sortedFeedbackSections.length}
+                      </span>
+                      <div className="flex gap-2">
+                        <Button variant="outline" size="sm" onClick={() => setFeedbackCurrentPage(p => Math.max(1, p - 1))} disabled={feedbackCurrentPage === 1} className="rounded-full h-8 px-4 font-bold">
+                          Anterior
+                        </Button>
+                        <Button variant="outline" size="sm" onClick={() => setFeedbackCurrentPage(p => Math.min(feedbackTotalPages, p + 1))} disabled={feedbackCurrentPage === feedbackTotalPages} className="rounded-full h-8 px-4 font-bold">
+                          Próxima
+                        </Button>
+                      </div>
+                    </div>
+                  )}
                 </Card>
               )}
             </div>

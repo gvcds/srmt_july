@@ -644,7 +644,7 @@ def fetch_translation(item, target_lang="pt"):
         "Content-Type": "application/json"
     }
     
-    lang_name = "ESPANHOL" if target_lang == "es" else "PORTUGUÊS"
+    lang_name = "ESPANHOL (AMÉRICA LATINA)" if target_lang == "es" else "PORTUGUÊS (BRASIL)"
     lang_code = "ES" if target_lang == "es" else "PT"
     
     system_prompt = f"""Você é o Revisor de Tradução da SAMSUNG.
@@ -652,6 +652,7 @@ DIRETRIZES APLICÁVEIS PARA ESTA STRING:
 {relevant_rules}
 
 INSTRUÇÕES (LEIA COM ATENÇÃO):
+- O idioma alvo da revisão é obrigatoriamente {lang_name}. Não utilize vocabulário de Portugal para Português, nem da Espanha (Castelhano Europeu) para o Espanhol.
 - Analise SEVERAMENTE o texto '{lang_code}' atual. Ele atende ao Tom de Voz da Samsung, regras gramaticais e de design ({design_type}) listadas acima?
 - Se o '{lang_code}' violar QUALQUER regra (ex: falta de espaço na unidade, erro gramatical), corrija-o obrigatoriamente.
 - Se a Regra de Ouro do Glossário estiver presente, ELA É SOBERANA.
