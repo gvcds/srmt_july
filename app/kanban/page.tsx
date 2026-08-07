@@ -140,6 +140,7 @@ export default function KanbanPage() {
   const [modalAssignedId, setModalAssignedId] = useState<number>(0);
   const [modalDeadline, setModalDeadline] = useState<string>('');
   const [searchQuery, setSearchQuery] = useState('');
+  const [filterPeriod, setFilterPeriod] = useState<string>('all');
   const [visibleCardsPerColumn, setVisibleCardsPerColumn] = useState<Record<string, number>>({});
 
   const handleLoadMore = (status: string) => {
@@ -690,15 +691,27 @@ export default function KanbanPage() {
             </div>
           )}
 
-          {/* Search Bar */}
-          <div className="w-full max-w-md mx-auto mt-4">
+          {/* Search Bar and Filters */}
+          <div className="w-full max-w-2xl mx-auto mt-4 flex flex-col sm:flex-row items-center gap-3">
             <Input
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Pesquisar nas atividades (título ou descrição)..."
-              className={`h-12 rounded-[1.5rem] px-6 text-xs font-bold transition-all duration-300 shadow-sm backdrop-blur-md
+              placeholder="Pesquisar atividades..."
+              className={`flex-1 h-12 rounded-[1.5rem] px-6 text-xs font-bold transition-all duration-300 shadow-sm backdrop-blur-md
                 ${isDarkMode ? 'bg-black/40 border-white/10 text-white focus:bg-white/5 focus:border-white/20' : 'bg-white/60 border-black/5 text-slate-900 focus:bg-white focus:border-blue-200'}`}
             />
+            <select
+              value={filterPeriod}
+              onChange={(e) => setFilterPeriod(e.target.value)}
+              className={`h-12 rounded-[1.5rem] px-6 text-xs font-bold transition-all duration-300 shadow-sm backdrop-blur-md border outline-none
+                ${isDarkMode ? 'bg-[#111]/80 border-white/10 text-white focus:bg-white/5 focus:border-white/20' : 'bg-white/90 border-black/5 text-slate-900 focus:bg-white focus:border-blue-200'}`}
+            >
+              <option value="all">Todo o período</option>
+              <option value="this_week">Esta Semana</option>
+              <option value="last_week">Semana Passada</option>
+              <option value="this_month">Este Mês</option>
+              <option value="last_month">Mês Passado</option>
+            </select>
           </div>
         </div>
 
@@ -756,6 +769,36 @@ export default function KanbanPage() {
                   (c.title || '').toLowerCase().includes(searchQuery.toLowerCase()) || 
                   (c.description || '').toLowerCase().includes(searchQuery.toLowerCase())
                 )
+                .filter(c => {
+                  if (filterPeriod === 'all') return true;
+                  
+                  const created = new Date(c.created_at);
+                  const now = new Date();
+                  
+                  if (filterPeriod === 'this_week') {
+                    const startOfWeek = new Date(now);
+                    startOfWeek.setDate(now.getDate() - now.getDay());
+                    startOfWeek.setHours(0,0,0,0);
+                    return created >= startOfWeek;
+                  }
+                  if (filterPeriod === 'last_week') {
+                    const startOfThisWeek = new Date(now);
+                    startOfThisWeek.setDate(now.getDate() - now.getDay());
+                    startOfThisWeek.setHours(0,0,0,0);
+                    const startOfLastWeek = new Date(startOfThisWeek);
+                    startOfLastWeek.setDate(startOfThisWeek.getDate() - 7);
+                    return created >= startOfLastWeek && created < startOfThisWeek;
+                  }
+                  if (filterPeriod === 'this_month') {
+                    return created.getMonth() === now.getMonth() && created.getFullYear() === now.getFullYear();
+                  }
+                  if (filterPeriod === 'last_month') {
+                    const lastMonth = new Date(now);
+                    lastMonth.setMonth(now.getMonth() - 1);
+                    return created.getMonth() === lastMonth.getMonth() && created.getFullYear() === lastMonth.getFullYear();
+                  }
+                  return true;
+                })
                 .sort((a, b) => {
                   if ((a.position ?? 0) !== (b.position ?? 0)) {
                     return (a.position ?? 0) - (b.position ?? 0);
