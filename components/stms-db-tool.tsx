@@ -161,7 +161,19 @@ const translations = {
     aiTimer: 'IA',
     humanTimer: 'Humano',
     startTimer: 'Iniciar',
-    pauseTimer: 'Pausar'
+    pauseTimer: 'Pausar',
+    resetTimer: 'Zerar Tempo',
+    focusModeOn: 'Modo Foco Ativado',
+    exitFocus: 'Sair do Foco',
+    selected: 'selecionados',
+    rowLabel: 'Linha',
+    designIdLabel: 'Design ID',
+    typeLabel: 'Tipo',
+    aiSuggestionLabel: 'Sugestão da IA',
+    analysisColLabel: 'Análise',
+    allFilter: 'Todos',
+    noResults: 'Nenhum resultado corresponde aos filtros.',
+    whatAiGotWrong: 'O que a IA errou?'
   },
   en: {
     total: 'Total',
@@ -231,7 +243,19 @@ const translations = {
     aiTimer: 'AI',
     humanTimer: 'Human',
     startTimer: 'Start',
-    pauseTimer: 'Pause'
+    pauseTimer: 'Pause',
+    resetTimer: 'Reset Timer',
+    focusModeOn: 'Focus Mode On',
+    exitFocus: 'Exit Focus',
+    selected: 'selected',
+    rowLabel: 'Row',
+    designIdLabel: 'Design ID',
+    typeLabel: 'Type',
+    aiSuggestionLabel: 'AI Suggestion',
+    analysisColLabel: 'Analysis',
+    allFilter: 'All',
+    noResults: 'No results match the filters.',
+    whatAiGotWrong: 'What did the AI get wrong?'
   },
   ko: {
     total: '전체',
@@ -301,7 +325,19 @@ const translations = {
     aiTimer: 'AI',
     humanTimer: '인간',
     startTimer: '시작',
-    pauseTimer: '일시 중지'
+    pauseTimer: '일시 중지',
+    resetTimer: '타이머 초기화',
+    focusModeOn: '집중 모드 켜짐',
+    exitFocus: '집중 모드 종료',
+    selected: '선택됨',
+    rowLabel: '행',
+    designIdLabel: 'Design ID',
+    typeLabel: '유형',
+    aiSuggestionLabel: 'AI 제안',
+    analysisColLabel: '분석',
+    allFilter: '모두',
+    noResults: '필터와 일치하는 결과가 없습니다.',
+    whatAiGotWrong: 'AI가 무엇을 잘못했습니까?'
   }
 };
 
@@ -1057,6 +1093,13 @@ return (
               >
                 {isHumanTimerRunning ? <Pause size={12} className="text-green-500" /> : <Play size={12} className={isDarkMode ? 'text-gray-400 hover:text-white' : 'text-gray-500 hover:text-black'} />}
               </button>
+              <button 
+                onClick={() => { setHumanReviewTime(0); setIsHumanTimerRunning(false); }}
+                className={`hover:text-red-400 transition-colors p-0 m-0 flex items-center justify-center bg-transparent border-none ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}
+                title={t.resetTimer}
+              >
+                <RotateCcw size={10} />
+              </button>
               {t.humanTimer}: {formatTime(humanReviewTime)}
             </div>
           </div>
@@ -1200,7 +1243,7 @@ return (
         {selectedIds.size > 0 && (
           <div className={`flex items-center gap-2 px-4 rounded-xl h-12 shrink-0 animate-in fade-in zoom-in duration-300 border ${isDarkMode ? 'bg-white/5 border-white/10' : 'bg-gray-50 border-black/5'}`}>
             <span className={`text-[10px] font-black uppercase tracking-widest mr-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-              {selectedIds.size} selecionados
+              {selectedIds.size} {t.selected}
             </span>
             <Button size="sm" onClick={() => handleBulkAction('approve')} disabled={isGlobalLoading} className="bg-blue-600 text-white hover:bg-blue-500 rounded-lg px-3 h-8 shadow-md shadow-blue-600/20 text-[10px] font-bold uppercase tracking-widest">
               {isGlobalLoading ? <Loader2 className="w-3 h-3 animate-spin mr-1" /> : <CheckCircle2 className="w-3 h-3 mr-1" />} {t.bulkApprove}
@@ -1231,7 +1274,7 @@ return (
         <div className={`p-4 border-b flex justify-between items-center ${isDarkMode ? 'bg-black/40 border-white/10' : 'bg-gray-100 border-black/5'}`}>
           <div className="flex items-center gap-3">
             <TableIcon className="w-5 h-5 text-blue-500" />
-            <h3 className="font-bold uppercase tracking-widest text-xs">Modo Foco Ativado</h3>
+            <h3 className="font-bold uppercase tracking-widest text-xs">{t.focusModeOn}</h3>
           </div>
           <Button
             onClick={() => setIsFocusMode(false)}
@@ -1239,7 +1282,7 @@ return (
             size="sm"
             className="rounded-lg h-9 px-4 font-bold bg-blue-600/10 text-blue-600 hover:bg-blue-600/20"
           >
-            <Minimize2 className="w-4 h-4 mr-2" /> Sair do Foco
+            <Minimize2 className="w-4 h-4 mr-2" /> {t.exitFocus}
           </Button>
         </div>
       )}
@@ -1263,7 +1306,7 @@ return (
               </th>
               <th className="p-4 min-w-[120px] cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 transition-colors" onClick={() => handleSort('excel_row')}>
                 <div className="flex items-center gap-2 text-[9px] font-black uppercase tracking-[0.2em] opacity-40">
-                  Row
+                  {t.rowLabel}
                   {sortConfig.key === 'excel_row' && (sortConfig.direction === 'asc' ? <ChevronUp size={10} /> : <ChevronDown size={10} />)}
                 </div>
               </th>
@@ -1278,14 +1321,14 @@ return (
               {showDesignId && (
                 <th className="p-4 min-w-[220px] cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 transition-colors" onClick={() => handleSort('design_id')}>
                   <div className="flex items-center gap-2 text-[9px] font-black uppercase tracking-[0.2em] opacity-40">
-                    Design ID
+                    {t.designIdLabel}
                     {sortConfig.key === 'design_id' && (sortConfig.direction === 'asc' ? <ChevronUp size={10} /> : <ChevronDown size={10} />)}
                   </div>
                 </th>
               )}
               <th className="p-4 min-w-[120px] cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 transition-colors" onClick={() => handleSort('design_type')}>
                 <div className="flex items-center gap-2 text-[9px] font-black uppercase tracking-[0.2em] opacity-40">
-                  Type
+                  {t.typeLabel}
                   {sortConfig.key === 'design_type' && (sortConfig.direction === 'asc' ? <ChevronUp size={10} /> : <ChevronDown size={10} />)}
                 </div>
               </th>
@@ -1303,13 +1346,13 @@ return (
               </th>
               <th className="p-4 min-w-[200px] cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 transition-colors" onClick={() => handleSort('suggested_text')}>
                 <div className="flex items-center gap-2 text-[9px] font-black uppercase tracking-[0.2em] text-blue-500">
-                  AI Suggestion
+                  {t.aiSuggestionLabel}
                   {sortConfig.key === 'suggested_text' && (sortConfig.direction === 'asc' ? <ChevronUp size={10} /> : <ChevronDown size={10} />)}
                 </div>
               </th>
               <th className="p-4 min-w-[150px] cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 transition-colors" onClick={() => handleSort('simply_reason')}>
                 <div className="flex items-center gap-2 text-[9px] font-black uppercase tracking-[0.2em] text-blue-500">
-                  Analysis
+                  {t.analysisColLabel}
                   {sortConfig.key === 'simply_reason' && (sortConfig.direction === 'asc' ? <ChevronUp size={10} /> : <ChevronDown size={10} />)}
                 </div>
               </th>
@@ -1333,7 +1376,7 @@ return (
                   onChange={e => setColFilters(p => ({ ...p, en: e.target.value }))}
                   className={`w-full h-9 px-3 rounded-xl text-[11px] font-bold border-none outline-none focus:ring-2 focus:ring-blue-500/20 transition-all ${isDarkMode ? 'bg-white/5 text-gray-400 hover:bg-white/10' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
                 >
-                  <option value="">Todos</option>
+                  <option value="">{t.allFilter}</option>
                   {Array.from(new Set(items.map(i => i.source_text || ''))).filter(val => val !== '').sort().map(val => (
                     <option key={val} value={val}>{String(val).substring(0, 50)}{String(val).length > 50 ? '...' : ''}</option>
                   ))}
@@ -1345,7 +1388,7 @@ return (
                   onChange={e => setColFilters(p => ({ ...p, pt: e.target.value }))}
                   className={`w-full h-9 px-3 rounded-xl text-[11px] font-bold border-none outline-none focus:ring-2 focus:ring-blue-500/20 transition-all ${isDarkMode ? 'bg-white/5 text-gray-400 hover:bg-white/10' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
                 >
-                  <option value="">Todos</option>
+                  <option value="">{t.allFilter}</option>
                   {Array.from(new Set(items.map(i => i.target_text || ''))).filter(val => val !== '').sort().map(val => (
                     <option key={val} value={val}>{String(val).substring(0, 50)}{String(val).length > 50 ? '...' : ''}</option>
                   ))}
@@ -1357,7 +1400,7 @@ return (
                   onChange={e => setColFilters(p => ({ ...p, ai: e.target.value }))}
                   className={`w-full h-9 px-3 rounded-xl text-[11px] font-bold border-none outline-none focus:ring-2 focus:ring-blue-500/20 transition-all ${isDarkMode ? 'bg-white/5 text-gray-400 hover:bg-white/10' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
                 >
-                  <option value="">Todos</option>
+                  <option value="">{t.allFilter}</option>
                   {Array.from(new Set(items.map(i => i.suggested_text || ''))).filter(val => val !== '').sort().map(val => (
                     <option key={val} value={val}>{String(val).substring(0, 50)}{String(val).length > 50 ? '...' : ''}</option>
                   ))}
@@ -1369,7 +1412,7 @@ return (
                   onChange={e => setColFilters(p => ({ ...p, analysis: e.target.value }))}
                   className={`w-full h-9 px-3 rounded-xl text-[11px] font-bold border-none outline-none focus:ring-2 focus:ring-blue-500/20 transition-all ${isDarkMode ? 'bg-white/5 text-gray-400 hover:bg-white/10' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
                 >
-                  <option value="">Todos</option>
+                  <option value="">{t.allFilter}</option>
                   {Array.from(new Set(items.map(i => i.simply_reason || ''))).filter(val => val !== '').sort().map(val => (
                     <option key={val} value={val}>{String(val).substring(0, 50)}{String(val).length > 50 ? '...' : ''}</option>
                   ))}
@@ -1381,12 +1424,12 @@ return (
                   onChange={e => setColFilters(p => ({ ...p, status: e.target.value }))}
                   className={`w-full h-9 px-3 rounded-xl text-[11px] font-bold border-none outline-none focus:ring-2 focus:ring-blue-500/20 transition-all ${isDarkMode ? 'bg-white/5 text-gray-400 hover:bg-white/10' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
                 >
-                  <option value="">Todos</option>
-                  <option value="pending">Pendente</option>
-                  <option value="reviewing">Revisando</option>
-                  <option value="approved">Aprovado</option>
-                  <option value="rejected">Rejeitado</option>
-                  <option value="postponed">Adiado</option>
+                  <option value="">{t.allFilter}</option>
+                  <option value="pending">{t.pending}</option>
+                  <option value="reviewing">{t.reviewing}</option>
+                  <option value="approved">{t.approved}</option>
+                  <option value="rejected">{t.rejected}</option>
+                  <option value="postponed">{t.postponed}</option>
                 </select>
               </th>
             </tr>
@@ -1396,7 +1439,7 @@ return (
             {currentItems.length === 0 ? (
               <tr>
                 <td colSpan={showContext && showDesignId ? 10 : (showContext || showDesignId ? 9 : 8)} className="p-20 text-center opacity-40 font-bold text-lg">
-                  Nenhum resultado corresponde aos filtros.
+                  {t.noResults}
                 </td>
               </tr>
             ) : (
@@ -1881,7 +1924,7 @@ return (
             {/* User Feedback Input */}
             <div className="space-y-2">
               <label className="text-[10px] font-black uppercase tracking-widest text-amber-500">
-                O que a IA errou?
+                {t.whatAiGotWrong}
               </label>
               <textarea
                 value={feedbackText}
