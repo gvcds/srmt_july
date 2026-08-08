@@ -346,6 +346,31 @@ export function STMSDBTool({ onFocusChange }: { onFocusChange?: (focused: boolea
   const [feedbackAction, setFeedbackAction] = useState<'reject' | 're_review'>('reject');
   const [isFeedbackLoading, setIsFeedbackLoading] = useState(false);
 
+  // Timers state
+  const [aiReviewTime, setAiReviewTime] = useState(0);
+  const [humanReviewTime, setHumanReviewTime] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (isBatchProcessing) {
+        setAiReviewTime(prev => prev + 1);
+      }
+      const hasReviewing = itemsRef.current.some(i => i.status === 'reviewing');
+      if (hasReviewing && !isBatchProcessing) {
+        setHumanReviewTime(prev => prev + 1);
+      }
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [isBatchProcessing]);
+
+  const formatTime = (seconds: number) => {
+    const h = Math.floor(seconds / 3600);
+    const m = Math.floor((seconds % 3600) / 60).toString().padStart(2, '0');
+    const s = (seconds % 60).toString().padStart(2, '0');
+    if (h > 0) return `${h}:${m}:${s}`;
+    return `${m}:${s}`;
+  };
+
   useEffect(() => {
     if (selectedItem) {
       setTempDesignId(selectedItem.design_id || '');
@@ -584,6 +609,9 @@ export function STMSDBTool({ onFocusChange }: { onFocusChange?: (focused: boolea
 
   const runAllAgain = () => {
     if (filteredAndSortedItems.length === 0 || isBatchProcessing) return;
+
+    setAiReviewTime(0);
+    setHumanReviewTime(0);
 
     const ids = new Set(filteredAndSortedItems.map(i => i.id));
     setItems(prev => {
@@ -997,10 +1025,19 @@ return (
             onClick={runAllAgain}
             disabled={isGlobalLoading || isBatchProcessing || filteredAndSortedItems.length === 0}
             title={t.runAllAgainBtn}
-            className={`rounded-xl h-12 w-12 p-0 flex items-center justify-center transition-all bg-purple-600 hover:bg-purple-500 text-white shadow-purple-600/40`}
+            className={`rounded-xl h-12 w-12 p-0 flex items-center justify-center transition-all bg-purple-600 hover:bg-purple-500 text-white shadow-purple-600/40 shrink-0`}
           >
             <RefreshCcw size={18} />
           </Button>
+          
+          <div className={`flex flex-col justify-center ml-2 space-y-1 font-mono text-[10px] font-black tracking-widest uppercase ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+            <div className={`flex items-center gap-1.5 ${isBatchProcessing ? 'text-blue-500 animate-pulse' : ''}`}>
+              <Bot size={12} /> IA: {formatTime(aiReviewTime)}
+            </div>
+            <div className={`flex items-center gap-1.5 ${stats.reviewing > 0 && !isBatchProcessing ? 'text-green-500 animate-pulse' : ''}`}>
+              <Eye size={12} /> Humano: {formatTime(humanReviewTime)}
+            </div>
+          </div>
         </div>
 
         <div className="relative flex-1 w-full" ref={dropdownRef}>
