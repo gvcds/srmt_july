@@ -37,7 +37,9 @@ import {
   AlertTriangle,
   CheckSquare,
   Send,
-  RefreshCcw
+  RefreshCcw,
+  Play,
+  Pause
 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -155,7 +157,11 @@ const translations = {
     feedbackPlaceholder: 'Descreva o que a IA errou nesta sugestão...',
     feedbackRejectBtn: 'Aplicar Feedback e Rejeitar',
     feedbackReReviewBtn: 'Aplicar Feedback e Revisar Novamente',
-    reReviewBtn: 'Revisar Novamente'
+    reReviewBtn: 'Revisar Novamente',
+    aiTimer: 'IA',
+    humanTimer: 'Humano',
+    startTimer: 'Iniciar',
+    pauseTimer: 'Pausar'
   },
   en: {
     total: 'Total',
@@ -221,7 +227,11 @@ const translations = {
     feedbackPlaceholder: 'Describe what the AI got wrong...',
     feedbackRejectBtn: 'Apply Feedback & Reject',
     feedbackReReviewBtn: 'Apply Feedback & Re-Review',
-    reReviewBtn: 'Re-Review'
+    reReviewBtn: 'Re-Review',
+    aiTimer: 'AI',
+    humanTimer: 'Human',
+    startTimer: 'Start',
+    pauseTimer: 'Pause'
   },
   ko: {
     total: '전체',
@@ -287,7 +297,11 @@ const translations = {
     feedbackPlaceholder: 'AI가 잘못한 점을 설명하세요...',
     feedbackRejectBtn: '피드백 적용 후 거절',
     feedbackReReviewBtn: '피드백 적용 후 재검토',
-    reReviewBtn: '재검토'
+    reReviewBtn: '재검토',
+    aiTimer: 'AI',
+    humanTimer: '인간',
+    startTimer: '시작',
+    pauseTimer: '일시 중지'
   }
 };
 
@@ -349,19 +363,19 @@ export function STMSDBTool({ onFocusChange }: { onFocusChange?: (focused: boolea
   // Timers state
   const [aiReviewTime, setAiReviewTime] = useState(0);
   const [humanReviewTime, setHumanReviewTime] = useState(0);
+  const [isHumanTimerRunning, setIsHumanTimerRunning] = useState(false);
 
   useEffect(() => {
     const interval = setInterval(() => {
       if (isBatchProcessing) {
         setAiReviewTime(prev => prev + 1);
       }
-      const hasReviewing = itemsRef.current.some(i => i.status === 'reviewing');
-      if (hasReviewing && !isBatchProcessing) {
+      if (isHumanTimerRunning) {
         setHumanReviewTime(prev => prev + 1);
       }
     }, 1000);
     return () => clearInterval(interval);
-  }, [isBatchProcessing]);
+  }, [isBatchProcessing, isHumanTimerRunning]);
 
   const formatTime = (seconds: number) => {
     const h = Math.floor(seconds / 3600);
@@ -612,6 +626,7 @@ export function STMSDBTool({ onFocusChange }: { onFocusChange?: (focused: boolea
 
     setAiReviewTime(0);
     setHumanReviewTime(0);
+    setIsHumanTimerRunning(false);
 
     const ids = new Set(filteredAndSortedItems.map(i => i.id));
     setItems(prev => {
@@ -1032,10 +1047,17 @@ return (
           
           <div className={`flex flex-col justify-center ml-2 space-y-1 font-mono text-[10px] font-black tracking-widest uppercase ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
             <div className={`flex items-center gap-1.5 ${isBatchProcessing ? 'text-blue-500 animate-pulse' : ''}`}>
-              <Bot size={12} /> IA: {formatTime(aiReviewTime)}
+              <Bot size={12} /> {t.aiTimer}: {formatTime(aiReviewTime)}
             </div>
-            <div className={`flex items-center gap-1.5 ${stats.reviewing > 0 && !isBatchProcessing ? 'text-green-500 animate-pulse' : ''}`}>
-              <Eye size={12} /> Humano: {formatTime(humanReviewTime)}
+            <div className={`flex items-center gap-1.5 ${isHumanTimerRunning ? 'text-green-500 animate-pulse' : ''}`}>
+              <button 
+                onClick={() => setIsHumanTimerRunning(!isHumanTimerRunning)}
+                className="hover:text-green-400 transition-colors p-0 m-0 flex items-center justify-center bg-transparent border-none"
+                title={isHumanTimerRunning ? t.pauseTimer : t.startTimer}
+              >
+                {isHumanTimerRunning ? <Pause size={12} className="text-green-500" /> : <Play size={12} className={isDarkMode ? 'text-gray-400 hover:text-white' : 'text-gray-500 hover:text-black'} />}
+              </button>
+              {t.humanTimer}: {formatTime(humanReviewTime)}
             </div>
           </div>
         </div>
