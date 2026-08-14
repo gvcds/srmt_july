@@ -81,7 +81,7 @@ const modules = [
     tag: "Workload",
     status: "Em construção",
     pill: "Workload (em breve)"
-
+  }
 ];
 
 const capabilityPills = modules.map((module) => ({
