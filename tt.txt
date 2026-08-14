@@ -1,18 +1,26 @@
-const { createServer } = require('http');
-const { parse } = require('url');
-const next = require('next');
+<configuration>
+  <system.webServer>
+    
+    <!-- Configura o IISNode para o server.js -->
+    <handlers>
+      <add name="iisnode" path="server.js" verb="*" modules="iisnode" />
+    </handlers>
+    
+    <rewrite>
+      <rules>
+        <!-- Redireciona TUDO para o server.js gerenciar -->
+        <rule name="NextJS">
+          <match url="/*" />
+          <action type="Rewrite" url="server.js" />
+        </rule>
+      </rules>
+    </rewrite>
 
-const dev = process.env.NODE_ENV !== 'production';
-const port = process.env.PORT || 3000;
-const app = next({ dev });
-const handle = app.getRequestHandler();
+    <!-- Força o Node a rodar em modo de produção -->
+    <iisnode node_env="production" />
 
-app.prepare().then(() => {
-  createServer((req, res) => {
-    const parsedUrl = parse(req.url, true);
-    handle(req, res, parsedUrl);
-  }).listen(port, (err) => {
-    if (err) throw err;
-    console.log(`> Ready on http://localhost:${port}`);
-  });
-});
+    <!-- Deixa o Next.js cuidar das páginas de erro (ex: 404) -->
+    <httpErrors existingResponse="PassThrough" />
+    
+  </system.webServer>
+</configuration>
