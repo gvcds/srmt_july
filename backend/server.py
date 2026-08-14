@@ -144,20 +144,6 @@ class RemarkIssue(Base):
     app_name = Column(String)
     created_at = Column(DateTime, default=datetime.utcnow)
 
-class DailyProject(Base):
-    __tablename__ = "daily_projects"
-    id = Column(Integer, primary_key=True, index=True)
-    name = Column(String, unique=True, index=True, nullable=False)
-    created_at = Column(DateTime, default=datetime.utcnow)
-
-class DailyIssue(Base):
-    __tablename__ = "daily_issues"
-    id = Column(Integer, primary_key=True, index=True)
-    project_id = Column(Integer, ForeignKey("daily_projects.id"), nullable=False)
-    title = Column(String, nullable=False)
-    date = Column(String, nullable=False, index=True) # YYYY-MM-DD
-    created_at = Column(DateTime, default=datetime.utcnow)
-
 class ReferenceModel(Base):
     __tablename__ = "reference_models"
     id = Column(Integer, primary_key=True, index=True)
@@ -610,7 +596,7 @@ def get_dynamic_rules(key, en_content, pt_content, en_comment, pt_comment, targe
     return relevant_rules.strip(), design_type
 
 # --- INTEGRAÇÃO COM A API DA IA (Não altere a lógica) ---
-def fetch_translation(item, target_lang="pt"):
+def fetch_translation(item, target_lang="pt", model=None):
     key = item['string_name']
     en_content = item['en']
     pt_content = item['pt']
@@ -671,7 +657,7 @@ Revise o texto priorizando a fidelidade ao original em inglês. Mantenha o texto
     ]
 
     payload = {
-        "model": MODEL_ID,
+        "model": model or MODEL_ID,
         "messages": messages,
         "stream": False
     }
@@ -772,6 +758,7 @@ class SystemNoticeUpdate(BaseModel):
 class BatchRequest(BaseModel):
     items: List[Dict[str, Any]]
     target_lang: Optional[str] = "pt"
+    model: Optional[str] = None
 
 @app.post("/process_batch")
 async def process_batch(request: BatchRequest):
@@ -779,7 +766,7 @@ async def process_batch(request: BatchRequest):
     results = []
     
     with concurrent.futures.ThreadPoolExecutor(max_workers=40) as executor:
-        futures = [executor.submit(fetch_translation, item, request.target_lang) for item in items]
+        futures = [executor.submit(fetch_translation, item, request.target_lang, request.model) for item in items]
         for future in concurrent.futures.as_completed(futures):
             results.append(future.result())
             
@@ -788,6 +775,7 @@ async def process_batch(request: BatchRequest):
 class ReportRequest(BaseModel):
     projectInfo: Dict[str, Any]
     items: List[Dict[str, Any]]
+    model: Optional[str] = None
 
 @app.post("/generate_report")
 async def generate_report(request: ReportRequest):
@@ -856,7 +844,7 @@ async def generate_report(request: ReportRequest):
     ]
 
     payload = {
-        "model": MODEL_ID,
+        "model": request.model or MODEL_ID,
         "messages": messages,
         "stream": False
     }
@@ -957,14 +945,6 @@ class TicketCreate(BaseModel):
     content: str
     resolution: Optional[str] = None
     creators: List[Dict[str, str]]
-
-class DailyProjectCreate(BaseModel):
-    name: str
-
-class DailyIssueCreate(BaseModel):
-    projectId: int
-    title: str
-    date: str
 
 class STMSReviewRequest(BaseModel):
     id: int
@@ -1620,38 +1600,6 @@ def delete_project(project_id: int, db: Session = Depends(get_db)):
     db.commit()
     return {"status": "success"}
 
-# --- ROTAS DE DAILY ISSUES ---
-
-@app.get("/daily-projects")
-def list_daily_projects(db: Session = Depends(get_db)):
-    return db.query(DailyProject).order_by(DailyProject.name.asc()).all()
-
-@app.post("/daily-projects")
-def create_daily_project(data: DailyProjectCreate, db: Session = Depends(get_db)):
-    existing = db.query(DailyProject).filter(DailyProject.name == data.name).first()
-    if existing:
-        raise HTTPException(status_code=400, detail="Já existe um projeto com este nome.")
-    
-    new_project = DailyProject(name=data.name)
-    db.add(new_project)
-    db.commit()
-    db.refresh(new_project)
-    return new_project
-
-@app.delete("/daily-projects/{project_id}")
-def delete_daily_project(project_id: int, db: Session = Depends(get_db)):
-    project = db.query(DailyProject).filter(DailyProject.id == project_id).first()
-    if not project:
-        raise HTTPException(status_code=404, detail="Projeto não encontrado.")
-    
-    issues_count = db.query(DailyIssue).filter(DailyIssue.project_id == project_id).count()
-    if issues_count > 0:
-        raise HTTPException(status_code=400, detail="Não é possível excluir um projeto que possui issues registradas.")
-    
-    db.delete(project)
-    db.commit()
-    return {"message": "Projeto removido."}
-
 # --- ROTAS DE AVISOS DO SISTEMA (SYSTEM NOTICES) ---
 
 @app.get("/system-notices")
@@ -1727,59 +1675,6 @@ def delete_system_notice(notice_id: int, db: Session = Depends(get_db)):
     db.commit()
     return {"message": "Aviso deletado com sucesso"}
 
-@app.get("/daily-issues")
-def list_daily_issues(date: Optional[str] = None, db: Session = Depends(get_db)):
-    query = db.query(DailyIssue)
-    if date:
-        query = query.filter(DailyIssue.date == date)
-    return query.order_by(DailyIssue.created_at.desc()).all()
-
-@app.post("/daily-issues")
-def create_daily_issue(data: DailyIssueCreate, db: Session = Depends(get_db)):
-    project = db.query(DailyProject).filter(DailyProject.id == data.projectId).first()
-    if not project:
-        raise HTTPException(status_code=404, detail="Projeto não encontrado.")
-    
-    new_issue = DailyIssue(
-        project_id=data.projectId,
-        title=data.title,
-        date=data.date
-    )
-    db.add(new_issue)
-    db.commit()
-    db.refresh(new_issue)
-    return new_issue
-
-@app.post("/daily-issues/bulk")
-def create_daily_issues_bulk(data: List[DailyIssueCreate], db: Session = Depends(get_db)):
-    created_issues = []
-    for item in data:
-        project = db.query(DailyProject).filter(DailyProject.id == item.projectId).first()
-        if not project:
-            continue # Pula se o projeto não existir
-            
-        new_issue = DailyIssue(
-            project_id=item.projectId,
-            title=item.title,
-            date=item.date
-        )
-        db.add(new_issue)
-        created_issues.append(new_issue)
-    
-    db.commit()
-    for issue in created_issues:
-        db.refresh(issue)
-    return created_issues
-
-@app.delete("/daily-issues/{issue_id}")
-def delete_daily_issue(issue_id: int, db: Session = Depends(get_db)):
-    issue = db.query(DailyIssue).filter(DailyIssue.id == issue_id).first()
-    if not issue:
-        raise HTTPException(status_code=404, detail="Issue não encontrada.")
-    
-    db.delete(issue)
-    db.commit()
-    return {"message": "Issue removida."}
 
 # --- ROTAS DE NOTIFICAÇÕES ---
 
@@ -1917,7 +1812,7 @@ async def ai_analyze(payload: Dict[str, Any], db: Session = Depends(get_db)):
         ai_messages.append({"role": msg.get("role", "user"), "content": msg.get("content", "")})
 
     ai_data = {
-        "model": MODEL_ID,
+        "model": payload.get("model", MODEL_ID),
         "messages": ai_messages,
         "stream": payload.get("stream", False)
     }
@@ -2772,6 +2667,7 @@ class KnowledgeUpdateRequest(BaseModel):
 class SuggestKnowledgeRequest(BaseModel):
     content: str
     type: str
+    model: Optional[str] = None
 
 @app.get("/knowledge/{filename}")
 def get_knowledge_file(filename: str):
@@ -2825,7 +2721,7 @@ def suggest_knowledge(data: SuggestKnowledgeRequest):
     ]
 
     payload = {
-        "model": MODEL_ID,
+        "model": data.model or MODEL_ID,
         "messages": messages,
         "stream": False
     }

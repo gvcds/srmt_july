@@ -1,25 +1,35 @@
-                                                                                                                                                                                                                                                                                                                           
-                                                                                                                                                                                                                                                                                                                           
-EEEEEEEEEEEEEEEEEEEEEEDDDDDDDDDDDDD                GGGGGGGGGGGGG               AAA               RRRRRRRRRRRRRRRRR   DDDDDDDDDDDDD                                        OOOOOOOOO          HHHHHHHHH     HHHHHHHHH     OOOOOOOOO     MMMMMMMM               MMMMMMMMEEEEEEEEEEEEEEEEEEEEEEMMMMMMMM               MMMMMMMM
-E::::::::::::::::::::ED::::::::::::DDD          GGG::::::::::::G              A:::A              R::::::::::::::::R  D::::::::::::DDD                                   OO:::::::::OO        H:::::::H     H:::::::H   OO:::::::::OO   M:::::::M             M:::::::ME::::::::::::::::::::EM:::::::M             M:::::::M
-E::::::::::::::::::::ED:::::::::::::::DD      GG:::::::::::::::G             A:::::A             R::::::RRRRRR:::::R D:::::::::::::::DD                               OO:::::::::::::OO      H:::::::H     H:::::::H OO:::::::::::::OO M::::::::M           M::::::::ME::::::::::::::::::::EM::::::::M           M::::::::M
-EE::::::EEEEEEEEE::::EDDD:::::DDDDD:::::D    G:::::GGGGGGGG::::G            A:::::::A            RR:::::R     R:::::RDDD:::::DDDDD:::::D                             O:::::::OOO:::::::O     HH::::::H     H::::::HHO:::::::OOO:::::::OM:::::::::M         M:::::::::MEE::::::EEEEEEEEE::::EM:::::::::M         M:::::::::M
-  E:::::E       EEEEEE  D:::::D    D:::::D  G:::::G       GGGGGG           A:::::::::A             R::::R     R:::::R  D:::::D    D:::::D                            O::::::O   O::::::O       H:::::H     H:::::H  O::::::O   O::::::OM::::::::::M       M::::::::::M  E:::::E       EEEEEEM::::::::::M       M::::::::::M
-  E:::::E               D:::::D     D:::::DG:::::G                        A:::::A:::::A            R::::R     R:::::R  D:::::D     D:::::D                           O:::::O     O:::::O       H:::::H     H:::::H  O:::::O     O:::::OM:::::::::::M     M:::::::::::M  E:::::E             M:::::::::::M     M:::::::::::M
-  E::::::EEEEEEEEEE     D:::::D     D:::::DG:::::G                       A:::::A A:::::A           R::::RRRRRR:::::R   D:::::D     D:::::D                           O:::::O     O:::::O       H::::::HHHHH::::::H  O:::::O     O:::::OM:::::::M::::M   M::::M:::::::M  E::::::EEEEEEEEEE   M:::::::M::::M   M::::M:::::::M
-  E:::::::::::::::E     D:::::D     D:::::DG:::::G    GGGGGGGGGG        A:::::A   A:::::A          R:::::::::::::RR    D:::::D     D:::::D      ---------------      O:::::O     O:::::O       H:::::::::::::::::H  O:::::O     O:::::OM::::::M M::::M M::::M M::::::M  E:::::::::::::::E   M::::::M M::::M M::::M M::::::M
-  E:::::::::::::::E     D:::::D     D:::::DG:::::G    G::::::::G       A:::::A     A:::::A         R::::RRRRRR:::::R   D:::::D     D:::::D      -:::::::::::::-      O:::::O     O:::::O       H:::::::::::::::::H  O:::::O     O:::::OM::::::M  M::::M::::M  M::::::M  E:::::::::::::::E   M::::::M  M::::M::::M  M::::::M
-  E::::::EEEEEEEEEE     D:::::D     D:::::DG:::::G    GGGGG::::G      A:::::AAAAAAAAA:::::A        R::::R     R:::::R  D:::::D     D:::::D      ---------------      O:::::O     O:::::O       H::::::HHHHH::::::H  O:::::O     O:::::OM::::::M   M:::::::M   M::::::M  E::::::EEEEEEEEEE   M::::::M   M:::::::M   M::::::M
-  E:::::E               D:::::D     D:::::DG:::::G        G::::G     A:::::::::::::::::::::A       R::::R     R:::::R  D:::::D     D:::::D                           O:::::O     O:::::O       H:::::H     H:::::H  O:::::O     O:::::OM::::::M    M:::::M    M::::::M  E:::::E             M::::::M    M:::::M    M::::::M
-  E:::::E       EEEEEE  D:::::D    D:::::D  G:::::G       G::::G    A:::::AAAAAAAAAAAAA:::::A      R::::R     R:::::R  D:::::D    D:::::D                            O::::::O   O::::::O       H:::::H     H:::::H  O::::::O   O::::::OM::::::M     MMMMM     M::::::M  E:::::E       EEEEEEM::::::M     MMMMM     M::::::M
-EE::::::EEEEEEEE:::::EDDD:::::DDDDD:::::D    G:::::GGGGGGGG::::G   A:::::A             A:::::A   RR:::::R     R:::::RDDD:::::DDDDD:::::D                             O:::::::OOO:::::::O     HH::::::H     H::::::HHO:::::::OOO:::::::OM::::::M               M::::::MEE::::::EEEEEEEE:::::EM::::::M               M::::::M
-E::::::::::::::::::::ED:::::::::::::::DD      GG:::::::::::::::G  A:::::A               A:::::A  R::::::R     R:::::RD:::::::::::::::DD                               OO:::::::::::::OO      H:::::::H     H:::::::H OO:::::::::::::OO M::::::M               M::::::ME::::::::::::::::::::EM::::::M               M::::::M
-E::::::::::::::::::::ED::::::::::::DDD          GGG::::::GGG:::G A:::::A                 A:::::A R::::::R     R:::::RD::::::::::::DDD                                   OO:::::::::OO        H:::::::H     H:::::::H   OO:::::::::OO   M::::::M               M::::::ME::::::::::::::::::::EM::::::M               M::::::M
-EEEEEEEEEEEEEEEEEEEEEEDDDDDDDDDDDDD                GGGGGG   GGGGAAAAAAA                   AAAAAAARRRRRRRR     RRRRRRRDDDDDDDDDDDDD                                        OOOOOOOOO          HHHHHHHHH     HHHHHHHHH     OOOOOOOOO     MMMMMMMM               MMMMMMMMEEEEEEEEEEEEEEEEEEEEEEMMMMMMMM               MMMMMMMM
-                                                                                                                                                                                                                                                                                                                           
-                                                                                                                                                                                                                                                                                                                           
-                                                                                                                                                                                                                                                                                                                           
-                                                                                                                                                                                                                                                                                                                           
-                                                                                                                                                                                                                                                                                                                           
-                                                                                                                                                                                                                                                                                                                           
-                                                                                                                                                                                                                                                                                                                           
+gemma-4-31b-it, 
+gpt-oss-120b, 
+gpt-oss-20b, 
+qwen3.6-27b, 
+qwen3.6-35b, 
+qwen3.5-35b, 
+qwen3-embedding-8b, 
+bge-m3, 
+nomic-embed-text-v1.5, 
+phi-4-reasoning, 
+mistral-small
+
+
+--
+
+LLM (Large Language Models):
+qwen2.5-32b
+gpt-oss-120b
+qwen2.5-72b
+qwen3.5-35b
+qwen3-next-80b
+gpt-oss-20b, phi-4-mini
+
+VLM (Vision Language Models) e Multimodais:
+qwen3.6-35b
+*gemma-4-31B-instruct
+qwen3.5-35b
+
+CLM (Code Language Models): 
+codellama-13b-instruct
+
+Embeddings:
+nomic-ai/nomic-embed-text-v1.5, 
+qwen3-embedding-8b, 
+bge-m3

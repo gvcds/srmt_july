@@ -784,43 +784,7 @@ export default function ShowcasePage() {
         </section>
       </div>
 
-      {/* Daily Operations Section */}
-      <section className="w-full max-w-[1600px] px-6 py-40">
-        <div className="flex flex-col lg:flex-row gap-20 items-start">
-          <div className="w-full lg:w-1/3 sticky top-32">
-            <SectionHeading 
-              icon={Activity} 
-              badge={t.daily.badge} 
-              title={t.daily.title} 
-              highlight={t.daily.highlight}
-              description={t.daily.desc}
-              isDarkMode={isDarkMode}
-              color="red"
-            />
-            <div className="mt-12 space-y-6">
-               <motion.div whileHover={{ x: 10 }} className={`flex gap-4 p-6 rounded-2xl border transition-colors cursor-default ${isDarkMode ? 'bg-red-500/5 border-red-500/10' : 'bg-white border-red-100 shadow-sm'}`}>
-                  <div className="w-10 h-10 rounded-full bg-red-500/20 text-red-500 flex items-center justify-center shrink-0 shadow-[0_0_15px_rgba(239,68,68,0.3)]"><Activity size={20}/></div>
-                  <div>
-                    <h4 className={`font-bold text-lg ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{t.daily.regTitle}</h4>
-                    <p className="text-sm opacity-60 italic">URL: /daily-issues</p>
-                    <p className={`text-sm opacity-60 mt-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>{t.daily.regDesc}</p>
-                  </div>
-               </motion.div>
-               <motion.div whileHover={{ x: 10 }} className={`flex gap-4 p-6 rounded-2xl border transition-colors cursor-default ${isDarkMode ? 'bg-red-500/5 border-red-500/10' : 'bg-white border-red-100 shadow-sm'}`}>
-                  <div className="w-10 h-10 rounded-full bg-red-500/20 text-red-500 flex items-center justify-center shrink-0 shadow-[0_0_15px_rgba(239,68,68,0.3)]"><BrainCircuit size={20}/></div>
-                  <div>
-                    <h4 className={`font-bold text-lg ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{t.daily.aiTitle}</h4>
-                    <p className={`text-sm opacity-60 mt-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>{t.daily.aiDesc}</p>
-                  </div>
-               </motion.div>
-            </div>
-          </div>
-          <div className="w-full lg:w-2/3 space-y-10">
-            <ImagePlaceholder label="Daily Issues Listing" url="/daily-issues" isDarkMode={isDarkMode} className="border-red-500/20 hover:shadow-[0_0_40px_rgba(239,68,68,0.15)]" delay={0.1} />
-            <ImagePlaceholder label="Management Dashboard IA Analysis" url="/daily-issues" isDarkMode={isDarkMode} className="border-red-500/20 hover:shadow-[0_0_40px_rgba(239,68,68,0.15)]" delay={0.3} />
-          </div>
-        </div>
-      </section>
+
 
       {/* Workflow Control Section */}
       <div className={`w-full border-y transition-colors duration-500 py-40 ${isDarkMode ? 'bg-gradient-to-b from-blue-900/5 to-transparent border-blue-500/10' : 'bg-gradient-to-b from-blue-50 to-white border-blue-100'}`}>

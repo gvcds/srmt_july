@@ -30,7 +30,8 @@ import {
     Download,
     Mail,
     Database,
-    ArrowRight
+    ArrowRight,
+    Info
 } from 'lucide-react';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
@@ -686,15 +687,20 @@ const translations = {
         newChatBtn: "Novo Chat",
         noChatFound: "Nenhum chat encontrado",
         inputPlaceholder: "Pergunte qualquer coisa sobre SVP...",
-        footerText: "O SVP AI está utilizando o modelo gpt-oss:120b.",
-        footerSubtext: "Nossa inteligência está conectada ao proxy corporativo Sidia para garantir privacidade e performance.",
+        footerText: "O SVP AI está utilizando o modelo escolhido acima.",
+        footerSubtext: "Nossa inteligência é conectada ao proxy corporativo Sidia para garantir privacidade e performance.",
         chatRestarted: "Chat reiniciado. Como posso ajudar?",
         aiTyping: "SVP Assistant está digitando...",
         newChatTitle: "Novo Chat",
-        assistantGreeting: "Olá! Sou o assistente de IA do SVP. Como posso ajudar você hoje?",
-        goToChat: "Ir para o Chat",
+        assistantGreeting: "Olá! Sou o assistente de IA do SVP. Como posso te ajudar hoje?",
+        goToChat: "Ir para Chat",
         goToXmlTool: "Ferramenta XML",
-        goToDbTool: "Ferramenta Database"
+        goToDbTool: "Ferramenta Database",
+        modelInfoTitle: "Modelos Disponíveis",
+        modelInfoLLM: "LLM (Large Language Models): Modelos de texto avançados para raciocínio, resumo e conversação geral.",
+        modelInfoVLM: "VLM (Vision Language Models) e Multimodais: Modelos capazes de processar texto e imagens simultaneamente.",
+        modelInfoCLM: "CLM (Code Language Models): Especializados na compreensão e geração de código de programação.",
+        modelInfoEmbeddings: "Embeddings: Convertem texto em vetores para busca semântica e cálculos de similaridade."
     },
     en: {
         badge: "SVP Artificial Intelligence",
@@ -713,7 +719,7 @@ const translations = {
         newChatBtn: "New Chat",
         noChatFound: "No chat found",
         inputPlaceholder: "Ask anything about SVP...",
-        footerText: "SVP AI is using the gpt-oss:120b model.",
+        footerText: "SVP AI is using the chosen model.",
         footerSubtext: "Our intelligence is connected to the Sidia corporate proxy to ensure privacy and performance.",
         chatRestarted: "Chat restarted. How can I help?",
         aiTyping: "SVP Assistant is typing...",
@@ -721,7 +727,12 @@ const translations = {
         assistantGreeting: "Hello! I am the SVP AI assistant. How can I help you today?",
         goToChat: "Go to Chat",
         goToXmlTool: "XML Tool",
-        goToDbTool: "Database Tool"
+        goToDbTool: "Database Tool",
+        modelInfoTitle: "Available Models",
+        modelInfoLLM: "LLM (Large Language Models): Advanced text models for reasoning, summarization, and conversation.",
+        modelInfoVLM: "VLM (Vision Language Models) & Multimodal: Models capable of processing text and images simultaneously.",
+        modelInfoCLM: "CLM (Code Language Models): Specialized in understanding and generating programming code.",
+        modelInfoEmbeddings: "Embeddings: Convert text into vectors for semantic search and similarity calculations."
     },
     ko: {
         badge: "SVP 인공지능",
@@ -740,7 +751,7 @@ const translations = {
         newChatBtn: "새 채팅",
         noChatFound: "채팅을 찾을 수 없습니다",
         inputPlaceholder: "SVP에 대해 무엇이든 물어보세요...",
-        footerText: "SVP AI는 gpt-oss:120b 모델을 사용하고 있습니다.",
+        footerText: "SVP AI는 선택한 모델을 사용하고 있습니다.",
         footerSubtext: "Sidia 기업 프록시를 통한 개인 정보 보호 및 성능.",
         chatRestarted: "채팅이 재시작되었습니다. 무엇을 도와드릴까요?",
         aiTyping: "입력 중...",
@@ -748,7 +759,12 @@ const translations = {
         assistantGreeting: "안녕하세요! 저는 SVP AI 어시스턴트입니다. 오늘 무엇을 도와드릴까요?",
         goToChat: "채팅으로 이동",
         goToXmlTool: "XML 도구",
-        goToDbTool: "데이터베이스 도구"
+        goToDbTool: "데이터베이스 도구",
+        modelInfoTitle: "사용 가능한 모델",
+        modelInfoLLM: "LLM (대형 언어 모델): 추론, 요약 및 일반 대화를 위한 고급 텍스트 모델.",
+        modelInfoVLM: "VLM (비전 언어 모델) 및 다중 모달: 텍스트와 이미지를 동시에 처리할 수 있는 모델.",
+        modelInfoCLM: "CLM (코드 언어 모델): 프로그래밍 코드 이해 및 생성에 특화됨.",
+        modelInfoEmbeddings: "Embeddings: 의미론적 검색 및 유사도 계산을 위해 텍스트를 벡터로 변환."
     }
 };
 
@@ -814,12 +830,18 @@ export default function IASVPPage() {
     const { isDarkMode } = useTheme();
     const [lang, setLanguage] = useState<Language>('pt');
     const [showNeutronStar, setShowNeutronStar] = useState(false);
+    const [selectedModel, setSelectedModel] = useState<string>('gpt-oss-120b');
+    const [showModelInfo, setShowModelInfo] = useState(false);
     const t = translations[lang];
 
     useEffect(() => {
         const savedLang = localStorage.getItem('srmt_lang') as Language;
         if (savedLang && ['pt', 'en', 'ko'].includes(savedLang)) {
             setLanguage(savedLang);
+        }
+        const savedModel = localStorage.getItem('svp_selected_model');
+        if (savedModel) {
+            setSelectedModel(savedModel);
         }
     }, []);
 
@@ -938,6 +960,7 @@ export default function IASVPPage() {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
+                    model: selectedModel,
                     messages: [
                         { role: 'system', content: `Resuma o assunto da mensagem do usuário em no máximo 3 palavras para um título de chat curto e direto. Responda APENAS o resumo no idioma: ${langName}.` },
                         { role: 'user', content: userMsg }
@@ -983,6 +1006,7 @@ export default function IASVPPage() {
                 headers: { 'Content-Type': 'application/json' },
                 signal: controller.signal,
                 body: JSON.stringify({
+                    model: selectedModel,
                     messages: [
                         {
                             role: 'system',
@@ -1114,6 +1138,7 @@ REGRAS CRÍTICAS E INVIOLÁVEIS:
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
+                        model: selectedModel,
                         messages: [
                             { role: 'system', content: 'Você é um Analista Estratégico SVP. Forneça insights técnicos diretos e profissionais.' },
                             { role: 'user', content: prompt }
@@ -1168,26 +1193,104 @@ REGRAS CRÍTICAS E INVIOLÁVEIS:
                 </React.Fragment>
             ))}
 
+            {showModelInfo && (
+                <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm" onClick={() => setShowModelInfo(false)}>
+                    <Card className={`w-full max-w-lg p-8 rounded-xl border-none shadow-2xl animate-in zoom-in-95 duration-200 ${isDarkMode ? 'bg-[#1a1a1a] text-white' : 'bg-white text-gray-900'}`} onClick={e => e.stopPropagation()}>
+                        <div className="flex items-center justify-between mb-6">
+                            <h2 className="text-xl font-black tracking-tight flex items-center gap-2">
+                                <Info className="w-5 h-5 text-blue-500" /> {t.modelInfoTitle}
+                            </h2>
+                            <Button variant="ghost" onClick={() => setShowModelInfo(false)} className="rounded-lg h-8 w-8 p-0 opacity-50 hover:opacity-100"><X className="w-4 h-4"/></Button>
+                        </div>
+                        <div className="space-y-4 text-sm leading-relaxed">
+                            <div className={`p-4 rounded-xl border ${isDarkMode ? 'bg-white/5 border-white/10' : 'bg-gray-50 border-gray-200'}`}>
+                                <p><strong>LLM:</strong> {t.modelInfoLLM.split(':')[1]}</p>
+                            </div>
+                            <div className={`p-4 rounded-xl border ${isDarkMode ? 'bg-white/5 border-white/10' : 'bg-gray-50 border-gray-200'}`}>
+                                <p><strong>VLM:</strong> {t.modelInfoVLM.split(':')[1]}</p>
+                            </div>
+                            <div className={`p-4 rounded-xl border ${isDarkMode ? 'bg-white/5 border-white/10' : 'bg-gray-50 border-gray-200'}`}>
+                                <p><strong>CLM:</strong> {t.modelInfoCLM.split(':')[1]}</p>
+                            </div>
+                            <div className={`p-4 rounded-xl border ${isDarkMode ? 'bg-white/5 border-white/10' : 'bg-gray-50 border-gray-200'}`}>
+                                <p><strong>Embeddings:</strong> {t.modelInfoEmbeddings.split(':')[1]}</p>
+                            </div>
+                        </div>
+                    </Card>
+                </div>
+            )}
+
             <div className={`w-full max-w-7xl relative z-10 space-y-12 ${isToolFocused || isFullScreen ? 'pt-0 px-0 space-y-0 h-screen flex flex-col' : 'px-4 pt-10'}`}>
 
                 {/* CONTEÚDO A SER ESCONDIDO NO MODO FOCO/TELA CHEIA */}
                 {(!isFullScreen && !isToolFocused) && (
                     <>
-                        {/* Seletor de Idioma */}
-                        <div className="flex justify-center mb-4 gap-2">
-                            {[
-                                { id: 'pt', label: 'Português', icon: '🇧🇷' },
-                                { id: 'en', label: 'English', icon: '🇺🇸' },
-                                { id: 'ko', label: '한국어', icon: '🇰🇷' }
-                            ].map((l) => (
-                                <button
-                                    key={l.id}
-                                    onClick={() => changeLanguage(l.id as Language)}
-                                    className={`px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all border flex items-center gap-2 ${lang === l.id ? 'bg-blue-600 border-blue-600 text-white shadow-lg shadow-blue-600/30' : 'bg-white/5 border-white/10 opacity-60 hover:opacity-100 hover:bg-white/10'}`}
+                        {/* Controles de Configuração (Idioma e Modelo) */}
+                        <div className="flex flex-col sm:flex-row justify-center items-center mb-6 gap-4">
+                            {/* Seletor de Idioma */}
+                            <div className="flex gap-2">
+                                {[
+                                    { id: 'pt', label: 'Português', icon: '🇧🇷' },
+                                    { id: 'en', label: 'English', icon: '🇺🇸' },
+                                    { id: 'ko', label: '한국어', icon: '🇰🇷' }
+                                ].map((l) => (
+                                    <button
+                                        key={l.id}
+                                        onClick={() => changeLanguage(l.id as Language)}
+                                        className={`px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all border flex items-center gap-2 ${lang === l.id ? 'bg-blue-600 border-blue-600 text-white shadow-lg shadow-blue-600/30' : 'bg-white/5 border-white/10 opacity-60 hover:opacity-100 hover:bg-white/10'}`}
+                                    >
+                                        <span>{l.icon}</span> {l.label}
+                                    </button>
+                                ))}
+                            </div>
+                            
+                            {/* Divisor */}
+                            <div className="hidden sm:block w-px h-8 bg-gray-300 dark:bg-gray-700"></div>
+                            
+                            {/* Seletor de Modelo */}
+                            <div className="flex items-center gap-2">
+                                <Bot className="w-4 h-4 opacity-50" />
+                                <select 
+                                    value={selectedModel}
+                                    onChange={(e) => {
+                                        setSelectedModel(e.target.value);
+                                        localStorage.setItem('svp_selected_model', e.target.value);
+                                    }}
+                                    className={`px-3 py-2 rounded-lg text-xs font-bold transition-all border outline-none ${isDarkMode ? 'bg-[#111] border-white/20 text-white' : 'bg-white border-gray-300 text-gray-900'}`}
                                 >
-                                    <span>{l.icon}</span> {l.label}
-                                </button>
-                            ))}
+                                    <optgroup label="LLM (Large Language Models)">
+                                        <option value="qwen2.5-32b">qwen2.5-32b</option>
+                                        <option value="gpt-oss-120b">gpt-oss-120b</option>
+                                        <option value="qwen2.5-72b">qwen2.5-72b</option>
+                                        <option value="qwen3.5-35b">qwen3.5-35b</option>
+                                        <option value="qwen3-next-80b">qwen3-next-80b</option>
+                                        <option value="gpt-oss-20b">gpt-oss-20b</option>
+                                        <option value="phi-4-mini">phi-4-mini</option>
+                                    </optgroup>
+                                    <optgroup label="VLM (Vision Language Models) e Multimodais">
+                                        <option value="qwen3.6-35b">qwen3.6-35b</option>
+                                        <option value="gemma-4-31B-instruct">gemma-4-31B-instruct</option>
+                                        <option value="qwen3.5-35b">qwen3.5-35b</option>
+                                    </optgroup>
+                                    <optgroup label="CLM (Code Language Models)">
+                                        <option value="codellama-13b-instruct">codellama-13b-instruct</option>
+                                    </optgroup>
+                                    <optgroup label="Embeddings">
+                                        <option value="nomic-ai/nomic-embed-text-v1.5">nomic-ai/nomic-embed-text-v1.5</option>
+                                        <option value="qwen3-embedding-8b">qwen3-embedding-8b</option>
+                                        <option value="bge-m3">bge-m3</option>
+                                    </optgroup>
+                                </select>
+                                <Button 
+                                    variant="ghost" 
+                                    size="sm" 
+                                    onClick={() => setShowModelInfo(true)}
+                                    className="p-1.5 h-auto rounded-lg opacity-60 hover:opacity-100"
+                                    title={t.modelInfoTitle}
+                                >
+                                    <Info className="w-4 h-4" />
+                                </Button>
+                            </div>
                         </div>
 
                         {/* BOTÃO NÚCLEO EXPANSÍVEL */}

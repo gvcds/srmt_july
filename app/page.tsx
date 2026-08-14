@@ -81,17 +81,7 @@ const modules = [
     tag: "Workload",
     status: "Em construção",
     pill: "Workload (em breve)"
-  },
-  {
-    key: "daily-issues",
-    title: "Daily Issues",
-    description: "Cadastre projetos e acompanhe problemas e bugs diários.",
-    icon: LayoutGrid, // You can change this to another suitable icon like ListTodo if imported
-    href: "/daily-issues",
-    color: "emerald",
-    tag: "Issues",
-    pill: "Daily Issues"
-  }
+
 ];
 
 const capabilityPills = modules.map((module) => ({

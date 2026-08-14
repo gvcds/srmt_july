@@ -227,9 +227,6 @@ export function Navbar() {
                 <a href="/tickets">Issues ou Melhorias em SVP</a>
               </Button>
 
-              <Button size="sm" asChild {...getNavButtonProps('/daily-issues')}>
-                <a href="/daily-issues">Daily Issues</a>
-              </Button>
 
               <Button size="sm" asChild {...getNavButtonProps('/time-semanal')}>
                 <a href="/time-semanal">Time Semanal</a>
