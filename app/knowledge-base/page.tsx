@@ -950,9 +950,7 @@ export default function KnowledgeBasePage() {
                       <Button onClick={() => { setEditingSection({ id: 'new_' + Date.now(), title: '# Novo Capítulo', content: '' }); setIsSectionModalOpen(true); }} className="rounded-full font-bold h-12 bg-blue-600/10 text-blue-600 hover:bg-blue-600/20 shadow-none border-none">
                         <Plus className="w-4 h-4 mr-2" /> Novo Capítulo
                       </Button>
-                      <Button onClick={() => startBatchAIAnalysis()} className={`rounded-full font-bold h-12 text-white shadow-lg ${activeTab.startsWith('tone_of_voice') ? 'bg-purple-600 hover:bg-purple-500 shadow-purple-600/20' : 'bg-blue-600 hover:bg-blue-500 shadow-blue-600/20'}`}>
-                        <Sparkles className="w-4 h-4 mr-2" /> Análise IA (Lotes)
-                      </Button>
+
                       <Button onClick={handleSaveTextFile} disabled={saving} className="rounded-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold h-12 shadow-lg shadow-emerald-600/20">
                         {saving ? <Loader2 className="animate-spin w-4 h-4 mr-2" /> : <Save className="w-4 h-4 mr-2" />}
                         Salvar Manual
@@ -1111,13 +1109,7 @@ export default function KnowledgeBasePage() {
                             <option value="No">DNT: Não</option>
                           </select>
                         </div>
-                        <Button 
-                          onClick={() => setIsAiSelectionModalOpen(true)}
-                          className="h-12 w-12 rounded-full bg-blue-600 hover:bg-blue-500 text-white p-0 shrink-0 shadow-lg shadow-blue-600/20" 
-                          title="Análise IA em Lote (Glossário)"
-                        >
-                          <Sparkles size={18} />
-                        </Button>
+
                       </div>
                     </Card>
 
