@@ -336,7 +336,7 @@ export function STMSXmlTool({ onFocusChange }: { onFocusChange?: (focused: boole
  const batchResponse = await fetch(`${API_URL}/process_batch`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ items: batch })
+ body: JSON.stringify({ items: batch, model: localStorage.getItem('svp_selected_model') || undefined })
  });
  const batchData = await batchResponse.json();
  setFinalResults(prev => [...prev, ...batchData.results]);

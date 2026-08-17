@@ -953,6 +953,7 @@ class STMSReviewRequest(BaseModel):
     target_text: Optional[str] = ""
     char_limit: Optional[str] = ""
     target_lang: Optional[str] = "pt"
+    model: Optional[str] = None
 
 class STMSApproveRequest(BaseModel):
     id: int
@@ -1020,7 +1021,7 @@ def review_stms_ai(item: STMSReviewRequest, db: Session = Depends(get_db)):
         
     try:
         # Chama a lógica principal de revisão da IA que já existe no servidor
-        result = fetch_translation(mapping_item, target_lang=item.target_lang)
+        result = fetch_translation(mapping_item, target_lang=item.target_lang, model=item.model)
         
         advice = result.get('advice', item.target_text)
         reason = result.get('reason', 'Revisão automática realizada.')
@@ -1085,6 +1086,7 @@ class STMSFeedbackRequest(BaseModel):
     suggested_text: Optional[str] = ""
     target_lang: Optional[str] = "pt"
     action: Optional[str] = "reject"  # "reject" or "re_review"
+    model: Optional[str] = None
 
 @app.post("/stms/feedback")
 def submit_stms_feedback(data: STMSFeedbackRequest, db: Session = Depends(get_db)):
@@ -1136,7 +1138,7 @@ def submit_stms_feedback(data: STMSFeedbackRequest, db: Session = Depends(get_db
             if db_item.char_limit:
                 mapping_item["en_comment"] += f" (MAX: {db_item.char_limit})"
             
-            result = fetch_translation(mapping_item, target_lang=data.target_lang)
+            result = fetch_translation(mapping_item, target_lang=data.target_lang, model=data.model)
             
             advice = result.get('advice', db_item.target_text)
             reason = result.get('reason', 'Revisão automática realizada.')

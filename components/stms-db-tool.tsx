@@ -600,7 +600,8 @@ export function STMSDBTool({ onFocusChange }: { onFocusChange?: (focused: boolea
             source_text: item.source_text,
             target_text: item.target_text,
             char_limit: item.char_limit,
-            target_lang: detectedLang
+            target_lang: detectedLang,
+            model: localStorage.getItem('svp_selected_model') || undefined
           };
 
           const response = await fetch(`${API_URL}/stms/review_ai`, {
@@ -703,7 +704,8 @@ export function STMSDBTool({ onFocusChange }: { onFocusChange?: (focused: boolea
             source_text: item.source_text,
             target_text: item.target_text,
             char_limit: item.char_limit,
-            target_lang: detectedLang
+            target_lang: detectedLang,
+            model: localStorage.getItem('svp_selected_model') || undefined
           };
 
           const response = await fetch(`${API_URL}/stms/review_ai`, {
@@ -805,7 +807,8 @@ export function STMSDBTool({ onFocusChange }: { onFocusChange?: (focused: boolea
       const payload = {
         id: currentItemId, feedback: currentFeedbackText, ai_reason: currentFeedbackItem.reason || '',
         source_text: currentFeedbackItem.source_text, target_text: currentFeedbackItem.target_text,
-        suggested_text: currentFeedbackItem.suggested_text || '', target_lang: detectedLang, action: currentAction
+        suggested_text: currentFeedbackItem.suggested_text || '', target_lang: detectedLang, action: currentAction,
+        model: localStorage.getItem('svp_selected_model') || undefined
       };
 
       const response = await fetch(`${API_URL}/stms/feedback`, {
