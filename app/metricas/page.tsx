@@ -354,6 +354,7 @@ export default function MetricasPage() {
             alert(`Falha ao atualizar: ${error.message}`);
         }
     };
+    const calcTeamAvg = (allRecords: MetricRecord[], valueField: keyof MetricRecord): number => {
         const values = allRecords.map(r => (r[valueField] as number) || 0).filter(v => v > 0);
         if (values.length === 0) return 0;
         return values.reduce((a, b) => a + b, 0) / values.length;
