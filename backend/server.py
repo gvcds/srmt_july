@@ -830,6 +830,33 @@ def create_metric(metric: MetricCreate):
     finally:
         db.close()
 
+@app.get("/metrics")
+def get_metrics():
+    db = SessionLocal()
+    try:
+        metrics = db.query(Metric).order_by(Metric.created_at.asc()).all()
+        result = []
+        for m in metrics:
+            result.append({
+                "id": m.id,
+                "tipo": m.tipo,
+                "revisor": m.revisor,
+                "modelo": m.modelo,
+                "issues": m.issues,
+                "idioma_ug": m.idioma_ug,
+                "idioma_stms": m.idioma_stms,
+                "strings_revisadas": m.strings_revisadas,
+                "qsg_criados": m.qsg_criados,
+                "ug_criados": m.ug_criados,
+                "revisoes": m.revisoes,
+                "requests": m.requests,
+                "created_at": m.created_at.isoformat() if m.created_at else None
+            })
+        return {"metrics": result}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        db.close()
 
 class BatchRequest(BaseModel):
     items: List[Dict[str, Any]]
