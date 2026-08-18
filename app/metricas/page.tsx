@@ -30,7 +30,8 @@ import {
   X,
   Save,
   EyeOff,
-  Filter
+  Filter,
+  Lock
 } from 'lucide-react';
 import {
   LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
@@ -659,13 +660,40 @@ export default function MetricasPage() {
 
     if (isAuthorized === false) {
         return (
-            <div className={`min-h-screen font-sans flex flex-col items-center justify-center transition-colors duration-1000 ${isDarkMode ? "bg-[#050505] text-gray-200" : "bg-[#f5f5f7] text-gray-800"}`}>
-                <AIBackground isDarkMode={isDarkMode} />
-                <Navbar />
-                <div className="relative z-10 flex flex-col items-center p-8 text-center bg-black/40 backdrop-blur-xl border border-red-500/30 rounded-3xl shadow-2xl animate-in zoom-in-95 duration-500 max-w-md mx-4">
-                    <AlertCircle className="w-16 h-16 text-red-500 mb-6 drop-shadow-[0_0_15px_rgba(239,68,68,0.5)]" />
-                    <h1 className="text-3xl font-black text-white mb-2">Acesso Restrito</h1>
-                    <p className="text-gray-400 font-medium">Apenas usuários autorizados (Edgard, Gilmar, Wallid ou Ivan) podem acessar o painel de métricas.</p>
+            <div className="min-h-screen font-sans flex flex-col items-center justify-center bg-[#020204] text-gray-200 overflow-hidden relative">
+                {/* Forçando fundo AI dark */}
+                <AIBackground isDarkMode={true} />
+                
+                {/* Navbar oculta ou escura se quiser, mas é melhor manter a Navbar normal pra poder sair */}
+                <div className="absolute top-0 w-full z-50">
+                    <Navbar />
+                </div>
+                
+                <div className="relative z-10 flex flex-col items-center p-12 text-center bg-black/40 backdrop-blur-3xl border border-red-500/20 rounded-[2.5rem] shadow-[0_32px_128px_-12px_rgba(239,68,68,0.2)] animate-in zoom-in-95 duration-1000 max-w-lg mx-4">
+                    <div className="absolute inset-0 rounded-[2.5rem] bg-gradient-to-b from-red-500/5 to-transparent opacity-50 pointer-events-none" />
+                    
+                    <div className="w-24 h-24 mb-8 rounded-full bg-red-500/10 flex items-center justify-center border border-red-500/20 relative group">
+                        <div className="absolute inset-0 rounded-full border border-red-500/30 animate-ping opacity-20" style={{ animationDuration: '3s' }} />
+                        <Lock className="w-10 h-10 text-red-500 drop-shadow-[0_0_15px_rgba(239,68,68,0.6)] group-hover:scale-110 transition-transform duration-500" />
+                    </div>
+                    
+                    <h1 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-b from-white to-gray-500 mb-4 tracking-tight">
+                        Acesso Restrito
+                    </h1>
+                    
+                    <p className="text-gray-400 font-medium text-[15px] leading-relaxed max-w-[320px] mx-auto">
+                        Este painel é confidencial. Apenas administradores <span className="text-gray-200 font-bold">(Edgard, Gilmar, Wallid ou Ivan)</span> possuem autorização.
+                    </p>
+                    
+                    <div className="mt-10 pt-8 w-full border-t border-white/5">
+                        <Button 
+                            variant="outline" 
+                            onClick={() => window.location.href = '/perfil'}
+                            className="w-full rounded-2xl h-14 bg-white/5 border-white/10 text-white hover:bg-white/10 hover:text-white font-bold tracking-wide transition-all duration-500 shadow-2xl"
+                        >
+                            Voltar para o Perfil
+                        </Button>
+                    </div>
                 </div>
             </div>
         );
