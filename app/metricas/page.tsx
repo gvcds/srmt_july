@@ -229,9 +229,9 @@ export default function MetricasPage() {
                                             Idioma da Revisão
                                         </Label>
                                         <div className="grid grid-cols-2 gap-4">
-                                            <label className={`relative flex flex-col items-center justify-center p-4 rounded-xl border-2 cursor-pointer transition-all ${idiomaUG === 'Revisao Portugues-Brasil' ? (isDarkMode ? 'border-blue-500 bg-blue-500/20' : 'border-blue-600 bg-blue-50') : (isDarkMode ? 'border-white/10 bg-black/40 hover:bg-white/5' : 'border-gray-200 bg-white hover:bg-gray-50')}`}>
-                                                <input type="radio" name="idiomaUG" value="Revisao Portugues-Brasil" className="sr-only" onChange={(e) => setIdiomaUG(e.target.value)} required />
-                                                <span className={`font-bold text-sm ${idiomaUG === 'Revisao Portugues-Brasil' ? (isDarkMode ? 'text-blue-400' : 'text-blue-700') : ''}`}>Revisão Português-Brasil</span>
+                                            <label className={`relative flex flex-col items-center justify-center p-4 rounded-xl border-2 cursor-pointer transition-all ${idiomaUG === 'Revisao Espanhol-Latin' ? (isDarkMode ? 'border-blue-500 bg-blue-500/20' : 'border-blue-600 bg-blue-50') : (isDarkMode ? 'border-white/10 bg-black/40 hover:bg-white/5' : 'border-gray-200 bg-white hover:bg-gray-50')}`}>
+                                                <input type="radio" name="idiomaUG" value="Revisao Espanhol-Latin" className="sr-only" onChange={(e) => setIdiomaUG(e.target.value)} required />
+                                                <span className={`font-bold text-sm text-center ${idiomaUG === 'Revisao Espanhol-Latin' ? (isDarkMode ? 'text-blue-400' : 'text-blue-700') : ''}`}>Revisão Espanhol-Latin</span>
                                             </label>
                                             <label className={`relative flex flex-col items-center justify-center p-4 rounded-xl border-2 cursor-pointer transition-all ${idiomaUG === 'Revisao Ingles-Latin' ? (isDarkMode ? 'border-blue-500 bg-blue-500/20' : 'border-blue-600 bg-blue-50') : (isDarkMode ? 'border-white/10 bg-black/40 hover:bg-white/5' : 'border-gray-200 bg-white hover:bg-gray-50')}`}>
                                                 <input type="radio" name="idiomaUG" value="Revisao Ingles-Latin" className="sr-only" onChange={(e) => setIdiomaUG(e.target.value)} />
