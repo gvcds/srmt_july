@@ -271,9 +271,20 @@ export default function MetricasPage() {
         e.preventDefault();
         setIsLoading(true);
         try {
+            const toIntOrNull = (v: string) => v === '' ? null : parseInt(v, 10);
+            const toStrOrNull = (v: string) => v === '' ? null : v;
             const payload = { 
-                tipo, revisor, modelo, issues, 
-                idiomaUG, idiomaSTMS, stringsRevisadas, qsgCriados, ugCriados, revisoes, requests 
+                tipo, 
+                revisor, 
+                modelo: toStrOrNull(modelo), 
+                issues: toIntOrNull(issues), 
+                idiomaUG: toStrOrNull(idiomaUG), 
+                idiomaSTMS: toStrOrNull(idiomaSTMS), 
+                stringsRevisadas: toIntOrNull(stringsRevisadas), 
+                qsgCriados: toIntOrNull(qsgCriados), 
+                ugCriados: toIntOrNull(ugCriados), 
+                revisoes: toIntOrNull(revisoes), 
+                requests: toIntOrNull(requests) 
             };
             
             const response = await fetch('http://localhost:8000/metrics', {
