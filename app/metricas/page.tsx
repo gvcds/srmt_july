@@ -18,7 +18,11 @@ import {
   Sparkles,
   BookOpen,
   Code,
-  Wrench
+  Wrench,
+  CheckSquare,
+  FileUp,
+  Globe,
+  Languages
 } from 'lucide-react';
 
 // --- COMPONENTE DE FUNDO ANIMADO ---
@@ -81,18 +85,31 @@ const AIBackground = ({ isDarkMode }: { isDarkMode: boolean }) => {
 
 export default function MetricasPage() {
     const { isDarkMode } = useTheme();
-    const [tipo, setTipo] = useState<'Revisao Manual UG' | 'Revisao STMS' | 'Revisao Manual QSG' | 'Desenvolvimento QSG' | 'Desenvolvimento UG' | ''>('');
+    const [tipo, setTipo] = useState<'Revisao Manual UG' | 'Revisao STMS' | 'Revisao Manual QSG' | 'Desenvolvimento QSG' | 'Desenvolvimento UG' | 'Proofread accessories' | 'TEM Request' | ''>('');
+    
+    // Campos
     const [revisor, setRevisor] = useState('');
     const [modelo, setModelo] = useState('');
     const [issues, setIssues] = useState('');
     const [dataInicial, setDataInicial] = useState('');
     const [dataFim, setDataFim] = useState('');
     const [tempoDecorrido, setTempoDecorrido] = useState('');
+    
+    // Novos campos
+    const [idiomaUG, setIdiomaUG] = useState('');
+    const [idiomaSTMS, setIdiomaSTMS] = useState('');
+    const [stringsRevisadas, setStringsRevisadas] = useState('');
+    const [qsgCriados, setQsgCriados] = useState('');
+    const [ugCriados, setUgCriados] = useState('');
+    const [revisoes, setRevisoes] = useState('');
+    const [correcoes, setCorrecoes] = useState('');
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        // Lógica de envio (a ser implementada futuramente)
-        console.log({ tipo, revisor, modelo, issues, dataInicial, dataFim, tempoDecorrido });
+        console.log({ 
+            tipo, revisor, modelo, issues, dataInicial, dataFim, tempoDecorrido, 
+            idiomaUG, idiomaSTMS, stringsRevisadas, qsgCriados, ugCriados, revisoes, correcoes 
+        });
         alert('Métricas registradas com sucesso (Log no console)');
     };
 
@@ -102,7 +119,7 @@ export default function MetricasPage() {
 
             <Navbar />
 
-            <div className="w-full max-w-3xl px-4 pt-32 pb-12 relative z-10 flex flex-col min-h-screen">
+            <div className="w-full max-w-4xl px-4 pt-32 pb-12 relative z-10 flex flex-col min-h-screen">
                 <div className="text-center mb-10 animate-in slide-in-from-bottom-4 duration-700 fade-in">
                     <div className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-lg border mb-4 shadow-lg ${isDarkMode ? 'bg-white/5 border-white/10 text-blue-400' : 'bg-blue-50 border-blue-100 text-blue-600'}`}>
                         <Sparkles className="w-4 h-4 animate-pulse" />
@@ -128,110 +145,64 @@ export default function MetricasPage() {
                             <Label className={`text-sm font-bold uppercase tracking-widest flex items-center justify-center gap-2 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
                                 <Box className="w-4 h-4" /> Selecione o tipo de métrica
                             </Label>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                                <label className={`
-                                    relative flex flex-col items-center p-4 rounded-2xl border-2 cursor-pointer transition-all duration-300 group
-                                    ${tipo === 'Revisao Manual UG' 
-                                        ? (isDarkMode ? 'border-blue-500 bg-blue-500/10 shadow-[0_0_30px_rgba(59,130,246,0.15)]' : 'border-blue-600 bg-blue-50 shadow-lg shadow-blue-600/20') 
-                                        : (isDarkMode ? 'border-white/10 bg-black/40 hover:border-white/20 hover:bg-white/5' : 'border-gray-200 bg-white hover:border-blue-200 hover:bg-gray-50')}
-                                `}>
+                            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                                <label className={`relative flex flex-col items-center p-4 rounded-2xl border-2 cursor-pointer transition-all duration-300 group ${tipo === 'Revisao Manual UG' ? (isDarkMode ? 'border-blue-500 bg-blue-500/10 shadow-[0_0_30px_rgba(59,130,246,0.15)]' : 'border-blue-600 bg-blue-50 shadow-lg shadow-blue-600/20') : (isDarkMode ? 'border-white/10 bg-black/40 hover:border-white/20 hover:bg-white/5' : 'border-gray-200 bg-white hover:border-blue-200 hover:bg-gray-50')}`}>
                                     <input type="radio" name="tipo" value="Revisao Manual UG" className="sr-only" onChange={() => setTipo('Revisao Manual UG')} />
-                                    <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-3 transition-transform group-hover:scale-110 duration-300 ${
-                                        tipo === 'Revisao Manual UG' ? 'bg-blue-500 text-white' : (isDarkMode ? 'bg-white/5 text-gray-400' : 'bg-gray-100 text-gray-500')
-                                    }`}>
-                                        <FileText className="w-6 h-6" />
-                                    </div>
-                                    <span className={`text-sm text-center font-black tracking-tight ${tipo === 'Revisao Manual UG' ? (isDarkMode ? 'text-blue-400' : 'text-blue-700') : ''}`}>Revisão Manual UG</span>
-                                    
-                                    {tipo === 'Revisao Manual UG' && (
-                                        <div className="absolute top-3 right-3 w-2.5 h-2.5 rounded-full bg-blue-500 animate-pulse shadow-[0_0_15px_rgba(59,130,246,1)]" />
-                                    )}
+                                    <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-3 transition-transform group-hover:scale-110 duration-300 ${tipo === 'Revisao Manual UG' ? 'bg-blue-500 text-white' : (isDarkMode ? 'bg-white/5 text-gray-400' : 'bg-gray-100 text-gray-500')}`}><FileText className="w-6 h-6" /></div>
+                                    <span className={`text-xs text-center font-black tracking-tight ${tipo === 'Revisao Manual UG' ? (isDarkMode ? 'text-blue-400' : 'text-blue-700') : ''}`}>Revisão Manual UG</span>
+                                    {tipo === 'Revisao Manual UG' && <div className="absolute top-3 right-3 w-2.5 h-2.5 rounded-full bg-blue-500 animate-pulse shadow-[0_0_15px_rgba(59,130,246,1)]" />}
                                 </label>
 
-                                <label className={`
-                                    relative flex flex-col items-center p-4 rounded-2xl border-2 cursor-pointer transition-all duration-300 group
-                                    ${tipo === 'Revisao STMS' 
-                                        ? (isDarkMode ? 'border-purple-500 bg-purple-500/10 shadow-[0_0_30px_rgba(168,85,247,0.15)]' : 'border-purple-600 bg-purple-50 shadow-lg shadow-purple-600/20') 
-                                        : (isDarkMode ? 'border-white/10 bg-black/40 hover:border-white/20 hover:bg-white/5' : 'border-gray-200 bg-white hover:border-purple-200 hover:bg-gray-50')}
-                                `}>
+                                <label className={`relative flex flex-col items-center p-4 rounded-2xl border-2 cursor-pointer transition-all duration-300 group ${tipo === 'Revisao STMS' ? (isDarkMode ? 'border-purple-500 bg-purple-500/10 shadow-[0_0_30px_rgba(168,85,247,0.15)]' : 'border-purple-600 bg-purple-50 shadow-lg shadow-purple-600/20') : (isDarkMode ? 'border-white/10 bg-black/40 hover:border-white/20 hover:bg-white/5' : 'border-gray-200 bg-white hover:border-purple-200 hover:bg-gray-50')}`}>
                                     <input type="radio" name="tipo" value="Revisao STMS" className="sr-only" onChange={() => setTipo('Revisao STMS')} />
-                                    <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-3 transition-transform group-hover:scale-110 duration-300 ${
-                                        tipo === 'Revisao STMS' ? 'bg-purple-500 text-white' : (isDarkMode ? 'bg-white/5 text-gray-400' : 'bg-gray-100 text-gray-500')
-                                    }`}>
-                                        <Box className="w-6 h-6" />
-                                    </div>
-                                    <span className={`text-sm text-center font-black tracking-tight ${tipo === 'Revisao STMS' ? (isDarkMode ? 'text-purple-400' : 'text-purple-700') : ''}`}>Revisão STMS</span>
-                                    
-                                    {tipo === 'Revisao STMS' && (
-                                        <div className="absolute top-3 right-3 w-2.5 h-2.5 rounded-full bg-purple-500 animate-pulse shadow-[0_0_15px_rgba(168,85,247,1)]" />
-                                    )}
+                                    <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-3 transition-transform group-hover:scale-110 duration-300 ${tipo === 'Revisao STMS' ? 'bg-purple-500 text-white' : (isDarkMode ? 'bg-white/5 text-gray-400' : 'bg-gray-100 text-gray-500')}`}><Box className="w-6 h-6" /></div>
+                                    <span className={`text-xs text-center font-black tracking-tight ${tipo === 'Revisao STMS' ? (isDarkMode ? 'text-purple-400' : 'text-purple-700') : ''}`}>Revisão STMS</span>
+                                    {tipo === 'Revisao STMS' && <div className="absolute top-3 right-3 w-2.5 h-2.5 rounded-full bg-purple-500 animate-pulse shadow-[0_0_15px_rgba(168,85,247,1)]" />}
                                 </label>
 
-                                <label className={`
-                                    relative flex flex-col items-center p-4 rounded-2xl border-2 cursor-pointer transition-all duration-300 group
-                                    ${tipo === 'Revisao Manual QSG' 
-                                        ? (isDarkMode ? 'border-indigo-500 bg-indigo-500/10 shadow-[0_0_30px_rgba(99,102,241,0.15)]' : 'border-indigo-600 bg-indigo-50 shadow-lg shadow-indigo-600/20') 
-                                        : (isDarkMode ? 'border-white/10 bg-black/40 hover:border-white/20 hover:bg-white/5' : 'border-gray-200 bg-white hover:border-indigo-200 hover:bg-gray-50')}
-                                `}>
+                                <label className={`relative flex flex-col items-center p-4 rounded-2xl border-2 cursor-pointer transition-all duration-300 group ${tipo === 'Revisao Manual QSG' ? (isDarkMode ? 'border-indigo-500 bg-indigo-500/10 shadow-[0_0_30px_rgba(99,102,241,0.15)]' : 'border-indigo-600 bg-indigo-50 shadow-lg shadow-indigo-600/20') : (isDarkMode ? 'border-white/10 bg-black/40 hover:border-white/20 hover:bg-white/5' : 'border-gray-200 bg-white hover:border-indigo-200 hover:bg-gray-50')}`}>
                                     <input type="radio" name="tipo" value="Revisao Manual QSG" className="sr-only" onChange={() => setTipo('Revisao Manual QSG')} />
-                                    <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-3 transition-transform group-hover:scale-110 duration-300 ${
-                                        tipo === 'Revisao Manual QSG' ? 'bg-indigo-500 text-white' : (isDarkMode ? 'bg-white/5 text-gray-400' : 'bg-gray-100 text-gray-500')
-                                    }`}>
-                                        <BookOpen className="w-6 h-6" />
-                                    </div>
-                                    <span className={`text-sm text-center font-black tracking-tight ${tipo === 'Revisao Manual QSG' ? (isDarkMode ? 'text-indigo-400' : 'text-indigo-700') : ''}`}>Revisão Manual QSG</span>
-                                    
-                                    {tipo === 'Revisao Manual QSG' && (
-                                        <div className="absolute top-3 right-3 w-2.5 h-2.5 rounded-full bg-indigo-500 animate-pulse shadow-[0_0_15px_rgba(99,102,241,1)]" />
-                                    )}
+                                    <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-3 transition-transform group-hover:scale-110 duration-300 ${tipo === 'Revisao Manual QSG' ? 'bg-indigo-500 text-white' : (isDarkMode ? 'bg-white/5 text-gray-400' : 'bg-gray-100 text-gray-500')}`}><BookOpen className="w-6 h-6" /></div>
+                                    <span className={`text-xs text-center font-black tracking-tight ${tipo === 'Revisao Manual QSG' ? (isDarkMode ? 'text-indigo-400' : 'text-indigo-700') : ''}`}>Revisão Manual QSG</span>
+                                    {tipo === 'Revisao Manual QSG' && <div className="absolute top-3 right-3 w-2.5 h-2.5 rounded-full bg-indigo-500 animate-pulse shadow-[0_0_15px_rgba(99,102,241,1)]" />}
                                 </label>
 
-                                <label className={`
-                                    relative flex flex-col items-center p-4 rounded-2xl border-2 cursor-pointer transition-all duration-300 group
-                                    ${tipo === 'Desenvolvimento QSG' 
-                                        ? (isDarkMode ? 'border-teal-500 bg-teal-500/10 shadow-[0_0_30px_rgba(20,184,166,0.15)]' : 'border-teal-600 bg-teal-50 shadow-lg shadow-teal-600/20') 
-                                        : (isDarkMode ? 'border-white/10 bg-black/40 hover:border-white/20 hover:bg-white/5' : 'border-gray-200 bg-white hover:border-teal-200 hover:bg-gray-50')}
-                                `}>
+                                <label className={`relative flex flex-col items-center p-4 rounded-2xl border-2 cursor-pointer transition-all duration-300 group ${tipo === 'Desenvolvimento QSG' ? (isDarkMode ? 'border-teal-500 bg-teal-500/10 shadow-[0_0_30px_rgba(20,184,166,0.15)]' : 'border-teal-600 bg-teal-50 shadow-lg shadow-teal-600/20') : (isDarkMode ? 'border-white/10 bg-black/40 hover:border-white/20 hover:bg-white/5' : 'border-gray-200 bg-white hover:border-teal-200 hover:bg-gray-50')}`}>
                                     <input type="radio" name="tipo" value="Desenvolvimento QSG" className="sr-only" onChange={() => setTipo('Desenvolvimento QSG')} />
-                                    <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-3 transition-transform group-hover:scale-110 duration-300 ${
-                                        tipo === 'Desenvolvimento QSG' ? 'bg-teal-500 text-white' : (isDarkMode ? 'bg-white/5 text-gray-400' : 'bg-gray-100 text-gray-500')
-                                    }`}>
-                                        <Code className="w-6 h-6" />
-                                    </div>
-                                    <span className={`text-sm text-center font-black tracking-tight ${tipo === 'Desenvolvimento QSG' ? (isDarkMode ? 'text-teal-400' : 'text-teal-700') : ''}`}>Desenvolvimento QSG</span>
-                                    
-                                    {tipo === 'Desenvolvimento QSG' && (
-                                        <div className="absolute top-3 right-3 w-2.5 h-2.5 rounded-full bg-teal-500 animate-pulse shadow-[0_0_15px_rgba(20,184,166,1)]" />
-                                    )}
+                                    <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-3 transition-transform group-hover:scale-110 duration-300 ${tipo === 'Desenvolvimento QSG' ? 'bg-teal-500 text-white' : (isDarkMode ? 'bg-white/5 text-gray-400' : 'bg-gray-100 text-gray-500')}`}><Code className="w-6 h-6" /></div>
+                                    <span className={`text-xs text-center font-black tracking-tight ${tipo === 'Desenvolvimento QSG' ? (isDarkMode ? 'text-teal-400' : 'text-teal-700') : ''}`}>Desenvolvimento QSG</span>
+                                    {tipo === 'Desenvolvimento QSG' && <div className="absolute top-3 right-3 w-2.5 h-2.5 rounded-full bg-teal-500 animate-pulse shadow-[0_0_15px_rgba(20,184,166,1)]" />}
                                 </label>
 
-                                <label className={`
-                                    relative flex flex-col items-center p-4 rounded-2xl border-2 cursor-pointer transition-all duration-300 group
-                                    ${tipo === 'Desenvolvimento UG' 
-                                        ? (isDarkMode ? 'border-orange-500 bg-orange-500/10 shadow-[0_0_30px_rgba(249,115,22,0.15)]' : 'border-orange-600 bg-orange-50 shadow-lg shadow-orange-600/20') 
-                                        : (isDarkMode ? 'border-white/10 bg-black/40 hover:border-white/20 hover:bg-white/5' : 'border-gray-200 bg-white hover:border-orange-200 hover:bg-gray-50')}
-                                `}>
+                                <label className={`relative flex flex-col items-center p-4 rounded-2xl border-2 cursor-pointer transition-all duration-300 group ${tipo === 'Desenvolvimento UG' ? (isDarkMode ? 'border-orange-500 bg-orange-500/10 shadow-[0_0_30px_rgba(249,115,22,0.15)]' : 'border-orange-600 bg-orange-50 shadow-lg shadow-orange-600/20') : (isDarkMode ? 'border-white/10 bg-black/40 hover:border-white/20 hover:bg-white/5' : 'border-gray-200 bg-white hover:border-orange-200 hover:bg-gray-50')}`}>
                                     <input type="radio" name="tipo" value="Desenvolvimento UG" className="sr-only" onChange={() => setTipo('Desenvolvimento UG')} />
-                                    <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-3 transition-transform group-hover:scale-110 duration-300 ${
-                                        tipo === 'Desenvolvimento UG' ? 'bg-orange-500 text-white' : (isDarkMode ? 'bg-white/5 text-gray-400' : 'bg-gray-100 text-gray-500')
-                                    }`}>
-                                        <Wrench className="w-6 h-6" />
-                                    </div>
-                                    <span className={`text-sm text-center font-black tracking-tight ${tipo === 'Desenvolvimento UG' ? (isDarkMode ? 'text-orange-400' : 'text-orange-700') : ''}`}>Desenvolvimento UG</span>
-                                    
-                                    {tipo === 'Desenvolvimento UG' && (
-                                        <div className="absolute top-3 right-3 w-2.5 h-2.5 rounded-full bg-orange-500 animate-pulse shadow-[0_0_15px_rgba(249,115,22,1)]" />
-                                    )}
+                                    <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-3 transition-transform group-hover:scale-110 duration-300 ${tipo === 'Desenvolvimento UG' ? 'bg-orange-500 text-white' : (isDarkMode ? 'bg-white/5 text-gray-400' : 'bg-gray-100 text-gray-500')}`}><Wrench className="w-6 h-6" /></div>
+                                    <span className={`text-xs text-center font-black tracking-tight ${tipo === 'Desenvolvimento UG' ? (isDarkMode ? 'text-orange-400' : 'text-orange-700') : ''}`}>Desenvolvimento UG</span>
+                                    {tipo === 'Desenvolvimento UG' && <div className="absolute top-3 right-3 w-2.5 h-2.5 rounded-full bg-orange-500 animate-pulse shadow-[0_0_15px_rgba(249,115,22,1)]" />}
+                                </label>
+
+                                <label className={`relative flex flex-col items-center p-4 rounded-2xl border-2 cursor-pointer transition-all duration-300 group ${tipo === 'Proofread accessories' ? (isDarkMode ? 'border-pink-500 bg-pink-500/10 shadow-[0_0_30px_rgba(236,72,153,0.15)]' : 'border-pink-600 bg-pink-50 shadow-lg shadow-pink-600/20') : (isDarkMode ? 'border-white/10 bg-black/40 hover:border-white/20 hover:bg-white/5' : 'border-gray-200 bg-white hover:border-pink-200 hover:bg-gray-50')}`}>
+                                    <input type="radio" name="tipo" value="Proofread accessories" className="sr-only" onChange={() => setTipo('Proofread accessories')} />
+                                    <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-3 transition-transform group-hover:scale-110 duration-300 ${tipo === 'Proofread accessories' ? 'bg-pink-500 text-white' : (isDarkMode ? 'bg-white/5 text-gray-400' : 'bg-gray-100 text-gray-500')}`}><CheckSquare className="w-6 h-6" /></div>
+                                    <span className={`text-xs text-center font-black tracking-tight ${tipo === 'Proofread accessories' ? (isDarkMode ? 'text-pink-400' : 'text-pink-700') : ''}`}>Proofread accessories</span>
+                                    {tipo === 'Proofread accessories' && <div className="absolute top-3 right-3 w-2.5 h-2.5 rounded-full bg-pink-500 animate-pulse shadow-[0_0_15px_rgba(236,72,153,1)]" />}
+                                </label>
+
+                                <label className={`relative flex flex-col items-center p-4 rounded-2xl border-2 cursor-pointer transition-all duration-300 group ${tipo === 'TEM Request' ? (isDarkMode ? 'border-cyan-500 bg-cyan-500/10 shadow-[0_0_30px_rgba(6,182,212,0.15)]' : 'border-cyan-600 bg-cyan-50 shadow-lg shadow-cyan-600/20') : (isDarkMode ? 'border-white/10 bg-black/40 hover:border-white/20 hover:bg-white/5' : 'border-gray-200 bg-white hover:border-cyan-200 hover:bg-gray-50')}`}>
+                                    <input type="radio" name="tipo" value="TEM Request" className="sr-only" onChange={() => setTipo('TEM Request')} />
+                                    <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-3 transition-transform group-hover:scale-110 duration-300 ${tipo === 'TEM Request' ? 'bg-cyan-500 text-white' : (isDarkMode ? 'bg-white/5 text-gray-400' : 'bg-gray-100 text-gray-500')}`}><FileUp className="w-6 h-6" /></div>
+                                    <span className={`text-xs text-center font-black tracking-tight ${tipo === 'TEM Request' ? (isDarkMode ? 'text-cyan-400' : 'text-cyan-700') : ''}`}>TEM Request</span>
+                                    {tipo === 'TEM Request' && <div className="absolute top-3 right-3 w-2.5 h-2.5 rounded-full bg-cyan-500 animate-pulse shadow-[0_0_15px_rgba(6,182,212,1)]" />}
                                 </label>
                             </div>
                         </div>
 
-                        {tipo !== '' && tipo !== 'Revisao STMS' && (
+                        {tipo !== '' && (
                             <div className="space-y-8 animate-in slide-in-from-top-4 fade-in duration-500 pt-4 border-t border-white/5">
-                                {/* Revisor */}
+                                {/* Revisor (Always Visible) */}
                                 <div className="space-y-3">
                                     <Label className="flex items-center gap-2 text-base font-semibold">
-                                        <div className={`p-1.5 rounded-md ${isDarkMode ? 'bg-blue-500/20 text-blue-400' : 'bg-blue-100 text-blue-600'}`}>
+                                        <div className={`p-1.5 rounded-md ${isDarkMode ? 'bg-gray-500/20 text-gray-400' : 'bg-gray-100 text-gray-600'}`}>
                                             <User className="w-4 h-4" />
                                         </div>
                                         Revisor
@@ -243,8 +214,8 @@ export default function MetricasPage() {
                                             required
                                             className={`w-full h-12 px-4 py-2 rounded-xl border appearance-none outline-none transition-all font-medium ${
                                                 isDarkMode 
-                                                    ? 'bg-black/50 border-white/10 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 text-white' 
-                                                    : 'bg-white border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 text-gray-900 shadow-sm'
+                                                    ? 'bg-black/50 border-white/10 focus:border-gray-500 focus:ring-2 focus:ring-gray-500/20 text-white' 
+                                                    : 'bg-white border-gray-300 focus:border-gray-500 focus:ring-2 focus:ring-gray-500/20 text-gray-900 shadow-sm'
                                             }`}
                                         >
                                             <option value="" disabled>Selecione um revisor...</option>
@@ -257,42 +228,175 @@ export default function MetricasPage() {
                                     </div>
                                 </div>
 
-                                {/* Nome do modelo revisado */}
-                                <div className="space-y-3">
-                                    <Label className="flex items-center gap-2 text-base font-semibold">
-                                        <div className={`p-1.5 rounded-md ${isDarkMode ? 'bg-indigo-500/20 text-indigo-400' : 'bg-indigo-100 text-indigo-600'}`}>
-                                            <Box className="w-4 h-4" />
+                                {/* Idioma UG */}
+                                {tipo === 'Revisao Manual UG' && (
+                                    <div className="space-y-3">
+                                        <Label className="flex items-center gap-2 text-base font-semibold">
+                                            <div className={`p-1.5 rounded-md ${isDarkMode ? 'bg-blue-500/20 text-blue-400' : 'bg-blue-100 text-blue-600'}`}>
+                                                <Languages className="w-4 h-4" />
+                                            </div>
+                                            Idioma da Revisão
+                                        </Label>
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <label className={`relative flex flex-col items-center justify-center p-4 rounded-xl border-2 cursor-pointer transition-all ${idiomaUG === 'Revisao Portugues-Brasil' ? (isDarkMode ? 'border-blue-500 bg-blue-500/20' : 'border-blue-600 bg-blue-50') : (isDarkMode ? 'border-white/10 bg-black/40 hover:bg-white/5' : 'border-gray-200 bg-white hover:bg-gray-50')}`}>
+                                                <input type="radio" name="idiomaUG" value="Revisao Portugues-Brasil" className="sr-only" onChange={(e) => setIdiomaUG(e.target.value)} required />
+                                                <span className={`font-bold text-sm ${idiomaUG === 'Revisao Portugues-Brasil' ? (isDarkMode ? 'text-blue-400' : 'text-blue-700') : ''}`}>Revisão Português-Brasil</span>
+                                            </label>
+                                            <label className={`relative flex flex-col items-center justify-center p-4 rounded-xl border-2 cursor-pointer transition-all ${idiomaUG === 'Revisao Ingles-Latin' ? (isDarkMode ? 'border-blue-500 bg-blue-500/20' : 'border-blue-600 bg-blue-50') : (isDarkMode ? 'border-white/10 bg-black/40 hover:bg-white/5' : 'border-gray-200 bg-white hover:bg-gray-50')}`}>
+                                                <input type="radio" name="idiomaUG" value="Revisao Ingles-Latin" className="sr-only" onChange={(e) => setIdiomaUG(e.target.value)} />
+                                                <span className={`font-bold text-sm ${idiomaUG === 'Revisao Ingles-Latin' ? (isDarkMode ? 'text-blue-400' : 'text-blue-700') : ''}`}>Revisão Inglês-Latin</span>
+                                            </label>
                                         </div>
-                                        Nome do modelo revisado
-                                    </Label>
-                                    <Input 
-                                        type="text" 
-                                        placeholder="Ex: SM-A546E..."
-                                        value={modelo}
-                                        onChange={(e) => setModelo(e.target.value)}
-                                        required
-                                        className={`h-12 rounded-xl border font-medium ${isDarkMode ? 'bg-black/50 border-white/10 text-white focus-visible:ring-indigo-500' : 'bg-white shadow-sm focus-visible:ring-indigo-500'}`}
-                                    />
-                                </div>
+                                    </div>
+                                )}
+
+                                {/* Idioma STMS */}
+                                {tipo === 'Revisao STMS' && (
+                                    <div className="space-y-3">
+                                        <Label className="flex items-center gap-2 text-base font-semibold">
+                                            <div className={`p-1.5 rounded-md ${isDarkMode ? 'bg-purple-500/20 text-purple-400' : 'bg-purple-100 text-purple-600'}`}>
+                                                <Languages className="w-4 h-4" />
+                                            </div>
+                                            Idioma da Revisão
+                                        </Label>
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <label className={`relative flex flex-col items-center justify-center p-4 rounded-xl border-2 cursor-pointer transition-all ${idiomaSTMS === 'Revisao Portugues-Brasil' ? (isDarkMode ? 'border-purple-500 bg-purple-500/20' : 'border-purple-600 bg-purple-50') : (isDarkMode ? 'border-white/10 bg-black/40 hover:bg-white/5' : 'border-gray-200 bg-white hover:bg-gray-50')}`}>
+                                                <input type="radio" name="idiomaSTMS" value="Revisao Portugues-Brasil" className="sr-only" onChange={(e) => setIdiomaSTMS(e.target.value)} required />
+                                                <span className={`font-bold text-sm text-center ${idiomaSTMS === 'Revisao Portugues-Brasil' ? (isDarkMode ? 'text-purple-400' : 'text-purple-700') : ''}`}>Revisão Português-Brasil</span>
+                                            </label>
+                                            <label className={`relative flex flex-col items-center justify-center p-4 rounded-xl border-2 cursor-pointer transition-all ${idiomaSTMS === 'Revisao Espanhol-Latin' ? (isDarkMode ? 'border-purple-500 bg-purple-500/20' : 'border-purple-600 bg-purple-50') : (isDarkMode ? 'border-white/10 bg-black/40 hover:bg-white/5' : 'border-gray-200 bg-white hover:bg-gray-50')}`}>
+                                                <input type="radio" name="idiomaSTMS" value="Revisao Espanhol-Latin" className="sr-only" onChange={(e) => setIdiomaSTMS(e.target.value)} />
+                                                <span className={`font-bold text-sm text-center ${idiomaSTMS === 'Revisao Espanhol-Latin' ? (isDarkMode ? 'text-purple-400' : 'text-purple-700') : ''}`}>Revisão Espanhol-Latin</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Nome do modelo revisado */}
+                                {['Revisao Manual UG', 'Revisao Manual QSG'].includes(tipo) && (
+                                    <div className="space-y-3">
+                                        <Label className="flex items-center gap-2 text-base font-semibold">
+                                            <div className={`p-1.5 rounded-md ${isDarkMode ? 'bg-indigo-500/20 text-indigo-400' : 'bg-indigo-100 text-indigo-600'}`}>
+                                                <Box className="w-4 h-4" />
+                                            </div>
+                                            Nome do modelo revisado
+                                        </Label>
+                                        <Input 
+                                            type="text" 
+                                            placeholder="Ex: SM-A546E..."
+                                            value={modelo}
+                                            onChange={(e) => setModelo(e.target.value)}
+                                            required
+                                            className={`h-12 rounded-xl border font-medium ${isDarkMode ? 'bg-black/50 border-white/10 text-white focus-visible:ring-indigo-500' : 'bg-white shadow-sm focus-visible:ring-indigo-500'}`}
+                                        />
+                                    </div>
+                                )}
+
+                                {/* Quantidade de Strings Revisadas */}
+                                {tipo === 'Revisao STMS' && (
+                                    <div className="space-y-3">
+                                        <Label className="flex items-center gap-2 text-base font-semibold">
+                                            <div className={`p-1.5 rounded-md ${isDarkMode ? 'bg-purple-500/20 text-purple-400' : 'bg-purple-100 text-purple-600'}`}>
+                                                <FileText className="w-4 h-4" />
+                                            </div>
+                                            Quantidade de Strings revisadas
+                                        </Label>
+                                        <Input 
+                                            type="number" min="0" placeholder="0"
+                                            value={stringsRevisadas} onChange={(e) => setStringsRevisadas(e.target.value)}
+                                            required className={`h-12 rounded-xl border font-medium ${isDarkMode ? 'bg-black/50 border-white/10 text-white focus-visible:ring-purple-500' : 'bg-white shadow-sm focus-visible:ring-purple-500'}`}
+                                        />
+                                    </div>
+                                )}
+
+                                {/* Quantidade de QSG Criados */}
+                                {tipo === 'Desenvolvimento QSG' && (
+                                    <div className="space-y-3">
+                                        <Label className="flex items-center gap-2 text-base font-semibold">
+                                            <div className={`p-1.5 rounded-md ${isDarkMode ? 'bg-teal-500/20 text-teal-400' : 'bg-teal-100 text-teal-600'}`}>
+                                                <Code className="w-4 h-4" />
+                                            </div>
+                                            Quantidade de QSG Criados
+                                        </Label>
+                                        <Input 
+                                            type="number" min="0" placeholder="0"
+                                            value={qsgCriados} onChange={(e) => setQsgCriados(e.target.value)}
+                                            required className={`h-12 rounded-xl border font-medium ${isDarkMode ? 'bg-black/50 border-white/10 text-white focus-visible:ring-teal-500' : 'bg-white shadow-sm focus-visible:ring-teal-500'}`}
+                                        />
+                                    </div>
+                                )}
+
+                                {/* Quantidade de UG Criados */}
+                                {tipo === 'Desenvolvimento UG' && (
+                                    <div className="space-y-3">
+                                        <Label className="flex items-center gap-2 text-base font-semibold">
+                                            <div className={`p-1.5 rounded-md ${isDarkMode ? 'bg-orange-500/20 text-orange-400' : 'bg-orange-100 text-orange-600'}`}>
+                                                <Wrench className="w-4 h-4" />
+                                            </div>
+                                            Quantidade de UG Criados
+                                        </Label>
+                                        <Input 
+                                            type="number" min="0" placeholder="0"
+                                            value={ugCriados} onChange={(e) => setUgCriados(e.target.value)}
+                                            required className={`h-12 rounded-xl border font-medium ${isDarkMode ? 'bg-black/50 border-white/10 text-white focus-visible:ring-orange-500' : 'bg-white shadow-sm focus-visible:ring-orange-500'}`}
+                                        />
+                                    </div>
+                                )}
+
+                                {/* Quantidade de Revisões */}
+                                {tipo === 'Proofread accessories' && (
+                                    <div className="space-y-3">
+                                        <Label className="flex items-center gap-2 text-base font-semibold">
+                                            <div className={`p-1.5 rounded-md ${isDarkMode ? 'bg-pink-500/20 text-pink-400' : 'bg-pink-100 text-pink-600'}`}>
+                                                <CheckSquare className="w-4 h-4" />
+                                            </div>
+                                            Quantidade de revisões
+                                        </Label>
+                                        <Input 
+                                            type="number" min="0" placeholder="0"
+                                            value={revisoes} onChange={(e) => setRevisoes(e.target.value)}
+                                            required className={`h-12 rounded-xl border font-medium ${isDarkMode ? 'bg-black/50 border-white/10 text-white focus-visible:ring-pink-500' : 'bg-white shadow-sm focus-visible:ring-pink-500'}`}
+                                        />
+                                    </div>
+                                )}
+
+                                {/* Quantidade de Correções */}
+                                {tipo === 'TEM Request' && (
+                                    <div className="space-y-3">
+                                        <Label className="flex items-center gap-2 text-base font-semibold">
+                                            <div className={`p-1.5 rounded-md ${isDarkMode ? 'bg-cyan-500/20 text-cyan-400' : 'bg-cyan-100 text-cyan-600'}`}>
+                                                <FileUp className="w-4 h-4" />
+                                            </div>
+                                            Quantidade de correções
+                                        </Label>
+                                        <Input 
+                                            type="number" min="0" placeholder="0"
+                                            value={correcoes} onChange={(e) => setCorrecoes(e.target.value)}
+                                            required className={`h-12 rounded-xl border font-medium ${isDarkMode ? 'bg-black/50 border-white/10 text-white focus-visible:ring-cyan-500' : 'bg-white shadow-sm focus-visible:ring-cyan-500'}`}
+                                        />
+                                    </div>
+                                )}
 
                                 {/* Quantidade de issues encontradas */}
-                                <div className="space-y-3">
-                                    <Label className="flex items-center gap-2 text-base font-semibold">
-                                        <div className={`p-1.5 rounded-md ${isDarkMode ? 'bg-red-500/20 text-red-400' : 'bg-red-100 text-red-600'}`}>
-                                            <AlertCircle className="w-4 h-4" />
-                                        </div>
-                                        Quantidade de issues encontradas
-                                    </Label>
-                                    <Input 
-                                        type="number" 
-                                        min="0"
-                                        placeholder="0"
-                                        value={issues}
-                                        onChange={(e) => setIssues(e.target.value)}
-                                        required
-                                        className={`h-12 rounded-xl border font-medium ${isDarkMode ? 'bg-black/50 border-white/10 text-white focus-visible:ring-red-500' : 'bg-white shadow-sm focus-visible:ring-red-500'}`}
-                                    />
-                                </div>
+                                {['Revisao Manual UG', 'Revisao Manual QSG', 'Revisao STMS', 'Proofread accessories', 'TEM Request'].includes(tipo) && (
+                                    <div className="space-y-3">
+                                        <Label className="flex items-center gap-2 text-base font-semibold">
+                                            <div className={`p-1.5 rounded-md ${isDarkMode ? 'bg-red-500/20 text-red-400' : 'bg-red-100 text-red-600'}`}>
+                                                <AlertCircle className="w-4 h-4" />
+                                            </div>
+                                            Quantidade de issues encontradas
+                                        </Label>
+                                        <Input 
+                                            type="number" 
+                                            min="0"
+                                            placeholder="0"
+                                            value={issues}
+                                            onChange={(e) => setIssues(e.target.value)}
+                                            required
+                                            className={`h-12 rounded-xl border font-medium ${isDarkMode ? 'bg-black/50 border-white/10 text-white focus-visible:ring-red-500' : 'bg-white shadow-sm focus-visible:ring-red-500'}`}
+                                        />
+                                    </div>
+                                )}
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                                     {/* Data inicial */}
@@ -346,18 +450,6 @@ export default function MetricasPage() {
                                         className={`h-12 rounded-xl border font-medium ${isDarkMode ? 'bg-black/50 border-white/10 text-white [color-scheme:dark] focus-visible:ring-orange-500' : 'bg-white shadow-sm focus-visible:ring-orange-500'}`}
                                     />
                                 </div>
-                            </div>
-                        )}
-
-                        {tipo === 'Revisao STMS' && (
-                            <div className="py-16 text-center animate-in zoom-in-95 fade-in duration-500 border rounded-2xl bg-black/5 dark:bg-white/5 border-dashed">
-                                <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-purple-500/10 flex items-center justify-center animate-pulse">
-                                    <Box className="w-10 h-10 text-purple-500" />
-                                </div>
-                                <h3 className="text-2xl font-bold mb-3 tracking-tight">Campos de STMS</h3>
-                                <p className={`opacity-70 max-w-sm mx-auto text-sm leading-relaxed ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-                                    Os campos específicos para análise de STMS serão implementados futuramente conforme sua solicitação.
-                                </p>
                             </div>
                         )}
 
