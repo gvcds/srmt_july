@@ -186,6 +186,27 @@ export default function MetricasPage() {
     const [activeTab, setActiveTab] = useState<'form' | 'charts' | 'tabela'>('form');
     const [tipo, setTipo] = useState<'Revisao Manual UG' | 'Revisao STMS' | 'Desenvolvimento QSG' | 'Desenvolvimento UG' | 'Proofread accessories' | 'TEM Request' | ''>('');
     
+    // Auth state
+    const [isAuthorized, setIsAuthorized] = useState<boolean | null>(null);
+
+    useEffect(() => {
+        const storedUser = localStorage.getItem('user_srmt');
+        if (storedUser) {
+            try {
+                const user = JSON.parse(storedUser);
+                const name = (user.name || '').toLowerCase();
+                const allowedNames = ['edgard', 'gilmar', 'wallid', 'ivan'];
+                
+                const hasAccess = allowedNames.some(allowed => name.includes(allowed));
+                setIsAuthorized(hasAccess);
+            } catch (e) {
+                setIsAuthorized(false);
+            }
+        } else {
+            setIsAuthorized(false);
+        }
+    }, []);
+    
     // Campos
     const [revisor, setRevisor] = useState('');
     const [modelo, setModelo] = useState('');
@@ -627,6 +648,28 @@ export default function MetricasPage() {
             </Card>
         );
     };
+
+    if (isAuthorized === null) {
+        return (
+            <div className={`min-h-screen font-sans flex flex-col items-center justify-center transition-colors duration-1000 ${isDarkMode ? "bg-[#050505] text-gray-200" : "bg-[#f5f5f7] text-gray-800"}`}>
+                <div className="animate-spin rounded-full h-8 w-8 border-2 border-blue-500 border-t-transparent" />
+            </div>
+        );
+    }
+
+    if (isAuthorized === false) {
+        return (
+            <div className={`min-h-screen font-sans flex flex-col items-center justify-center transition-colors duration-1000 ${isDarkMode ? "bg-[#050505] text-gray-200" : "bg-[#f5f5f7] text-gray-800"}`}>
+                <AIBackground isDarkMode={isDarkMode} />
+                <Navbar />
+                <div className="relative z-10 flex flex-col items-center p-8 text-center bg-black/40 backdrop-blur-xl border border-red-500/30 rounded-3xl shadow-2xl animate-in zoom-in-95 duration-500 max-w-md mx-4">
+                    <AlertCircle className="w-16 h-16 text-red-500 mb-6 drop-shadow-[0_0_15px_rgba(239,68,68,0.5)]" />
+                    <h1 className="text-3xl font-black text-white mb-2">Acesso Restrito</h1>
+                    <p className="text-gray-400 font-medium">Apenas usuários autorizados (Edgard, Gilmar, Wallid ou Ivan) podem acessar o painel de métricas.</p>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className={`min-h-screen font-sans flex flex-col items-center transition-colors duration-1000 ${isDarkMode ? "bg-[#050505] text-gray-200" : "bg-[#f5f5f7] text-gray-800"}`}>
