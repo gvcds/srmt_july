@@ -100,13 +100,45 @@ export default function MetricasPage() {
     const [revisoes, setRevisoes] = useState('');
     const [requests, setRequests] = useState('');
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const [isLoading, setIsLoading] = useState(false);
+
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        console.log({ 
-            tipo, revisor, modelo, issues, 
-            idiomaUG, idiomaSTMS, stringsRevisadas, qsgCriados, ugCriados, revisoes, requests 
-        });
-        alert('Métricas registradas com sucesso (Log no console)');
+        setIsLoading(true);
+        try {
+            const payload = { 
+                tipo, revisor, modelo, issues, 
+                idiomaUG, idiomaSTMS, stringsRevisadas, qsgCriados, ugCriados, revisoes, requests 
+            };
+            
+            const response = await fetch('http://localhost:8000/metrics', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            if (!response.ok) {
+                throw new Error('Falha na comunicação com o servidor');
+            }
+
+            alert('Métricas registradas com sucesso no banco de dados!');
+            
+            // Limpa os campos após enviar
+            setModelo('');
+            setIssues('');
+            setIdiomaUG('');
+            setIdiomaSTMS('');
+            setStringsRevisadas('');
+            setQsgCriados('');
+            setUgCriados('');
+            setRevisoes('');
+            setRequests('');
+        } catch (error) {
+            console.error('Erro ao registrar métricas:', error);
+            alert('Erro ao salvar métricas. Verifique se o backend está rodando.');
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     return (
@@ -432,15 +464,15 @@ export default function MetricasPage() {
                         <div className="pt-8 border-t mt-10 border-black/5 dark:border-white/5">
                             <Button 
                                 type="submit"
-                                disabled={!tipo}
+                                disabled={!tipo || isLoading}
                                 className={`w-full h-14 rounded-xl text-lg font-bold tracking-wide transition-all duration-300 ${
-                                    !tipo 
+                                    !tipo || isLoading
                                         ? 'opacity-50 cursor-not-allowed bg-gray-300 text-gray-500 dark:bg-white/10 dark:text-white/30' 
                                         : 'bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white shadow-xl hover:shadow-2xl hover:shadow-purple-500/20 hover:-translate-y-1'
                                 }`}
                             >
-                                <Send className="w-5 h-5 mr-3" />
-                                Registrar Métricas
+                                <Send className={`w-5 h-5 mr-3 ${isLoading ? 'animate-pulse' : ''}`} />
+                                {isLoading ? 'Salvando...' : 'Registrar Métricas'}
                             </Button>
                         </div>
 

@@ -231,6 +231,22 @@ class SystemNotice(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
+class Metric(Base):
+    __tablename__ = "metrics"
+    id = Column(Integer, primary_key=True, index=True)
+    tipo = Column(String, nullable=False)
+    revisor = Column(String, nullable=False)
+    modelo = Column(String, nullable=True)
+    issues = Column(Integer, nullable=True)
+    idioma_ug = Column(String, nullable=True)
+    idioma_stms = Column(String, nullable=True)
+    strings_revisadas = Column(Integer, nullable=True)
+    qsg_criados = Column(Integer, nullable=True)
+    ug_criados = Column(Integer, nullable=True)
+    revisoes = Column(Integer, nullable=True)
+    requests = Column(Integer, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
 # --- FUNÇÃO DE SINCRONIZAÇÃO AUTOMÁTICA ---
 def sync_database():
     print("--- Iniciando Sincronização do Banco de Dados ---")
@@ -277,6 +293,20 @@ def sync_database():
             "priority": "VARCHAR DEFAULT 'Média'",
             "position": "INTEGER DEFAULT 0",
             "deadline": "VARCHAR"
+        },
+        "metrics": {
+            "tipo": "VARCHAR",
+            "revisor": "VARCHAR",
+            "modelo": "VARCHAR",
+            "issues": "INTEGER",
+            "idioma_ug": "VARCHAR",
+            "idioma_stms": "VARCHAR",
+            "strings_revisadas": "INTEGER",
+            "qsg_criados": "INTEGER",
+            "ug_criados": "INTEGER",
+            "revisoes": "INTEGER",
+            "requests": "INTEGER",
+            "created_at": "TIMESTAMP"
         }
     }
 
@@ -753,6 +783,52 @@ class SystemNoticeUpdate(BaseModel):
     title: Optional[str] = None
     description: Optional[str] = None
     is_active: Optional[bool] = None
+
+class MetricCreate(BaseModel):
+    tipo: str
+    revisor: str
+    modelo: Optional[str] = None
+    issues: Optional[int] = None
+    idiomaUG: Optional[str] = None
+    idiomaSTMS: Optional[str] = None
+    stringsRevisadas: Optional[int] = None
+    qsgCriados: Optional[int] = None
+    ugCriados: Optional[int] = None
+    revisoes: Optional[int] = None
+    requests: Optional[int] = None
+
+@app.post("/metrics")
+def create_metric(metric: MetricCreate):
+    db = SessionLocal()
+    try:
+        # Convert empty strings or None properly, some frontend might send empty strings for numbers
+        def parse_int(v):
+            if v == "" or v is None: return None
+            try: return int(v)
+            except: return None
+            
+        new_metric = Metric(
+            tipo=metric.tipo,
+            revisor=metric.revisor,
+            modelo=metric.modelo if metric.modelo else None,
+            issues=parse_int(metric.issues),
+            idioma_ug=metric.idiomaUG if metric.idiomaUG else None,
+            idioma_stms=metric.idiomaSTMS if metric.idiomaSTMS else None,
+            strings_revisadas=parse_int(metric.stringsRevisadas),
+            qsg_criados=parse_int(metric.qsgCriados),
+            ug_criados=parse_int(metric.ugCriados),
+            revisoes=parse_int(metric.revisoes),
+            requests=parse_int(metric.requests)
+        )
+        db.add(new_metric)
+        db.commit()
+        db.refresh(new_metric)
+        return {"status": "success", "message": "Métrica salva com sucesso!", "data": {"id": new_metric.id}}
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        db.close()
 
 
 class BatchRequest(BaseModel):
