@@ -246,16 +246,22 @@ export default function MetricasPage() {
     const [metricsData, setMetricsData] = useState<MetricRecord[]>([]);
     const [chartsLoading, setChartsLoading] = useState(false);
 
+    // Definição da URL da API igual às outras páginas do sistema
+    const API_URL = "http://localhost:8001";
+
     const fetchMetrics = useCallback(async () => {
         setChartsLoading(true);
         try {
-            const res = await fetch(`http://${window.location.hostname}:8001/metrics`);
-            if (res.ok) {
-                const json = await res.json();
-                setMetricsData(json.metrics || []);
+            const res = await fetch(`${API_URL}/metrics`);
+            if (!res.ok) {
+                console.error("Erro do servidor:", await res.text());
+                throw new Error(`Erro do servidor: ${res.status}`);
             }
+            const json = await res.json();
+            setMetricsData(json.metrics || []);
         } catch (err) {
-            console.error('Erro ao buscar métricas:', err);
+            console.error('Falha de conexão ao buscar métricas:', err);
+            // Evitando pop-up na tela inteira apenas para gráficos, só log no console
         } finally {
             setChartsLoading(false);
         }
@@ -287,14 +293,15 @@ export default function MetricasPage() {
                 requests: toIntOrNull(requests) 
             };
             
-            const response = await fetch(`http://${window.location.hostname}:8001/metrics`, {
+            const response = await fetch(`${API_URL}/metrics`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
             });
 
             if (!response.ok) {
-                throw new Error('Falha na comunicação com o servidor');
+                const errorData = await response.text();
+                throw new Error(`Erro no Backend (Status ${response.status}): ${errorData}`);
             }
 
             alert('Métricas registradas com sucesso no banco de dados!');
@@ -308,9 +315,13 @@ export default function MetricasPage() {
             setUgCriados('');
             setRevisoes('');
             setRequests('');
-        } catch (error) {
-            console.error('Erro ao registrar métricas:', error);
-            alert('Erro ao salvar métricas. Verifique se o backend está rodando.');
+        } catch (error: any) {
+            console.error('Erro detalhado:', error);
+            if (error.message.includes('Failed to fetch')) {
+                alert(`Erro de Conexão: Não foi possível conectar ao servidor em ${API_URL}.\n\nCertifique-se de que o backend (server.py) está rodando e a página foi recarregada (F5).`);
+            } else {
+                alert(`Erro ao salvar: ${error.message}`);
+            }
         } finally {
             setIsLoading(false);
         }
