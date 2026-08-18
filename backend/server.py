@@ -801,7 +801,6 @@ class MetricCreate(BaseModel):
 def create_metric(metric: MetricCreate):
     db = SessionLocal()
     try:
-        # Convert empty strings or None properly, some frontend might send empty strings for numbers
         def parse_int(v):
             if v == "" or v is None: return None
             try: return int(v)
@@ -826,6 +825,7 @@ def create_metric(metric: MetricCreate):
         return {"status": "success", "message": "Métrica salva com sucesso!", "data": {"id": new_metric.id}}
     except Exception as e:
         db.rollback()
+        print(f"Erro ao salvar métrica: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
     finally:
         db.close()
@@ -843,17 +843,18 @@ def get_metrics():
                 "revisor": m.revisor,
                 "modelo": m.modelo,
                 "issues": m.issues,
-                "idioma_ug": m.idioma_ug,
-                "idioma_stms": m.idioma_stms,
-                "strings_revisadas": m.strings_revisadas,
-                "qsg_criados": m.qsg_criados,
-                "ug_criados": m.ug_criados,
+                "idiomaUG": m.idioma_ug,
+                "idiomaSTMS": m.idioma_stms,
+                "stringsRevisadas": m.strings_revisadas,
+                "qsgCriados": m.qsg_criados,
+                "ugCriados": m.ug_criados,
                 "revisoes": m.revisoes,
                 "requests": m.requests,
                 "created_at": m.created_at.isoformat() if m.created_at else None
             })
         return {"metrics": result}
     except Exception as e:
+        print(f"Erro ao buscar métricas: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
     finally:
         db.close()
