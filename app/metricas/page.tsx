@@ -98,13 +98,13 @@ export default function MetricasPage() {
     const [qsgCriados, setQsgCriados] = useState('');
     const [ugCriados, setUgCriados] = useState('');
     const [revisoes, setRevisoes] = useState('');
-    const [correcoes, setCorrecoes] = useState('');
+    const [requests, setRequests] = useState('');
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         console.log({ 
             tipo, revisor, modelo, issues, 
-            idiomaUG, idiomaSTMS, stringsRevisadas, qsgCriados, ugCriados, revisoes, correcoes 
+            idiomaUG, idiomaSTMS, stringsRevisadas, qsgCriados, ugCriados, revisoes, requests 
         });
         alert('Métricas registradas com sucesso (Log no console)');
     };
@@ -387,25 +387,25 @@ export default function MetricasPage() {
                                     </div>
                                 )}
 
-                                {/* Quantidade de Correções */}
+                                {/* Quantidade de Requests */}
                                 {tipo === 'TEM Request' && (
                                     <div className="space-y-3">
                                         <Label className="flex items-center gap-2 text-base font-semibold">
                                             <div className={`p-1.5 rounded-md ${isDarkMode ? 'bg-cyan-500/20 text-cyan-400' : 'bg-cyan-100 text-cyan-600'}`}>
                                                 <FileUp className="w-4 h-4" />
                                             </div>
-                                            Quantidade de correções
+                                            Quantidade de requests
                                         </Label>
                                         <Input 
                                             type="number" min="0" placeholder="0"
-                                            value={correcoes} onChange={(e) => setCorrecoes(e.target.value)}
+                                            value={requests} onChange={(e) => setRequests(e.target.value)}
                                             required className={`h-12 rounded-xl border font-medium ${isDarkMode ? 'bg-black/50 border-white/10 text-white focus-visible:ring-cyan-500' : 'bg-white shadow-sm focus-visible:ring-cyan-500'}`}
                                         />
                                     </div>
                                 )}
 
                                 {/* Quantidade de issues encontradas */}
-                                {['Revisao Manual UG', 'Revisao STMS', 'Proofread accessories', 'TEM Request'].includes(tipo) && (
+                                {['Revisao Manual UG', 'Revisao STMS', 'Proofread accessories'].includes(tipo) && (
                                     <div className="space-y-3">
                                         <Label className="flex items-center gap-2 text-base font-semibold">
                                             <div className={`p-1.5 rounded-md ${isDarkMode ? 'bg-red-500/20 text-red-400' : 'bg-red-100 text-red-600'}`}>
