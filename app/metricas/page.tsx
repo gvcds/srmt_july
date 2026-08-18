@@ -8,34 +8,34 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
-  FileText,
-  User,
-  Box,
-  AlertCircle,
-  Send,
-  Sparkles,
-  BookOpen,
-  Code,
-  Wrench,
-  CheckSquare,
-  FileUp,
-  Globe,
-  Languages,
-  BarChart3,
-  PenLine,
-  TrendingUp,
-  Table as TableIcon,
-  Trash2,
-  Edit2,
-  X,
-  Save,
-  EyeOff,
-  Filter,
-  Lock
+    FileText,
+    User,
+    Box,
+    AlertCircle,
+    Send,
+    Sparkles,
+    BookOpen,
+    Code,
+    Wrench,
+    CheckSquare,
+    FileUp,
+    Globe,
+    Languages,
+    BarChart3,
+    PenLine,
+    TrendingUp,
+    Table as TableIcon,
+    Trash2,
+    Edit2,
+    X,
+    Save,
+    EyeOff,
+    Filter,
+    Lock
 } from 'lucide-react';
 import {
-  LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
-  ResponsiveContainer, ReferenceLine
+    LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
+    ResponsiveContainer, ReferenceLine
 } from 'recharts';
 
 // --- COMPONENTE DE FUNDO ANIMADO ---
@@ -124,13 +124,13 @@ const CHART_COLORS = {
 };
 
 // --- COMPONENTE DE GRÁFICO DE BARRAS AGRUPADAS ---
-const GroupedBarChart = ({ 
-    title, data, dataKeys, isDarkMode, anonymizedRevisores = [] 
-}: { 
-    title: string; 
-    data: any[]; 
-    dataKeys: string[]; 
-    isDarkMode: boolean; 
+const GroupedBarChart = ({
+    title, data, dataKeys, isDarkMode, anonymizedRevisores = []
+}: {
+    title: string;
+    data: any[];
+    dataKeys: string[];
+    isDarkMode: boolean;
     anonymizedRevisores?: string[];
 }) => {
     const textColor = isDarkMode ? '#9ca3af' : '#6b7280';
@@ -154,15 +154,15 @@ const GroupedBarChart = ({
                 <BarChart data={data} margin={{ top: 5, right: 10, left: -15, bottom: 5 }} barGap={12}>
                     <CartesianGrid strokeDasharray="3 3" stroke={gridColor} vertical={false} />
                     <YAxis tick={{ fill: textColor, fontSize: 11 }} tickLine={false} axisLine={false} allowDecimals={false} />
-                    <Tooltip 
+                    <Tooltip
                         cursor={{ fill: isDarkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.02)' }}
-                        contentStyle={{ 
-                            backgroundColor: isDarkMode ? '#1f2937' : '#fff', 
-                            border: `1px solid ${isDarkMode ? '#374151' : '#e5e7eb'}`, 
+                        contentStyle={{
+                            backgroundColor: isDarkMode ? '#1f2937' : '#fff',
+                            border: `1px solid ${isDarkMode ? '#374151' : '#e5e7eb'}`,
                             borderRadius: '12px',
                             fontSize: '13px',
                             boxShadow: '0 10px 25px rgba(0,0,0,0.15)'
-                        }} 
+                        }}
                     />
                     <Legend iconType="circle" wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }} />
                     {avg > 0 && (
@@ -186,7 +186,7 @@ export default function MetricasPage() {
     const { isDarkMode } = useTheme();
     const [activeTab, setActiveTab] = useState<'form' | 'charts' | 'tabela'>('form');
     const [tipo, setTipo] = useState<'Revisao Manual UG' | 'Revisao STMS' | 'Desenvolvimento QSG' | 'Desenvolvimento UG' | 'Proofread accessories' | 'TEM Request' | ''>('');
-    
+
     // Auth state
     const [isAuthorized, setIsAuthorized] = useState<boolean | null>(null);
 
@@ -197,7 +197,7 @@ export default function MetricasPage() {
                 const user = JSON.parse(storedUser);
                 const name = (user.name || '').toLowerCase();
                 const allowedNames = ['edgard', 'gilmar', 'wallid', 'ivan'];
-                
+
                 const hasAccess = allowedNames.some(allowed => name.includes(allowed));
                 setIsAuthorized(hasAccess);
             } catch (e) {
@@ -207,7 +207,7 @@ export default function MetricasPage() {
             setIsAuthorized(false);
         }
     }, []);
-    
+
     // Campos
     const [revisor, setRevisor] = useState('');
     const [modelo, setModelo] = useState('');
@@ -227,7 +227,7 @@ export default function MetricasPage() {
     // Dados dos gráficos e Tabela
     const [metricsData, setMetricsData] = useState<MetricRecord[]>([]);
     const [chartsLoading, setChartsLoading] = useState(false);
-    
+
     // Edição
     const [editingMetric, setEditingMetric] = useState<MetricRecord | null>(null);
 
@@ -275,12 +275,12 @@ export default function MetricasPage() {
         e.preventDefault();
         setIsLoading(true);
         try {
-            const payload = { 
-                tipo, revisor, modelo, issues, 
-                idiomaUG, idiomaSTMS, stringsRevisadas, 
-                qsgCriados, ugCriados, revisoes, requests 
+            const payload = {
+                tipo, revisor, modelo, issues,
+                idiomaUG, idiomaSTMS, stringsRevisadas,
+                qsgCriados, ugCriados, revisoes, requests
             };
-            
+
             const response = await fetch('/api/metrics', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -293,11 +293,11 @@ export default function MetricasPage() {
             }
 
             alert('Métricas salvas com sucesso!');
-            
+
             setModelo(''); setIssues(''); setIdiomaUG(''); setIdiomaSTMS('');
             setStringsRevisadas(''); setQsgCriados(''); setUgCriados('');
             setRevisoes(''); setRequests('');
-            
+
         } catch (error: any) {
             console.error(error);
             alert(`Falha ao salvar:\n\n${error.message}`);
@@ -308,7 +308,7 @@ export default function MetricasPage() {
 
     const handleDelete = async (id: number) => {
         if (!confirm('Tem certeza que deseja excluir esta métrica? Esta ação não pode ser desfeita.')) return;
-        
+
         try {
             const res = await fetch(`/api/metrics/${id}`, { method: 'DELETE' });
             if (!res.ok) throw new Error('Erro ao excluir métrica');
@@ -329,7 +329,7 @@ export default function MetricasPage() {
                 body: JSON.stringify(editingMetric)
             });
             if (!res.ok) throw new Error('Erro ao atualizar métrica');
-            
+
             // Atualiza local
             setMetricsData(prev => prev.map(m => m.id === editingMetric.id ? editingMetric : m));
             setEditingMetric(null);
@@ -343,14 +343,14 @@ export default function MetricasPage() {
     // --- HELPERS PARA GRÁFICOS ACUMULADOS ---
     const buildAccumulatedCharts = (tipo: string, allOfType: MetricRecord[], hiddenRevisores: string[]) => {
         const charts: { subTitle: string; data: any[]; dataKeys: string[] }[] = [];
-        
+
         const sumField = (records: MetricRecord[], field: keyof MetricRecord) => {
             return records.reduce((acc, r) => acc + ((r[field] as number) || 0), 0);
         };
-        
+
         const revisoresRaw = [...new Set(allOfType.map(m => m.revisor))];
         const getNames = () => revisoresRaw.map(r => REVISORES[r] || r).filter(n => !hiddenRevisores.includes(n));
-        
+
         const buildDataObj = (records: MetricRecord[], field: keyof MetricRecord) => {
             const obj: any = { name: '' };
             revisoresRaw.forEach(rev => {
@@ -363,10 +363,10 @@ export default function MetricasPage() {
         if (tipo === 'Revisao Manual UG') {
             const ingles = allOfType.filter(m => m.idiomaUG === 'Revisao Ingles-Latin');
             const espanhol = allOfType.filter(m => m.idiomaUG === 'Revisao Espanhol-Latin');
-            
+
             charts.push({ subTitle: 'Issues Encontradas — Inglês-Latin', data: buildDataObj(ingles, 'issues'), dataKeys: getNames() });
             charts.push({ subTitle: 'Issues Encontradas — Espanhol-Latin', data: buildDataObj(espanhol, 'issues'), dataKeys: getNames() });
-            
+
             const buildCountObj = (records: MetricRecord[]) => {
                 const obj: any = { name: '' };
                 revisoresRaw.forEach(rev => {
@@ -439,9 +439,8 @@ export default function MetricasPage() {
                     const charts = buildAccumulatedCharts(cat.tipo, allOfType, hiddenRevisores);
 
                     return (
-                        <Card key={cat.tipo} className={`p-6 md:p-8 rounded-2xl border backdrop-blur-xl shadow-xl animate-in zoom-in-95 duration-500 ${
-                            isDarkMode ? 'bg-[#111]/60 border-white/10 shadow-black/30' : 'bg-white/80 border-gray-200 shadow-gray-200/50'
-                        }`}>
+                        <Card key={cat.tipo} className={`p-6 md:p-8 rounded-2xl border backdrop-blur-xl shadow-xl animate-in zoom-in-95 duration-500 ${isDarkMode ? 'bg-[#111]/60 border-white/10 shadow-black/30' : 'bg-white/80 border-gray-200 shadow-gray-200/50'
+                            }`}>
                             <div className="flex items-center gap-3 mb-8">
                                 <div className="w-12 h-12 rounded-full flex items-center justify-center text-white shadow-lg" style={{ backgroundColor: cat.accent }}>
                                     {cat.icon}
@@ -493,9 +492,8 @@ export default function MetricasPage() {
         }
 
         return (
-            <Card className={`p-6 md:p-8 rounded-2xl border backdrop-blur-xl shadow-xl animate-in fade-in slide-in-from-bottom-4 duration-500 ${
-                isDarkMode ? 'bg-[#111]/60 border-white/10 shadow-black/30' : 'bg-white/80 border-gray-200 shadow-gray-200/50'
-            }`}>
+            <Card className={`p-6 md:p-8 rounded-2xl border backdrop-blur-xl shadow-xl animate-in fade-in slide-in-from-bottom-4 duration-500 ${isDarkMode ? 'bg-[#111]/60 border-white/10 shadow-black/30' : 'bg-white/80 border-gray-200 shadow-gray-200/50'
+                }`}>
                 <div className="overflow-x-auto">
                     <table className="w-full text-sm text-left">
                         <thead className={`text-xs uppercase bg-opacity-50 ${isDarkMode ? 'bg-white/5 text-gray-400' : 'bg-gray-100 text-gray-600'}`}>
@@ -531,16 +529,15 @@ export default function MetricasPage() {
                 {/* MODAL DE EDIÇÃO */}
                 {editingMetric && (
                     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in">
-                        <Card className={`w-full max-w-xl max-h-[90vh] overflow-y-auto p-6 rounded-2xl border shadow-2xl ${
-                            isDarkMode ? 'bg-[#111] border-white/10' : 'bg-white border-gray-200'
-                        }`}>
+                        <Card className={`w-full max-w-xl max-h-[90vh] overflow-y-auto p-6 rounded-2xl border shadow-2xl ${isDarkMode ? 'bg-[#111] border-white/10' : 'bg-white border-gray-200'
+                            }`}>
                             <div className="flex justify-between items-center mb-6">
                                 <h3 className="text-xl font-black">Editar Métrica #{editingMetric.id}</h3>
                                 <button onClick={() => setEditingMetric(null)} className={`p-2 rounded-lg ${isDarkMode ? 'hover:bg-white/10 text-gray-400' : 'hover:bg-gray-100 text-gray-500'}`}>
                                     <X className="w-5 h-5" />
                                 </button>
                             </div>
-                            
+
                             <div className="space-y-4">
                                 <div>
                                     <Label className="mb-1 block">Tipo</Label>
@@ -548,9 +545,9 @@ export default function MetricasPage() {
                                 </div>
                                 <div>
                                     <Label className="mb-1 block">Revisor</Label>
-                                    <select 
-                                        value={editingMetric.revisor} 
-                                        onChange={e => setEditingMetric({...editingMetric, revisor: e.target.value})}
+                                    <select
+                                        value={editingMetric.revisor}
+                                        onChange={e => setEditingMetric({ ...editingMetric, revisor: e.target.value })}
                                         className={`w-full h-10 px-3 rounded-md border text-sm ${isDarkMode ? 'bg-black border-white/20' : 'bg-white border-gray-300'}`}
                                     >
                                         <option value="denise.martins">Denise Martins</option>
@@ -562,9 +559,9 @@ export default function MetricasPage() {
                                     <>
                                         <div>
                                             <Label className="mb-1 block">Idioma</Label>
-                                            <select 
-                                                value={editingMetric.idiomaUG || ''} 
-                                                onChange={e => setEditingMetric({...editingMetric, idiomaUG: e.target.value})}
+                                            <select
+                                                value={editingMetric.idiomaUG || ''}
+                                                onChange={e => setEditingMetric({ ...editingMetric, idiomaUG: e.target.value })}
                                                 className={`w-full h-10 px-3 rounded-md border text-sm ${isDarkMode ? 'bg-black border-white/20' : 'bg-white border-gray-300'}`}
                                             >
                                                 <option value="Revisao Espanhol-Latin">Espanhol-Latin</option>
@@ -573,7 +570,7 @@ export default function MetricasPage() {
                                         </div>
                                         <div>
                                             <Label className="mb-1 block">Issues Encontradas</Label>
-                                            <Input type="number" value={editingMetric.issues || ''} onChange={e => setEditingMetric({...editingMetric, issues: parseInt(e.target.value) || 0})} />
+                                            <Input type="number" value={editingMetric.issues || ''} onChange={e => setEditingMetric({ ...editingMetric, issues: parseInt(e.target.value) || 0 })} />
                                         </div>
                                     </>
                                 )}
@@ -582,9 +579,9 @@ export default function MetricasPage() {
                                     <>
                                         <div>
                                             <Label className="mb-1 block">Idioma</Label>
-                                            <select 
-                                                value={editingMetric.idiomaSTMS || ''} 
-                                                onChange={e => setEditingMetric({...editingMetric, idiomaSTMS: e.target.value})}
+                                            <select
+                                                value={editingMetric.idiomaSTMS || ''}
+                                                onChange={e => setEditingMetric({ ...editingMetric, idiomaSTMS: e.target.value })}
                                                 className={`w-full h-10 px-3 rounded-md border text-sm ${isDarkMode ? 'bg-black border-white/20' : 'bg-white border-gray-300'}`}
                                             >
                                                 <option value="Revisao Espanhol-Latin">Espanhol-Latin</option>
@@ -593,11 +590,11 @@ export default function MetricasPage() {
                                         </div>
                                         <div>
                                             <Label className="mb-1 block">Strings Revisadas</Label>
-                                            <Input type="number" value={editingMetric.stringsRevisadas || ''} onChange={e => setEditingMetric({...editingMetric, stringsRevisadas: parseInt(e.target.value) || 0})} />
+                                            <Input type="number" value={editingMetric.stringsRevisadas || ''} onChange={e => setEditingMetric({ ...editingMetric, stringsRevisadas: parseInt(e.target.value) || 0 })} />
                                         </div>
                                         <div>
                                             <Label className="mb-1 block">Issues Encontradas</Label>
-                                            <Input type="number" value={editingMetric.issues || ''} onChange={e => setEditingMetric({...editingMetric, issues: parseInt(e.target.value) || 0})} />
+                                            <Input type="number" value={editingMetric.issues || ''} onChange={e => setEditingMetric({ ...editingMetric, issues: parseInt(e.target.value) || 0 })} />
                                         </div>
                                     </>
                                 )}
@@ -605,14 +602,14 @@ export default function MetricasPage() {
                                 {editingMetric.tipo === 'Desenvolvimento QSG' && (
                                     <div>
                                         <Label className="mb-1 block">QSG Criados</Label>
-                                        <Input type="number" value={editingMetric.qsgCriados || ''} onChange={e => setEditingMetric({...editingMetric, qsgCriados: parseInt(e.target.value) || 0})} />
+                                        <Input type="number" value={editingMetric.qsgCriados || ''} onChange={e => setEditingMetric({ ...editingMetric, qsgCriados: parseInt(e.target.value) || 0 })} />
                                     </div>
                                 )}
 
                                 {editingMetric.tipo === 'Desenvolvimento UG' && (
                                     <div>
                                         <Label className="mb-1 block">UG Criados</Label>
-                                        <Input type="number" value={editingMetric.ugCriados || ''} onChange={e => setEditingMetric({...editingMetric, ugCriados: parseInt(e.target.value) || 0})} />
+                                        <Input type="number" value={editingMetric.ugCriados || ''} onChange={e => setEditingMetric({ ...editingMetric, ugCriados: parseInt(e.target.value) || 0 })} />
                                     </div>
                                 )}
 
@@ -620,11 +617,11 @@ export default function MetricasPage() {
                                     <>
                                         <div>
                                             <Label className="mb-1 block">Revisões Realizadas</Label>
-                                            <Input type="number" value={editingMetric.revisoes || ''} onChange={e => setEditingMetric({...editingMetric, revisoes: parseInt(e.target.value) || 0})} />
+                                            <Input type="number" value={editingMetric.revisoes || ''} onChange={e => setEditingMetric({ ...editingMetric, revisoes: parseInt(e.target.value) || 0 })} />
                                         </div>
                                         <div>
                                             <Label className="mb-1 block">Issues Encontradas</Label>
-                                            <Input type="number" value={editingMetric.issues || ''} onChange={e => setEditingMetric({...editingMetric, issues: parseInt(e.target.value) || 0})} />
+                                            <Input type="number" value={editingMetric.issues || ''} onChange={e => setEditingMetric({ ...editingMetric, issues: parseInt(e.target.value) || 0 })} />
                                         </div>
                                     </>
                                 )}
@@ -632,11 +629,11 @@ export default function MetricasPage() {
                                 {editingMetric.tipo === 'TEM Request' && (
                                     <div>
                                         <Label className="mb-1 block">Requests</Label>
-                                        <Input type="number" value={editingMetric.requests || ''} onChange={e => setEditingMetric({...editingMetric, requests: parseInt(e.target.value) || 0})} />
+                                        <Input type="number" value={editingMetric.requests || ''} onChange={e => setEditingMetric({ ...editingMetric, requests: parseInt(e.target.value) || 0 })} />
                                     </div>
                                 )}
                             </div>
-                            
+
                             <div className="flex justify-end gap-3 mt-8">
                                 <Button variant="outline" onClick={() => setEditingMetric(null)}>Cancelar</Button>
                                 <Button onClick={handleEditSave} className="bg-blue-600 hover:bg-blue-700 text-white border-none">
@@ -663,31 +660,31 @@ export default function MetricasPage() {
             <div className="min-h-screen font-sans flex flex-col items-center justify-center bg-[#020204] text-gray-200 overflow-hidden relative">
                 {/* Forçando fundo AI dark */}
                 <AIBackground isDarkMode={true} />
-                
+
                 {/* Navbar oculta ou escura se quiser, mas é melhor manter a Navbar normal pra poder sair */}
                 <div className="absolute top-0 w-full z-50">
                     <Navbar />
                 </div>
-                
+
                 <div className="relative z-10 flex flex-col items-center p-12 text-center bg-black/40 backdrop-blur-3xl border border-red-500/20 rounded-[2.5rem] shadow-[0_32px_128px_-12px_rgba(239,68,68,0.2)] animate-in zoom-in-95 duration-1000 max-w-lg mx-4">
                     <div className="absolute inset-0 rounded-[2.5rem] bg-gradient-to-b from-red-500/5 to-transparent opacity-50 pointer-events-none" />
-                    
+
                     <div className="w-24 h-24 mb-8 rounded-full bg-red-500/10 flex items-center justify-center border border-red-500/20 relative group">
                         <div className="absolute inset-0 rounded-full border border-red-500/30 animate-ping opacity-20" style={{ animationDuration: '3s' }} />
                         <Lock className="w-10 h-10 text-red-500 drop-shadow-[0_0_15px_rgba(239,68,68,0.6)] group-hover:scale-110 transition-transform duration-500" />
                     </div>
-                    
+
                     <h1 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-b from-white to-gray-500 mb-4 tracking-tight">
                         Acesso Restrito
                     </h1>
-                    
+
                     <p className="text-gray-400 font-medium text-[15px] leading-relaxed max-w-[320px] mx-auto">
-                        Este painel é confidencial. Apenas administradores <span className="text-gray-200 font-bold">(Edgard, Gilmar, Wallid ou Ivan)</span> possuem autorização.
+                        Este painel é confidencial. <span className="text-gray-200 font-bold">Apenas administradores</span> possuem autorização.
                     </p>
-                    
+
                     <div className="mt-10 pt-8 w-full border-t border-white/5">
-                        <Button 
-                            variant="outline" 
+                        <Button
+                            variant="outline"
                             onClick={() => window.location.href = '/perfil'}
                             className="w-full rounded-2xl h-14 bg-white/5 border-white/10 text-white hover:bg-white/10 hover:text-white font-bold tracking-wide transition-all duration-500 shadow-2xl"
                         >
@@ -719,11 +716,11 @@ export default function MetricasPage() {
                         )}
                     </h1>
                     <p className={`text-lg max-w-2xl mx-auto font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                        {activeTab === 'form' 
+                        {activeTab === 'form'
                             ? 'Preencha o formulário abaixo para registrar os dados das análises realizadas.'
                             : activeTab === 'charts'
-                            ? 'Visualize o desempenho de cada revisor com gráficos comparativos.'
-                            : 'Visualize, edite ou exclua métricas já registradas no sistema.'
+                                ? 'Visualize o desempenho de cada revisor com gráficos comparativos.'
+                                : 'Visualize, edite ou exclua métricas já registradas no sistema.'
                         }
                     </p>
                 </div>
@@ -733,54 +730,51 @@ export default function MetricasPage() {
                     <div className={`inline-flex rounded-2xl p-1.5 border shadow-lg ${isDarkMode ? 'bg-white/5 border-white/10' : 'bg-white border-gray-200'}`}>
                         <button
                             onClick={() => setActiveTab('form')}
-                            className={`flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-bold transition-all duration-300 ${
-                                activeTab === 'form'
+                            className={`flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-bold transition-all duration-300 ${activeTab === 'form'
                                     ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg shadow-blue-500/25'
                                     : isDarkMode ? 'text-gray-400 hover:text-white hover:bg-white/5' : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'
-                            }`}
+                                }`}
                         >
                             <PenLine className="w-4 h-4" />
                             Entrada de Métricas
                         </button>
                         <button
                             onClick={() => setActiveTab('charts')}
-                            className={`flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-bold transition-all duration-300 ${
-                                activeTab === 'charts'
+                            className={`flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-bold transition-all duration-300 ${activeTab === 'charts'
                                     ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg shadow-blue-500/25'
                                     : isDarkMode ? 'text-gray-400 hover:text-white hover:bg-white/5' : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'
-                            }`}
+                                }`}
                         >
                             <TrendingUp className="w-4 h-4" />
                             Análise Gráfica
                         </button>
                         <button
                             onClick={() => setActiveTab('tabela')}
-                            className={`flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-bold transition-all duration-300 ${
-                                activeTab === 'tabela'
+                            className={`flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-bold transition-all duration-300 ${activeTab === 'tabela'
                                     ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg shadow-blue-500/25'
                                     : isDarkMode ? 'text-gray-400 hover:text-white hover:bg-white/5' : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'
-                            }`}
+                                }`}
                         >
                             <TableIcon className="w-4 h-4" />
                             Tabela de Dados
                         </button>
                     </div>
-                    
+
                     {/* Botões de Filtro - Só visível na aba de gráficos */}
                     {activeTab === 'charts' && (
                         <div className="flex items-center gap-3 animate-in fade-in zoom-in-95 duration-300">
-                            <Button 
-                                variant="outline" 
-                                size="sm" 
+                            <Button
+                                variant="outline"
+                                size="sm"
                                 onClick={() => setIsAnonymizeModalOpen(true)}
                                 className={`rounded-full px-5 h-9 text-xs font-bold border shadow-sm ${isDarkMode ? 'border-white/10 text-gray-300 hover:bg-white/5 hover:text-white' : 'border-gray-200 text-gray-600 hover:bg-gray-50 hover:text-gray-900'}`}
                             >
                                 <EyeOff className="w-3.5 h-3.5 mr-2" />
                                 {anonymizedRevisores.length > 0 ? `${anonymizedRevisores.length} Nome(s) Oculto(s)` : 'Ocultar Nomes'}
                             </Button>
-                            <Button 
-                                variant="outline" 
-                                size="sm" 
+                            <Button
+                                variant="outline"
+                                size="sm"
                                 onClick={() => setIsFilterModalOpen(true)}
                                 className={`rounded-full px-5 h-9 text-xs font-bold border shadow-sm ${isDarkMode ? 'border-white/10 text-gray-300 hover:bg-white/5 hover:text-white' : 'border-gray-200 text-gray-600 hover:bg-gray-50 hover:text-gray-900'}`}
                             >
@@ -795,7 +789,7 @@ export default function MetricasPage() {
                 {activeTab === 'form' && (
                     <Card className={`p-6 md:p-10 rounded-3xl border shadow-2xl backdrop-blur-xl animate-in slide-in-from-bottom-4 fade-in duration-500 ${isDarkMode ? 'bg-[#111]/80 border-white/10 shadow-black/50' : 'bg-white/90 border-gray-200 shadow-gray-200/50'}`}>
                         <form onSubmit={handleSubmit} className="space-y-10">
-                            
+
                             {/* Tipo de Métrica */}
                             <div className="space-y-5">
                                 <Label className={`text-sm font-bold uppercase tracking-widest flex items-center justify-center gap-2 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
@@ -857,15 +851,14 @@ export default function MetricasPage() {
                                             Revisor
                                         </Label>
                                         <div className="relative">
-                                            <select 
+                                            <select
                                                 value={revisor}
                                                 onChange={(e) => setRevisor(e.target.value)}
                                                 required
-                                                className={`w-full h-12 px-4 py-2 rounded-xl border appearance-none outline-none transition-all font-medium ${
-                                                    isDarkMode 
-                                                        ? 'bg-black/50 border-white/10 focus:border-gray-500 focus:ring-2 focus:ring-gray-500/20 text-white' 
+                                                className={`w-full h-12 px-4 py-2 rounded-xl border appearance-none outline-none transition-all font-medium ${isDarkMode
+                                                        ? 'bg-black/50 border-white/10 focus:border-gray-500 focus:ring-2 focus:ring-gray-500/20 text-white'
                                                         : 'bg-white border-gray-300 focus:border-gray-500 focus:ring-2 focus:ring-gray-500/20 text-gray-900 shadow-sm'
-                                                }`}
+                                                    }`}
                                             >
                                                 <option value="" disabled>Selecione um revisor...</option>
                                                 <option value="denise.martins">Denise Martins</option>
@@ -930,8 +923,8 @@ export default function MetricasPage() {
                                                 </div>
                                                 Nome do modelo revisado
                                             </Label>
-                                            <Input 
-                                                type="text" 
+                                            <Input
+                                                type="text"
                                                 placeholder="Ex: SM-A546E..."
                                                 value={modelo}
                                                 onChange={(e) => setModelo(e.target.value)}
@@ -950,7 +943,7 @@ export default function MetricasPage() {
                                                 </div>
                                                 Quantidade de Strings revisadas
                                             </Label>
-                                            <Input 
+                                            <Input
                                                 type="number" min="0" placeholder="0"
                                                 value={stringsRevisadas} onChange={(e) => setStringsRevisadas(e.target.value)}
                                                 required className={`h-12 rounded-xl border font-medium ${isDarkMode ? 'bg-black/50 border-white/10 text-white focus-visible:ring-purple-500' : 'bg-white shadow-sm focus-visible:ring-purple-500'}`}
@@ -968,8 +961,8 @@ export default function MetricasPage() {
                                                     </div>
                                                     Modelo do QSG criado
                                                 </Label>
-                                                <Input 
-                                                    type="text" 
+                                                <Input
+                                                    type="text"
                                                     placeholder="Ex: SM-A546E..."
                                                     value={modelo}
                                                     onChange={(e) => setModelo(e.target.value)}
@@ -984,7 +977,7 @@ export default function MetricasPage() {
                                                     </div>
                                                     Quantidade de QSG Criados
                                                 </Label>
-                                                <Input 
+                                                <Input
                                                     type="number" min="0" placeholder="0"
                                                     value={qsgCriados} onChange={(e) => setQsgCriados(e.target.value)}
                                                     required className={`h-12 rounded-xl border font-medium ${isDarkMode ? 'bg-black/50 border-white/10 text-white focus-visible:ring-teal-500' : 'bg-white shadow-sm focus-visible:ring-teal-500'}`}
@@ -1003,8 +996,8 @@ export default function MetricasPage() {
                                                     </div>
                                                     Modelo do UG criado
                                                 </Label>
-                                                <Input 
-                                                    type="text" 
+                                                <Input
+                                                    type="text"
                                                     placeholder="Ex: SM-A546E..."
                                                     value={modelo}
                                                     onChange={(e) => setModelo(e.target.value)}
@@ -1019,7 +1012,7 @@ export default function MetricasPage() {
                                                     </div>
                                                     Quantidade de UG Criados
                                                 </Label>
-                                                <Input 
+                                                <Input
                                                     type="number" min="0" placeholder="0"
                                                     value={ugCriados} onChange={(e) => setUgCriados(e.target.value)}
                                                     required className={`h-12 rounded-xl border font-medium ${isDarkMode ? 'bg-black/50 border-white/10 text-white focus-visible:ring-orange-500' : 'bg-white shadow-sm focus-visible:ring-orange-500'}`}
@@ -1037,7 +1030,7 @@ export default function MetricasPage() {
                                                 </div>
                                                 Quantidade de revisões
                                             </Label>
-                                            <Input 
+                                            <Input
                                                 type="number" min="0" placeholder="0"
                                                 value={revisoes} onChange={(e) => setRevisoes(e.target.value)}
                                                 required className={`h-12 rounded-xl border font-medium ${isDarkMode ? 'bg-black/50 border-white/10 text-white focus-visible:ring-pink-500' : 'bg-white shadow-sm focus-visible:ring-pink-500'}`}
@@ -1054,7 +1047,7 @@ export default function MetricasPage() {
                                                 </div>
                                                 Quantidade de requests
                                             </Label>
-                                            <Input 
+                                            <Input
                                                 type="number" min="0" placeholder="0"
                                                 value={requests} onChange={(e) => setRequests(e.target.value)}
                                                 required className={`h-12 rounded-xl border font-medium ${isDarkMode ? 'bg-black/50 border-white/10 text-white focus-visible:ring-cyan-500' : 'bg-white shadow-sm focus-visible:ring-cyan-500'}`}
@@ -1071,8 +1064,8 @@ export default function MetricasPage() {
                                                 </div>
                                                 Quantidade de issues encontradas
                                             </Label>
-                                            <Input 
-                                                type="number" 
+                                            <Input
+                                                type="number"
                                                 min="0"
                                                 placeholder="0"
                                                 value={issues}
@@ -1086,14 +1079,13 @@ export default function MetricasPage() {
                             )}
 
                             <div className="pt-8 border-t mt-10 border-black/5 dark:border-white/5">
-                                <Button 
+                                <Button
                                     type="submit"
                                     disabled={!tipo || isLoading}
-                                    className={`w-full h-14 rounded-xl text-lg font-bold tracking-wide transition-all duration-300 ${
-                                        !tipo || isLoading
-                                            ? 'opacity-50 cursor-not-allowed bg-gray-300 text-gray-500 dark:bg-white/10 dark:text-white/30' 
+                                    className={`w-full h-14 rounded-xl text-lg font-bold tracking-wide transition-all duration-300 ${!tipo || isLoading
+                                            ? 'opacity-50 cursor-not-allowed bg-gray-300 text-gray-500 dark:bg-white/10 dark:text-white/30'
                                             : 'bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white shadow-xl hover:shadow-2xl hover:shadow-purple-500/20 hover:-translate-y-1'
-                                    }`}
+                                        }`}
                                 >
                                     <Send className={`w-5 h-5 mr-3 ${isLoading ? 'animate-pulse' : ''}`} />
                                     {isLoading ? 'Salvando...' : 'Registrar Métricas'}
@@ -1103,9 +1095,9 @@ export default function MetricasPage() {
                         </form>
                     </Card>
                 )}
-                
+
                 {activeTab === 'charts' && renderChartsSection()}
-                
+
                 {activeTab === 'tabela' && renderTableSection()}
                 {/* Modal de Ocultar Barras */}
                 {isFilterModalOpen && (
