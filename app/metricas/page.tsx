@@ -335,21 +335,39 @@ export default function MetricasPage() {
                                     </>
                                 )}
 
-                                {/* Quantidade de UG Criados */}
+                                {/* Campos de Desenvolvimento UG */}
                                 {tipo === 'Desenvolvimento UG' && (
-                                    <div className="space-y-3">
-                                        <Label className="flex items-center gap-2 text-base font-semibold">
-                                            <div className={`p-1.5 rounded-md ${isDarkMode ? 'bg-orange-500/20 text-orange-400' : 'bg-orange-100 text-orange-600'}`}>
-                                                <Wrench className="w-4 h-4" />
-                                            </div>
-                                            Quantidade de UG Criados
-                                        </Label>
-                                        <Input 
-                                            type="number" min="0" placeholder="0"
-                                            value={ugCriados} onChange={(e) => setUgCriados(e.target.value)}
-                                            required className={`h-12 rounded-xl border font-medium ${isDarkMode ? 'bg-black/50 border-white/10 text-white focus-visible:ring-orange-500' : 'bg-white shadow-sm focus-visible:ring-orange-500'}`}
-                                        />
-                                    </div>
+                                    <>
+                                        <div className="space-y-3">
+                                            <Label className="flex items-center gap-2 text-base font-semibold">
+                                                <div className={`p-1.5 rounded-md ${isDarkMode ? 'bg-orange-500/20 text-orange-400' : 'bg-orange-100 text-orange-600'}`}>
+                                                    <Box className="w-4 h-4" />
+                                                </div>
+                                                Modelo do UG criado
+                                            </Label>
+                                            <Input 
+                                                type="text" 
+                                                placeholder="Ex: SM-A546E..."
+                                                value={modelo}
+                                                onChange={(e) => setModelo(e.target.value)}
+                                                required
+                                                className={`h-12 rounded-xl border font-medium ${isDarkMode ? 'bg-black/50 border-white/10 text-white focus-visible:ring-orange-500' : 'bg-white shadow-sm focus-visible:ring-orange-500'}`}
+                                            />
+                                        </div>
+                                        <div className="space-y-3">
+                                            <Label className="flex items-center gap-2 text-base font-semibold">
+                                                <div className={`p-1.5 rounded-md ${isDarkMode ? 'bg-orange-500/20 text-orange-400' : 'bg-orange-100 text-orange-600'}`}>
+                                                    <Wrench className="w-4 h-4" />
+                                                </div>
+                                                Quantidade de UG Criados
+                                            </Label>
+                                            <Input 
+                                                type="number" min="0" placeholder="0"
+                                                value={ugCriados} onChange={(e) => setUgCriados(e.target.value)}
+                                                required className={`h-12 rounded-xl border font-medium ${isDarkMode ? 'bg-black/50 border-white/10 text-white focus-visible:ring-orange-500' : 'bg-white shadow-sm focus-visible:ring-orange-500'}`}
+                                            />
+                                        </div>
+                                    </>
                                 )}
 
                                 {/* Quantidade de Revisões */}
