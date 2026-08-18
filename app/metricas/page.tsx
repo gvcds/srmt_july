@@ -124,12 +124,13 @@ const CHART_COLORS = {
 
 // --- COMPONENTE DE GRÁFICO DE BARRAS AGRUPADAS ---
 const GroupedBarChart = ({ 
-    title, data, dataKeys, isDarkMode 
+    title, data, dataKeys, isDarkMode, anonymizedRevisores = [] 
 }: { 
     title: string; 
     data: any[]; 
     dataKeys: string[]; 
     isDarkMode: boolean; 
+    anonymizedRevisores?: string[];
 }) => {
     const textColor = isDarkMode ? '#9ca3af' : '#6b7280';
     const gridColor = isDarkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.06)';
@@ -166,10 +167,12 @@ const GroupedBarChart = ({
                     {avg > 0 && (
                         <ReferenceLine y={avg} stroke="#ef4444" strokeDasharray="6 4" strokeWidth={2} label={{ value: `Média: ${avg.toFixed(1)}`, fill: '#ef4444', fontSize: 10, position: 'insideTopRight' }} />
                     )}
-                    {dataKeys.map((key) => {
+                    {dataKeys.map((key, index) => {
                         const originalKey = Object.keys(REVISORES).find(k => REVISORES[k] === key) || key;
                         const fill = CHART_COLORS[originalKey as keyof typeof CHART_COLORS]?.bar || '#60a5fa';
-                        return <Bar key={key} dataKey={key} fill={fill} radius={[6, 6, 0, 0]} maxBarSize={60} />;
+                        const isAnonymized = anonymizedRevisores.includes(key);
+                        const displayName = isAnonymized ? `Revisor ${index + 1}` : key;
+                        return <Bar key={key} dataKey={key} name={displayName} fill={fill} radius={[6, 6, 0, 0]} maxBarSize={60} />;
                     })}
                 </BarChart>
             </ResponsiveContainer>
@@ -206,12 +209,20 @@ export default function MetricasPage() {
     // Edição
     const [editingMetric, setEditingMetric] = useState<MetricRecord | null>(null);
 
-    // Filtro de revisores ocultos
+    // Filtro de revisores ocultos (Ocultar Barras)
     const [hiddenRevisores, setHiddenRevisores] = useState<string[]>([]);
     const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
 
+    // Filtro de anonimização (Ocultar Nomes)
+    const [anonymizedRevisores, setAnonymizedRevisores] = useState<string[]>([]);
+    const [isAnonymizeModalOpen, setIsAnonymizeModalOpen] = useState(false);
+
     const toggleRevisorFilter = (name: string) => {
         setHiddenRevisores(prev => prev.includes(name) ? prev.filter(n => n !== name) : [...prev, name]);
+    };
+
+    const toggleAnonymizeFilter = (name: string) => {
+        setAnonymizedRevisores(prev => prev.includes(name) ? prev.filter(n => n !== name) : [...prev, name]);
     };
 
     // Usa rota de proxy do Next.js (mesmo servidor, sem problemas de rede)
@@ -426,6 +437,7 @@ export default function MetricasPage() {
                                         data={chart.data}
                                         dataKeys={chart.dataKeys}
                                         isDarkMode={isDarkMode}
+                                        anonymizedRevisores={anonymizedRevisores}
                                     />
                                 ))}
                             </div>
@@ -683,9 +695,18 @@ export default function MetricasPage() {
                         </button>
                     </div>
                     
-                    {/* Botão de Filtro - Só visível na aba de gráficos */}
+                    {/* Botões de Filtro - Só visível na aba de gráficos */}
                     {activeTab === 'charts' && (
-                        <div className="animate-in fade-in zoom-in-95 duration-300">
+                        <div className="flex items-center gap-3 animate-in fade-in zoom-in-95 duration-300">
+                            <Button 
+                                variant="outline" 
+                                size="sm" 
+                                onClick={() => setIsAnonymizeModalOpen(true)}
+                                className={`rounded-full px-5 h-9 text-xs font-bold border shadow-sm ${isDarkMode ? 'border-white/10 text-gray-300 hover:bg-white/5 hover:text-white' : 'border-gray-200 text-gray-600 hover:bg-gray-50 hover:text-gray-900'}`}
+                            >
+                                <EyeOff className="w-3.5 h-3.5 mr-2" />
+                                {anonymizedRevisores.length > 0 ? `${anonymizedRevisores.length} Nome(s) Oculto(s)` : 'Ocultar Nomes'}
+                            </Button>
                             <Button 
                                 variant="outline" 
                                 size="sm" 
@@ -693,7 +714,7 @@ export default function MetricasPage() {
                                 className={`rounded-full px-5 h-9 text-xs font-bold border shadow-sm ${isDarkMode ? 'border-white/10 text-gray-300 hover:bg-white/5 hover:text-white' : 'border-gray-200 text-gray-600 hover:bg-gray-50 hover:text-gray-900'}`}
                             >
                                 <Filter className="w-3.5 h-3.5 mr-2" />
-                                {hiddenRevisores.length > 0 ? `${hiddenRevisores.length} Nome(s) Oculto(s)` : 'Ocultar Nomes'}
+                                {hiddenRevisores.length > 0 ? `${hiddenRevisores.length} Barra(s) Oculta(s)` : 'Ocultar Barras'}
                             </Button>
                         </div>
                     )}
@@ -1015,13 +1036,13 @@ export default function MetricasPage() {
                 {activeTab === 'charts' && renderChartsSection()}
                 
                 {activeTab === 'tabela' && renderTableSection()}
-                {/* Modal de Ocultar Nomes */}
+                {/* Modal de Ocultar Barras */}
                 {isFilterModalOpen && (
                     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
                         <Card className={`w-full max-w-sm rounded-2xl border shadow-2xl p-6 ${isDarkMode ? 'bg-[#111] border-white/10 text-white' : 'bg-white border-gray-200 text-gray-900'}`}>
                             <div className="flex justify-between items-center mb-6">
                                 <h2 className="text-xl font-bold flex items-center gap-2">
-                                    <Filter className="w-5 h-5" /> Ocultar Nomes
+                                    <Filter className="w-5 h-5" /> Ocultar Barras
                                 </h2>
                                 <button onClick={() => setIsFilterModalOpen(false)} className={`p-2 rounded-full transition-colors ${isDarkMode ? 'hover:bg-white/10' : 'hover:bg-gray-100'}`}>
                                     <X className="w-4 h-4" />
@@ -1035,13 +1056,46 @@ export default function MetricasPage() {
                                             <span className={`font-medium text-sm transition-colors ${isHidden ? (isDarkMode ? 'text-red-400' : 'text-red-600 line-through opacity-70') : ''}`}>{nome}</span>
                                             <input type="checkbox" className="sr-only" checked={isHidden} onChange={() => toggleRevisorFilter(nome)} />
                                             <div className={`w-5 h-5 rounded-md flex items-center justify-center border transition-all ${isHidden ? 'bg-red-500 border-red-500 text-white' : (isDarkMode ? 'border-gray-600' : 'border-gray-300')}`}>
-                                                {isHidden && <EyeOff className="w-3 h-3" />}
+                                                {isHidden && <Filter className="w-3 h-3" />}
                                             </div>
                                         </label>
                                     );
                                 })}
                             </div>
                             <Button className="w-full h-12 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold" onClick={() => setIsFilterModalOpen(false)}>
+                                Aplicar e Fechar
+                            </Button>
+                        </Card>
+                    </div>
+                )}
+
+                {/* Modal de Ocultar Nomes */}
+                {isAnonymizeModalOpen && (
+                    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+                        <Card className={`w-full max-w-sm rounded-2xl border shadow-2xl p-6 ${isDarkMode ? 'bg-[#111] border-white/10 text-white' : 'bg-white border-gray-200 text-gray-900'}`}>
+                            <div className="flex justify-between items-center mb-6">
+                                <h2 className="text-xl font-bold flex items-center gap-2">
+                                    <EyeOff className="w-5 h-5" /> Ocultar Nomes
+                                </h2>
+                                <button onClick={() => setIsAnonymizeModalOpen(false)} className={`p-2 rounded-full transition-colors ${isDarkMode ? 'hover:bg-white/10' : 'hover:bg-gray-100'}`}>
+                                    <X className="w-4 h-4" />
+                                </button>
+                            </div>
+                            <div className="space-y-3 mb-6 max-h-[40vh] overflow-y-auto pr-1">
+                                {Object.values(REVISORES).map(nome => {
+                                    const isAnonymized = anonymizedRevisores.includes(nome);
+                                    return (
+                                        <label key={nome} className={`flex items-center justify-between p-3 rounded-xl border cursor-pointer transition-all ${isAnonymized ? (isDarkMode ? 'border-purple-500/30 bg-purple-500/10' : 'border-purple-300 bg-purple-50') : (isDarkMode ? 'border-white/10 bg-white/5 hover:bg-white/10' : 'border-gray-200 bg-white hover:bg-gray-50')}`}>
+                                            <span className={`font-medium text-sm transition-colors ${isAnonymized ? (isDarkMode ? 'text-purple-400' : 'text-purple-600 opacity-70') : ''}`}>{isAnonymized ? 'Oculto (Anonimizado)' : nome}</span>
+                                            <input type="checkbox" className="sr-only" checked={isAnonymized} onChange={() => toggleAnonymizeFilter(nome)} />
+                                            <div className={`w-5 h-5 rounded-md flex items-center justify-center border transition-all ${isAnonymized ? 'bg-purple-500 border-purple-500 text-white' : (isDarkMode ? 'border-gray-600' : 'border-gray-300')}`}>
+                                                {isAnonymized && <EyeOff className="w-3 h-3" />}
+                                            </div>
+                                        </label>
+                                    );
+                                })}
+                            </div>
+                            <Button className="w-full h-12 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold" onClick={() => setIsAnonymizeModalOpen(false)}>
                                 Aplicar e Fechar
                             </Button>
                         </Card>
