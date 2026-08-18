@@ -246,16 +246,11 @@ export default function MetricasPage() {
     const [metricsData, setMetricsData] = useState<MetricRecord[]>([]);
     const [chartsLoading, setChartsLoading] = useState(false);
 
-    // Mesmo padrão usado por login, time-semanal e férias (que funcionam)
-    const getApiBaseUrl = () => {
-        if (typeof window !== "undefined") return `${window.location.protocol}//${window.location.hostname}:8001`;
-        return "http://localhost:8001";
-    };
-
+    // Usa rota de proxy do Next.js (mesmo servidor, sem problemas de rede)
     const fetchMetrics = useCallback(async () => {
         setChartsLoading(true);
         try {
-            const res = await fetch(`${getApiBaseUrl()}/metrics`);
+            const res = await fetch('/api/metrics');
             const json = await res.json();
             if (res.ok) {
                 setMetricsData(json.metrics || []);
@@ -280,20 +275,12 @@ export default function MetricasPage() {
         setIsLoading(true);
         try {
             const payload = { 
-                tipo, 
-                revisor, 
-                modelo, 
-                issues, 
-                idiomaUG, 
-                idiomaSTMS, 
-                stringsRevisadas, 
-                qsgCriados, 
-                ugCriados, 
-                revisoes, 
-                requests 
+                tipo, revisor, modelo, issues, 
+                idiomaUG, idiomaSTMS, stringsRevisadas, 
+                qsgCriados, ugCriados, revisoes, requests 
             };
             
-            const response = await fetch(`${getApiBaseUrl()}/metrics`, {
+            const response = await fetch('/api/metrics', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
@@ -312,7 +299,7 @@ export default function MetricasPage() {
             
         } catch (error: any) {
             console.error(error);
-            alert(`Falha ao salvar:\n\n${error.message}\n\nVerifique se o backend (server.py) está rodando.`);
+            alert(`Falha ao salvar:\n\n${error.message}`);
         } finally {
             setIsLoading(false);
         }
