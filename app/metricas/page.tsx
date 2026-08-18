@@ -12,8 +12,6 @@ import {
   User,
   Box,
   AlertCircle,
-  CalendarDays,
-  Clock,
   Send,
   Sparkles,
   BookOpen,
@@ -85,15 +83,13 @@ const AIBackground = ({ isDarkMode }: { isDarkMode: boolean }) => {
 
 export default function MetricasPage() {
     const { isDarkMode } = useTheme();
-    const [tipo, setTipo] = useState<'Revisao Manual UG' | 'Revisao STMS' | 'Revisao Manual QSG' | 'Desenvolvimento QSG' | 'Desenvolvimento UG' | 'Proofread accessories' | 'TEM Request' | ''>('');
+    const [tipo, setTipo] = useState<'Revisao Manual UG' | 'Revisao STMS' | 'Desenvolvimento QSG' | 'Desenvolvimento UG' | 'Proofread accessories' | 'TEM Request' | ''>('');
     
     // Campos
     const [revisor, setRevisor] = useState('');
     const [modelo, setModelo] = useState('');
     const [issues, setIssues] = useState('');
-    const [dataInicial, setDataInicial] = useState('');
-    const [dataFim, setDataFim] = useState('');
-    const [tempoDecorrido, setTempoDecorrido] = useState('');
+
     
     // Novos campos
     const [idiomaUG, setIdiomaUG] = useState('');
@@ -107,7 +103,7 @@ export default function MetricasPage() {
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         console.log({ 
-            tipo, revisor, modelo, issues, dataInicial, dataFim, tempoDecorrido, 
+            tipo, revisor, modelo, issues, 
             idiomaUG, idiomaSTMS, stringsRevisadas, qsgCriados, ugCriados, revisoes, correcoes 
         });
         alert('Métricas registradas com sucesso (Log no console)');
@@ -160,12 +156,7 @@ export default function MetricasPage() {
                                     {tipo === 'Revisao STMS' && <div className="absolute top-3 right-3 w-2.5 h-2.5 rounded-full bg-purple-500 animate-pulse shadow-[0_0_15px_rgba(168,85,247,1)]" />}
                                 </label>
 
-                                <label className={`relative flex flex-col items-center p-4 rounded-2xl border-2 cursor-pointer transition-all duration-300 group ${tipo === 'Revisao Manual QSG' ? (isDarkMode ? 'border-indigo-500 bg-indigo-500/10 shadow-[0_0_30px_rgba(99,102,241,0.15)]' : 'border-indigo-600 bg-indigo-50 shadow-lg shadow-indigo-600/20') : (isDarkMode ? 'border-white/10 bg-black/40 hover:border-white/20 hover:bg-white/5' : 'border-gray-200 bg-white hover:border-indigo-200 hover:bg-gray-50')}`}>
-                                    <input type="radio" name="tipo" value="Revisao Manual QSG" className="sr-only" onChange={() => setTipo('Revisao Manual QSG')} />
-                                    <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-3 transition-transform group-hover:scale-110 duration-300 ${tipo === 'Revisao Manual QSG' ? 'bg-indigo-500 text-white' : (isDarkMode ? 'bg-white/5 text-gray-400' : 'bg-gray-100 text-gray-500')}`}><BookOpen className="w-6 h-6" /></div>
-                                    <span className={`text-xs text-center font-black tracking-tight ${tipo === 'Revisao Manual QSG' ? (isDarkMode ? 'text-indigo-400' : 'text-indigo-700') : ''}`}>Revisão Manual QSG</span>
-                                    {tipo === 'Revisao Manual QSG' && <div className="absolute top-3 right-3 w-2.5 h-2.5 rounded-full bg-indigo-500 animate-pulse shadow-[0_0_15px_rgba(99,102,241,1)]" />}
-                                </label>
+
 
                                 <label className={`relative flex flex-col items-center p-4 rounded-2xl border-2 cursor-pointer transition-all duration-300 group ${tipo === 'Desenvolvimento QSG' ? (isDarkMode ? 'border-teal-500 bg-teal-500/10 shadow-[0_0_30px_rgba(20,184,166,0.15)]' : 'border-teal-600 bg-teal-50 shadow-lg shadow-teal-600/20') : (isDarkMode ? 'border-white/10 bg-black/40 hover:border-white/20 hover:bg-white/5' : 'border-gray-200 bg-white hover:border-teal-200 hover:bg-gray-50')}`}>
                                     <input type="radio" name="tipo" value="Desenvolvimento QSG" className="sr-only" onChange={() => setTipo('Desenvolvimento QSG')} />
@@ -273,7 +264,7 @@ export default function MetricasPage() {
                                 )}
 
                                 {/* Nome do modelo revisado */}
-                                {['Revisao Manual UG', 'Revisao Manual QSG'].includes(tipo) && (
+                                {tipo === 'Revisao Manual UG' && (
                                     <div className="space-y-3">
                                         <Label className="flex items-center gap-2 text-base font-semibold">
                                             <div className={`p-1.5 rounded-md ${isDarkMode ? 'bg-indigo-500/20 text-indigo-400' : 'bg-indigo-100 text-indigo-600'}`}>
@@ -309,21 +300,39 @@ export default function MetricasPage() {
                                     </div>
                                 )}
 
-                                {/* Quantidade de QSG Criados */}
+                                {/* Campos de Desenvolvimento QSG */}
                                 {tipo === 'Desenvolvimento QSG' && (
-                                    <div className="space-y-3">
-                                        <Label className="flex items-center gap-2 text-base font-semibold">
-                                            <div className={`p-1.5 rounded-md ${isDarkMode ? 'bg-teal-500/20 text-teal-400' : 'bg-teal-100 text-teal-600'}`}>
-                                                <Code className="w-4 h-4" />
-                                            </div>
-                                            Quantidade de QSG Criados
-                                        </Label>
-                                        <Input 
-                                            type="number" min="0" placeholder="0"
-                                            value={qsgCriados} onChange={(e) => setQsgCriados(e.target.value)}
-                                            required className={`h-12 rounded-xl border font-medium ${isDarkMode ? 'bg-black/50 border-white/10 text-white focus-visible:ring-teal-500' : 'bg-white shadow-sm focus-visible:ring-teal-500'}`}
-                                        />
-                                    </div>
+                                    <>
+                                        <div className="space-y-3">
+                                            <Label className="flex items-center gap-2 text-base font-semibold">
+                                                <div className={`p-1.5 rounded-md ${isDarkMode ? 'bg-indigo-500/20 text-indigo-400' : 'bg-indigo-100 text-indigo-600'}`}>
+                                                    <Box className="w-4 h-4" />
+                                                </div>
+                                                Modelo do QSG criado
+                                            </Label>
+                                            <Input 
+                                                type="text" 
+                                                placeholder="Ex: SM-A546E..."
+                                                value={modelo}
+                                                onChange={(e) => setModelo(e.target.value)}
+                                                required
+                                                className={`h-12 rounded-xl border font-medium ${isDarkMode ? 'bg-black/50 border-white/10 text-white focus-visible:ring-indigo-500' : 'bg-white shadow-sm focus-visible:ring-indigo-500'}`}
+                                            />
+                                        </div>
+                                        <div className="space-y-3">
+                                            <Label className="flex items-center gap-2 text-base font-semibold">
+                                                <div className={`p-1.5 rounded-md ${isDarkMode ? 'bg-teal-500/20 text-teal-400' : 'bg-teal-100 text-teal-600'}`}>
+                                                    <Code className="w-4 h-4" />
+                                                </div>
+                                                Quantidade de QSG Criados
+                                            </Label>
+                                            <Input 
+                                                type="number" min="0" placeholder="0"
+                                                value={qsgCriados} onChange={(e) => setQsgCriados(e.target.value)}
+                                                required className={`h-12 rounded-xl border font-medium ${isDarkMode ? 'bg-black/50 border-white/10 text-white focus-visible:ring-teal-500' : 'bg-white shadow-sm focus-visible:ring-teal-500'}`}
+                                            />
+                                        </div>
+                                    </>
                                 )}
 
                                 {/* Quantidade de UG Criados */}
@@ -378,7 +387,7 @@ export default function MetricasPage() {
                                 )}
 
                                 {/* Quantidade de issues encontradas */}
-                                {['Revisao Manual UG', 'Revisao Manual QSG', 'Revisao STMS', 'Proofread accessories', 'TEM Request'].includes(tipo) && (
+                                {['Revisao Manual UG', 'Revisao STMS', 'Proofread accessories', 'TEM Request'].includes(tipo) && (
                                     <div className="space-y-3">
                                         <Label className="flex items-center gap-2 text-base font-semibold">
                                             <div className={`p-1.5 rounded-md ${isDarkMode ? 'bg-red-500/20 text-red-400' : 'bg-red-100 text-red-600'}`}>
@@ -398,58 +407,7 @@ export default function MetricasPage() {
                                     </div>
                                 )}
 
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                    {/* Data inicial */}
-                                    <div className="space-y-3">
-                                        <Label className="flex items-center gap-2 text-base font-semibold">
-                                            <div className={`p-1.5 rounded-md ${isDarkMode ? 'bg-green-500/20 text-green-400' : 'bg-green-100 text-green-600'}`}>
-                                                <CalendarDays className="w-4 h-4" />
-                                            </div>
-                                            Data inicial
-                                        </Label>
-                                        <Input 
-                                            type="date" 
-                                            value={dataInicial}
-                                            onChange={(e) => setDataInicial(e.target.value)}
-                                            required
-                                            className={`h-12 rounded-xl border font-medium ${isDarkMode ? 'bg-black/50 border-white/10 text-white [color-scheme:dark] focus-visible:ring-green-500' : 'bg-white shadow-sm focus-visible:ring-green-500'}`}
-                                        />
-                                    </div>
 
-                                    {/* Data fim */}
-                                    <div className="space-y-3">
-                                        <Label className="flex items-center gap-2 text-base font-semibold">
-                                            <div className={`p-1.5 rounded-md ${isDarkMode ? 'bg-teal-500/20 text-teal-400' : 'bg-teal-100 text-teal-600'}`}>
-                                                <CalendarDays className="w-4 h-4" />
-                                            </div>
-                                            Data fim
-                                        </Label>
-                                        <Input 
-                                            type="date" 
-                                            value={dataFim}
-                                            onChange={(e) => setDataFim(e.target.value)}
-                                            required
-                                            className={`h-12 rounded-xl border font-medium ${isDarkMode ? 'bg-black/50 border-white/10 text-white [color-scheme:dark] focus-visible:ring-teal-500' : 'bg-white shadow-sm focus-visible:ring-teal-500'}`}
-                                        />
-                                    </div>
-                                </div>
-
-                                {/* Tempo decorrido */}
-                                <div className="space-y-3">
-                                    <Label className="flex items-center gap-2 text-base font-semibold">
-                                        <div className={`p-1.5 rounded-md ${isDarkMode ? 'bg-orange-500/20 text-orange-400' : 'bg-orange-100 text-orange-600'}`}>
-                                            <Clock className="w-4 h-4" />
-                                        </div>
-                                        Tempo decorrido (Horas:Minutos)
-                                    </Label>
-                                    <Input 
-                                        type="time" 
-                                        value={tempoDecorrido}
-                                        onChange={(e) => setTempoDecorrido(e.target.value)}
-                                        required
-                                        className={`h-12 rounded-xl border font-medium ${isDarkMode ? 'bg-black/50 border-white/10 text-white [color-scheme:dark] focus-visible:ring-orange-500' : 'bg-white shadow-sm focus-visible:ring-orange-500'}`}
-                                    />
-                                </div>
                             </div>
                         )}
 
