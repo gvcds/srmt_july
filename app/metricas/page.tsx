@@ -95,11 +95,11 @@ interface MetricRecord {
     revisor: string;
     modelo: string | null;
     issues: number | null;
-    idioma_ug: string | null;
-    idioma_stms: string | null;
-    strings_revisadas: number | null;
-    qsg_criados: number | null;
-    ug_criados: number | null;
+    idiomaUG: string | null;
+    idiomaSTMS: string | null;
+    stringsRevisadas: number | null;
+    qsgCriados: number | null;
+    ugCriados: number | null;
     revisoes: number | null;
     requests: number | null;
     created_at: string | null;
@@ -328,10 +328,10 @@ export default function MetricasPage() {
         const mine = allOfType.filter(m => m.revisor === revisorKey);
 
         if (tipo === 'Revisao Manual UG') {
-            const ingles = mine.filter(m => m.idioma_ug === 'Revisao Ingles-Latin');
-            const espanhol = mine.filter(m => m.idioma_ug === 'Revisao Espanhol-Latin');
-            const allIngles = allOfType.filter(m => m.idioma_ug === 'Revisao Ingles-Latin');
-            const allEspanhol = allOfType.filter(m => m.idioma_ug === 'Revisao Espanhol-Latin');
+            const ingles = mine.filter(m => m.idiomaUG === 'Revisao Ingles-Latin');
+            const espanhol = mine.filter(m => m.idiomaUG === 'Revisao Espanhol-Latin');
+            const allIngles = allOfType.filter(m => m.idiomaUG === 'Revisao Ingles-Latin');
+            const allEspanhol = allOfType.filter(m => m.idiomaUG === 'Revisao Espanhol-Latin');
 
             charts.push({ title: 'Issues Encontradas — Inglês-Latin', data: buildChartData(ingles, 'issues'), teamAvg: calcTeamAvg(allIngles, 'issues') });
             charts.push({ title: 'Issues Encontradas — Espanhol-Latin', data: buildChartData(espanhol, 'issues'), teamAvg: calcTeamAvg(allEspanhol, 'issues') });
@@ -339,19 +339,19 @@ export default function MetricasPage() {
             charts.push({ title: 'Modelos Revisados — Inglês-Latin', data: ingles.map((r, i) => ({ name: r.created_at ? new Date(r.created_at).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }) : `#${i+1}`, value: 1 })), teamAvg: allIngles.length > 0 ? allIngles.length / Object.keys(REVISORES).length : 0 });
             charts.push({ title: 'Modelos Revisados — Espanhol-Latin', data: espanhol.map((r, i) => ({ name: r.created_at ? new Date(r.created_at).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }) : `#${i+1}`, value: 1 })), teamAvg: allEspanhol.length > 0 ? allEspanhol.length / Object.keys(REVISORES).length : 0 });
         } else if (tipo === 'Revisao STMS') {
-            const ptBr = mine.filter(m => m.idioma_stms === 'Revisao Portugues-Brasil');
-            const esLat = mine.filter(m => m.idioma_stms === 'Revisao Espanhol-Latin');
-            const allPtBr = allOfType.filter(m => m.idioma_stms === 'Revisao Portugues-Brasil');
-            const allEsLat = allOfType.filter(m => m.idioma_stms === 'Revisao Espanhol-Latin');
+            const ptBr = mine.filter(m => m.idiomaSTMS === 'Revisao Portugues-Brasil');
+            const esLat = mine.filter(m => m.idiomaSTMS === 'Revisao Espanhol-Latin');
+            const allPtBr = allOfType.filter(m => m.idiomaSTMS === 'Revisao Portugues-Brasil');
+            const allEsLat = allOfType.filter(m => m.idiomaSTMS === 'Revisao Espanhol-Latin');
 
-            charts.push({ title: 'Strings Revisadas — Português-Brasil', data: buildChartData(ptBr, 'strings_revisadas'), teamAvg: calcTeamAvg(allPtBr, 'strings_revisadas') });
-            charts.push({ title: 'Strings Revisadas — Espanhol-Latin', data: buildChartData(esLat, 'strings_revisadas'), teamAvg: calcTeamAvg(allEsLat, 'strings_revisadas') });
+            charts.push({ title: 'Strings Revisadas — Português-Brasil', data: buildChartData(ptBr, 'stringsRevisadas'), teamAvg: calcTeamAvg(allPtBr, 'stringsRevisadas') });
+            charts.push({ title: 'Strings Revisadas — Espanhol-Latin', data: buildChartData(esLat, 'stringsRevisadas'), teamAvg: calcTeamAvg(allEsLat, 'stringsRevisadas') });
             charts.push({ title: 'Issues Encontradas — Português-Brasil', data: buildChartData(ptBr, 'issues'), teamAvg: calcTeamAvg(allPtBr, 'issues') });
             charts.push({ title: 'Issues Encontradas — Espanhol-Latin', data: buildChartData(esLat, 'issues'), teamAvg: calcTeamAvg(allEsLat, 'issues') });
         } else if (tipo === 'Desenvolvimento QSG') {
-            charts.push({ title: 'QSG Criados', data: buildChartData(mine, 'qsg_criados'), teamAvg: calcTeamAvg(allOfType, 'qsg_criados') });
+            charts.push({ title: 'QSG Criados', data: buildChartData(mine, 'qsgCriados'), teamAvg: calcTeamAvg(allOfType, 'qsgCriados') });
         } else if (tipo === 'Desenvolvimento UG') {
-            charts.push({ title: 'UG Criados', data: buildChartData(mine, 'ug_criados'), teamAvg: calcTeamAvg(allOfType, 'ug_criados') });
+            charts.push({ title: 'UG Criados', data: buildChartData(mine, 'ugCriados'), teamAvg: calcTeamAvg(allOfType, 'ugCriados') });
         } else if (tipo === 'Proofread accessories') {
             charts.push({ title: 'Revisões Realizadas', data: buildChartData(mine, 'revisoes'), teamAvg: calcTeamAvg(allOfType, 'revisoes') });
             charts.push({ title: 'Issues Encontradas', data: buildChartData(mine, 'issues'), teamAvg: calcTeamAvg(allOfType, 'issues') });
