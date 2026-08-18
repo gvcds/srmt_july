@@ -246,22 +246,21 @@ export default function MetricasPage() {
     const [metricsData, setMetricsData] = useState<MetricRecord[]>([]);
     const [chartsLoading, setChartsLoading] = useState(false);
 
-    // Definição da URL da API igual às outras páginas do sistema
-    const API_URL = "http://localhost:8001";
+    // Refazendo do zero com 127.0.0.1 direto para ignorar falhas de DNS do Windows
+    const API_URL = "http://127.0.0.1:8001";
 
     const fetchMetrics = useCallback(async () => {
         setChartsLoading(true);
         try {
-            const res = await fetch(`${API_URL}/metrics`);
-            if (!res.ok) {
-                console.error("Erro do servidor:", await res.text());
-                throw new Error(`Erro do servidor: ${res.status}`);
-            }
+            const res = await fetch(API_URL + '/metrics');
             const json = await res.json();
-            setMetricsData(json.metrics || []);
+            if (res.ok) {
+                setMetricsData(json.metrics || []);
+            } else {
+                console.error("Erro do servidor:", json);
+            }
         } catch (err) {
-            console.error('Falha de conexão ao buscar métricas:', err);
-            // Evitando pop-up na tela inteira apenas para gráficos, só log no console
+            console.error('Falha crítica de conexão ao buscar métricas:', err);
         } finally {
             setChartsLoading(false);
         }
@@ -277,51 +276,40 @@ export default function MetricasPage() {
         e.preventDefault();
         setIsLoading(true);
         try {
-            const toIntOrNull = (v: string) => v === '' ? null : parseInt(v, 10);
-            const toStrOrNull = (v: string) => v === '' ? null : v;
-            const payload = { 
-                tipo, 
-                revisor, 
-                modelo: toStrOrNull(modelo), 
-                issues: toIntOrNull(issues), 
-                idiomaUG: toStrOrNull(idiomaUG), 
-                idiomaSTMS: toStrOrNull(idiomaSTMS), 
-                stringsRevisadas: toIntOrNull(stringsRevisadas), 
-                qsgCriados: toIntOrNull(qsgCriados), 
-                ugCriados: toIntOrNull(ugCriados), 
-                revisoes: toIntOrNull(revisoes), 
-                requests: toIntOrNull(requests) 
+            const rawPayload = { 
+                tipo: tipo, 
+                revisor: revisor, 
+                modelo: modelo, 
+                issues: issues, 
+                idiomaUG: idiomaUG, 
+                idiomaSTMS: idiomaSTMS, 
+                stringsRevisadas: stringsRevisadas, 
+                qsgCriados: qsgCriados, 
+                ugCriados: ugCriados, 
+                revisoes: revisoes, 
+                requests: requests 
             };
             
-            const response = await fetch(`${API_URL}/metrics`, {
+            const response = await fetch(API_URL + '/metrics', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
+                body: JSON.stringify(rawPayload)
             });
 
             if (!response.ok) {
-                const errorData = await response.text();
-                throw new Error(`Erro no Backend (Status ${response.status}): ${errorData}`);
+                const errorText = await response.text();
+                throw new Error(`Erro do servidor (${response.status}): ${errorText}`);
             }
 
-            alert('Métricas registradas com sucesso no banco de dados!');
+            alert('Métricas salvas com sucesso!');
             
-            setModelo('');
-            setIssues('');
-            setIdiomaUG('');
-            setIdiomaSTMS('');
-            setStringsRevisadas('');
-            setQsgCriados('');
-            setUgCriados('');
-            setRevisoes('');
-            setRequests('');
+            setModelo(''); setIssues(''); setIdiomaUG(''); setIdiomaSTMS('');
+            setStringsRevisadas(''); setQsgCriados(''); setUgCriados('');
+            setRevisoes(''); setRequests('');
+            
         } catch (error: any) {
-            console.error('Erro detalhado:', error);
-            if (error.message.includes('Failed to fetch')) {
-                alert(`Erro de Conexão: Não foi possível conectar ao servidor em ${API_URL}.\n\nCertifique-se de que o backend (server.py) está rodando e a página foi recarregada (F5).`);
-            } else {
-                alert(`Erro ao salvar: ${error.message}`);
-            }
+            console.error(error);
+            alert(`FALHA CRÍTICA AO SALVAR:\n\n${error.message}\n\nVerifique se o terminal do Python está aberto e se a página foi atualizada.`);
         } finally {
             setIsLoading(false);
         }

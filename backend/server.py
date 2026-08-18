@@ -787,45 +787,34 @@ class SystemNoticeUpdate(BaseModel):
 class MetricCreate(BaseModel):
     tipo: str
     revisor: str
-    modelo: Optional[str] = None
-    issues: Optional[int] = None
-    idiomaUG: Optional[str] = None
-    idiomaSTMS: Optional[str] = None
-    stringsRevisadas: Optional[int] = None
-    qsgCriados: Optional[int] = None
-    ugCriados: Optional[int] = None
-    revisoes: Optional[int] = None
-    requests: Optional[int] = None
-
 @app.post("/metrics")
-def create_metric(metric: MetricCreate):
+def create_metric(data: dict):
     db = SessionLocal()
     try:
-        def parse_int(v):
-            if v == "" or v is None: return None
+        def safe_int(v):
+            if v is None or str(v).strip() == "": return None
             try: return int(v)
             except: return None
-            
+
         new_metric = Metric(
-            tipo=metric.tipo,
-            revisor=metric.revisor,
-            modelo=metric.modelo if metric.modelo else None,
-            issues=parse_int(metric.issues),
-            idioma_ug=metric.idiomaUG if metric.idiomaUG else None,
-            idioma_stms=metric.idiomaSTMS if metric.idiomaSTMS else None,
-            strings_revisadas=parse_int(metric.stringsRevisadas),
-            qsg_criados=parse_int(metric.qsgCriados),
-            ug_criados=parse_int(metric.ugCriados),
-            revisoes=parse_int(metric.revisoes),
-            requests=parse_int(metric.requests)
+            tipo=data.get("tipo", ""),
+            revisor=data.get("revisor", ""),
+            modelo=data.get("modelo"),
+            issues=safe_int(data.get("issues")),
+            idioma_ug=data.get("idiomaUG"),
+            idioma_stms=data.get("idiomaSTMS"),
+            strings_revisadas=safe_int(data.get("stringsRevisadas")),
+            qsg_criados=safe_int(data.get("qsgCriados")),
+            ug_criados=safe_int(data.get("ugCriados")),
+            revisoes=safe_int(data.get("revisoes")),
+            requests=safe_int(data.get("requests"))
         )
         db.add(new_metric)
         db.commit()
         db.refresh(new_metric)
-        return {"status": "success", "message": "Métrica salva com sucesso!", "data": {"id": new_metric.id}}
+        return {"status": "success", "message": "Salvo com sucesso", "id": new_metric.id}
     except Exception as e:
         db.rollback()
-        print(f"Erro ao salvar métrica: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
     finally:
         db.close()
@@ -834,27 +823,27 @@ def create_metric(metric: MetricCreate):
 def get_metrics():
     db = SessionLocal()
     try:
-        metrics = db.query(Metric).order_by(Metric.created_at.asc()).all()
-        result = []
-        for m in metrics:
-            result.append({
-                "id": m.id,
-                "tipo": m.tipo,
-                "revisor": m.revisor,
-                "modelo": m.modelo,
-                "issues": m.issues,
-                "idiomaUG": m.idioma_ug,
-                "idiomaSTMS": m.idioma_stms,
-                "stringsRevisadas": m.strings_revisadas,
-                "qsgCriados": m.qsg_criados,
-                "ugCriados": m.ug_criados,
-                "revisoes": m.revisoes,
-                "requests": m.requests,
-                "created_at": m.created_at.isoformat() if m.created_at else None
-            })
-        return {"metrics": result}
+        metrics = db.query(Metric).all()
+        return {
+            "metrics": [
+                {
+                    "id": m.id,
+                    "tipo": m.tipo,
+                    "revisor": m.revisor,
+                    "modelo": m.modelo,
+                    "issues": m.issues,
+                    "idiomaUG": m.idioma_ug,
+                    "idiomaSTMS": m.idioma_stms,
+                    "stringsRevisadas": m.strings_revisadas,
+                    "qsgCriados": m.qsg_criados,
+                    "ugCriados": m.ug_criados,
+                    "revisoes": m.revisoes,
+                    "requests": m.requests,
+                    "created_at": m.created_at.isoformat() if m.created_at else None
+                } for m in metrics
+            ]
+        }
     except Exception as e:
-        print(f"Erro ao buscar métricas: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
     finally:
         db.close()
