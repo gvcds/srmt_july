@@ -848,6 +848,55 @@ def get_metrics():
     finally:
         db.close()
 
+@app.put("/metrics/{metric_id}")
+def update_metric(metric_id: int, data: dict):
+    db = SessionLocal()
+    try:
+        metric = db.query(Metric).filter(Metric.id == metric_id).first()
+        if not metric:
+            raise HTTPException(status_code=404, detail="Métrica não encontrada")
+
+        def safe_int(v):
+            if v is None or str(v).strip() == "": return None
+            try: return int(v)
+            except: return None
+
+        if "tipo" in data: metric.tipo = data["tipo"]
+        if "revisor" in data: metric.revisor = data["revisor"]
+        if "modelo" in data: metric.modelo = data["modelo"]
+        if "issues" in data: metric.issues = safe_int(data["issues"])
+        if "idiomaUG" in data: metric.idioma_ug = data["idiomaUG"]
+        if "idiomaSTMS" in data: metric.idioma_stms = data["idiomaSTMS"]
+        if "stringsRevisadas" in data: metric.strings_revisadas = safe_int(data["stringsRevisadas"])
+        if "qsgCriados" in data: metric.qsg_criados = safe_int(data["qsgCriados"])
+        if "ugCriados" in data: metric.ug_criados = safe_int(data["ugCriados"])
+        if "revisoes" in data: metric.revisoes = safe_int(data["revisoes"])
+        if "requests" in data: metric.requests = safe_int(data["requests"])
+
+        db.commit()
+        return {"status": "success", "message": "Métrica atualizada com sucesso"}
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        db.close()
+
+@app.delete("/metrics/{metric_id}")
+def delete_metric(metric_id: int):
+    db = SessionLocal()
+    try:
+        metric = db.query(Metric).filter(Metric.id == metric_id).first()
+        if not metric:
+            raise HTTPException(status_code=404, detail="Métrica não encontrada")
+        db.delete(metric)
+        db.commit()
+        return {"status": "success", "message": "Métrica deletada com sucesso"}
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        db.close()
+
 class BatchRequest(BaseModel):
     items: List[Dict[str, Any]]
     target_lang: Optional[str] = "pt"

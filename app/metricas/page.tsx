@@ -23,7 +23,12 @@ import {
   Languages,
   BarChart3,
   PenLine,
-  TrendingUp
+  TrendingUp,
+  Table as TableIcon,
+  Trash2,
+  Edit2,
+  X,
+  Save
 } from 'lucide-react';
 import {
   LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
@@ -223,7 +228,7 @@ const ReviewerCard = ({
 // --- COMPONENTE PRINCIPAL ---
 export default function MetricasPage() {
     const { isDarkMode } = useTheme();
-    const [activeTab, setActiveTab] = useState<'form' | 'charts'>('form');
+    const [activeTab, setActiveTab] = useState<'form' | 'charts' | 'tabela'>('form');
     const [tipo, setTipo] = useState<'Revisao Manual UG' | 'Revisao STMS' | 'Desenvolvimento QSG' | 'Desenvolvimento UG' | 'Proofread accessories' | 'TEM Request' | ''>('');
     
     // Campos
@@ -242,9 +247,12 @@ export default function MetricasPage() {
 
     const [isLoading, setIsLoading] = useState(false);
 
-    // Dados dos gráficos
+    // Dados dos gráficos e Tabela
     const [metricsData, setMetricsData] = useState<MetricRecord[]>([]);
     const [chartsLoading, setChartsLoading] = useState(false);
+    
+    // Edição
+    const [editingMetric, setEditingMetric] = useState<MetricRecord | null>(null);
 
     // Usa rota de proxy do Next.js (mesmo servidor, sem problemas de rede)
     const fetchMetrics = useCallback(async () => {
@@ -265,7 +273,7 @@ export default function MetricasPage() {
     }, []);
 
     useEffect(() => {
-        if (activeTab === 'charts') {
+        if (activeTab === 'charts' || activeTab === 'tabela') {
             fetchMetrics();
         }
     }, [activeTab, fetchMetrics]);
@@ -313,7 +321,39 @@ export default function MetricasPage() {
         }));
     };
 
-    const calcTeamAvg = (allRecords: MetricRecord[], valueField: keyof MetricRecord): number => {
+    const handleDelete = async (id: number) => {
+        if (!confirm('Tem certeza que deseja excluir esta métrica? Esta ação não pode ser desfeita.')) return;
+        
+        try {
+            const res = await fetch(`/api/metrics/${id}`, { method: 'DELETE' });
+            if (!res.ok) throw new Error('Erro ao excluir métrica');
+            setMetricsData(prev => prev.filter(m => m.id !== id));
+            alert('Métrica excluída com sucesso!');
+        } catch (error: any) {
+            console.error(error);
+            alert(`Falha ao excluir: ${error.message}`);
+        }
+    };
+
+    const handleEditSave = async () => {
+        if (!editingMetric) return;
+        try {
+            const res = await fetch(`/api/metrics/${editingMetric.id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(editingMetric)
+            });
+            if (!res.ok) throw new Error('Erro ao atualizar métrica');
+            
+            // Atualiza local
+            setMetricsData(prev => prev.map(m => m.id === editingMetric.id ? editingMetric : m));
+            setEditingMetric(null);
+            alert('Métrica atualizada com sucesso!');
+        } catch (error: any) {
+            console.error(error);
+            alert(`Falha ao atualizar: ${error.message}`);
+        }
+    };
         const values = allRecords.map(r => (r[valueField] as number) || 0).filter(v => v > 0);
         if (values.length === 0) return 0;
         return values.reduce((a, b) => a + b, 0) / values.length;
@@ -429,6 +469,186 @@ export default function MetricasPage() {
         );
     };
 
+    // --- RENDER SEÇÃO DE TABELA ---
+    const renderTableSection = () => {
+        if (chartsLoading) {
+            return (
+                <div className="flex items-center justify-center py-20">
+                    <div className="animate-spin rounded-full h-8 w-8 border-2 border-blue-500 border-t-transparent" />
+                </div>
+            );
+        }
+
+        if (metricsData.length === 0) {
+            return (
+                <div className="text-center py-20 animate-in fade-in slide-in-from-bottom-4 duration-700">
+                    <TableIcon className={`w-16 h-16 mx-auto mb-6 opacity-20 ${isDarkMode ? 'text-white' : 'text-black'}`} />
+                    <h3 className="text-xl font-black mb-2">Nenhuma métrica registrada</h3>
+                    <p className={`text-sm max-w-md mx-auto ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`}>
+                        Comece registrando dados na aba &quot;Entrada de Métricas&quot; para visualizar a tabela.
+                    </p>
+                </div>
+            );
+        }
+
+        return (
+            <Card className={`p-6 md:p-8 rounded-2xl border backdrop-blur-xl shadow-xl animate-in fade-in slide-in-from-bottom-4 duration-500 ${
+                isDarkMode ? 'bg-[#111]/60 border-white/10 shadow-black/30' : 'bg-white/80 border-gray-200 shadow-gray-200/50'
+            }`}>
+                <div className="overflow-x-auto">
+                    <table className="w-full text-sm text-left">
+                        <thead className={`text-xs uppercase bg-opacity-50 ${isDarkMode ? 'bg-white/5 text-gray-400' : 'bg-gray-100 text-gray-600'}`}>
+                            <tr>
+                                <th className="px-4 py-3 rounded-tl-lg">ID</th>
+                                <th className="px-4 py-3">Tipo</th>
+                                <th className="px-4 py-3">Revisor</th>
+                                <th className="px-4 py-3">Data</th>
+                                <th className="px-4 py-3 rounded-tr-lg text-right">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {metricsData.slice().reverse().map(m => (
+                                <tr key={m.id} className={`border-b last:border-0 ${isDarkMode ? 'border-white/5 hover:bg-white/5' : 'border-gray-100 hover:bg-gray-50'}`}>
+                                    <td className="px-4 py-3 font-medium">#{m.id}</td>
+                                    <td className="px-4 py-3">{m.tipo}</td>
+                                    <td className="px-4 py-3">{REVISORES[m.revisor] || m.revisor}</td>
+                                    <td className="px-4 py-3">{m.created_at ? new Date(m.created_at).toLocaleDateString('pt-BR') : '-'}</td>
+                                    <td className="px-4 py-3 text-right">
+                                        <button onClick={() => setEditingMetric(m)} className="p-2 text-blue-500 hover:bg-blue-500/10 rounded-lg transition-colors mr-2">
+                                            <Edit2 className="w-4 h-4" />
+                                        </button>
+                                        <button onClick={() => handleDelete(m.id)} className="p-2 text-red-500 hover:bg-red-500/10 rounded-lg transition-colors">
+                                            <Trash2 className="w-4 h-4" />
+                                        </button>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+
+                {/* MODAL DE EDIÇÃO */}
+                {editingMetric && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in">
+                        <Card className={`w-full max-w-xl max-h-[90vh] overflow-y-auto p-6 rounded-2xl border shadow-2xl ${
+                            isDarkMode ? 'bg-[#111] border-white/10' : 'bg-white border-gray-200'
+                        }`}>
+                            <div className="flex justify-between items-center mb-6">
+                                <h3 className="text-xl font-black">Editar Métrica #{editingMetric.id}</h3>
+                                <button onClick={() => setEditingMetric(null)} className={`p-2 rounded-lg ${isDarkMode ? 'hover:bg-white/10 text-gray-400' : 'hover:bg-gray-100 text-gray-500'}`}>
+                                    <X className="w-5 h-5" />
+                                </button>
+                            </div>
+                            
+                            <div className="space-y-4">
+                                <div>
+                                    <Label className="mb-1 block">Tipo</Label>
+                                    <Input value={editingMetric.tipo} disabled className="opacity-50" />
+                                </div>
+                                <div>
+                                    <Label className="mb-1 block">Revisor</Label>
+                                    <select 
+                                        value={editingMetric.revisor} 
+                                        onChange={e => setEditingMetric({...editingMetric, revisor: e.target.value})}
+                                        className={`w-full h-10 px-3 rounded-md border text-sm ${isDarkMode ? 'bg-black border-white/20' : 'bg-white border-gray-300'}`}
+                                    >
+                                        <option value="denise.martins">Denise Martins</option>
+                                        <option value="edgard.cunha">Edgard Cunha</option>
+                                    </select>
+                                </div>
+
+                                {editingMetric.tipo === 'Revisao Manual UG' && (
+                                    <>
+                                        <div>
+                                            <Label className="mb-1 block">Idioma</Label>
+                                            <select 
+                                                value={editingMetric.idiomaUG || ''} 
+                                                onChange={e => setEditingMetric({...editingMetric, idiomaUG: e.target.value})}
+                                                className={`w-full h-10 px-3 rounded-md border text-sm ${isDarkMode ? 'bg-black border-white/20' : 'bg-white border-gray-300'}`}
+                                            >
+                                                <option value="Revisao Espanhol-Latin">Espanhol-Latin</option>
+                                                <option value="Revisao Ingles-Latin">Inglês-Latin</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <Label className="mb-1 block">Issues Encontradas</Label>
+                                            <Input type="number" value={editingMetric.issues || ''} onChange={e => setEditingMetric({...editingMetric, issues: parseInt(e.target.value) || 0})} />
+                                        </div>
+                                    </>
+                                )}
+
+                                {editingMetric.tipo === 'Revisao STMS' && (
+                                    <>
+                                        <div>
+                                            <Label className="mb-1 block">Idioma</Label>
+                                            <select 
+                                                value={editingMetric.idiomaSTMS || ''} 
+                                                onChange={e => setEditingMetric({...editingMetric, idiomaSTMS: e.target.value})}
+                                                className={`w-full h-10 px-3 rounded-md border text-sm ${isDarkMode ? 'bg-black border-white/20' : 'bg-white border-gray-300'}`}
+                                            >
+                                                <option value="Revisao Espanhol-Latin">Espanhol-Latin</option>
+                                                <option value="Revisao Portugues-Brasil">Português-Brasil</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <Label className="mb-1 block">Strings Revisadas</Label>
+                                            <Input type="number" value={editingMetric.stringsRevisadas || ''} onChange={e => setEditingMetric({...editingMetric, stringsRevisadas: parseInt(e.target.value) || 0})} />
+                                        </div>
+                                        <div>
+                                            <Label className="mb-1 block">Issues Encontradas</Label>
+                                            <Input type="number" value={editingMetric.issues || ''} onChange={e => setEditingMetric({...editingMetric, issues: parseInt(e.target.value) || 0})} />
+                                        </div>
+                                    </>
+                                )}
+
+                                {editingMetric.tipo === 'Desenvolvimento QSG' && (
+                                    <div>
+                                        <Label className="mb-1 block">QSG Criados</Label>
+                                        <Input type="number" value={editingMetric.qsgCriados || ''} onChange={e => setEditingMetric({...editingMetric, qsgCriados: parseInt(e.target.value) || 0})} />
+                                    </div>
+                                )}
+
+                                {editingMetric.tipo === 'Desenvolvimento UG' && (
+                                    <div>
+                                        <Label className="mb-1 block">UG Criados</Label>
+                                        <Input type="number" value={editingMetric.ugCriados || ''} onChange={e => setEditingMetric({...editingMetric, ugCriados: parseInt(e.target.value) || 0})} />
+                                    </div>
+                                )}
+
+                                {editingMetric.tipo === 'Proofread accessories' && (
+                                    <>
+                                        <div>
+                                            <Label className="mb-1 block">Revisões Realizadas</Label>
+                                            <Input type="number" value={editingMetric.revisoes || ''} onChange={e => setEditingMetric({...editingMetric, revisoes: parseInt(e.target.value) || 0})} />
+                                        </div>
+                                        <div>
+                                            <Label className="mb-1 block">Issues Encontradas</Label>
+                                            <Input type="number" value={editingMetric.issues || ''} onChange={e => setEditingMetric({...editingMetric, issues: parseInt(e.target.value) || 0})} />
+                                        </div>
+                                    </>
+                                )}
+
+                                {editingMetric.tipo === 'TEM Request' && (
+                                    <div>
+                                        <Label className="mb-1 block">Requests</Label>
+                                        <Input type="number" value={editingMetric.requests || ''} onChange={e => setEditingMetric({...editingMetric, requests: parseInt(e.target.value) || 0})} />
+                                    </div>
+                                )}
+                            </div>
+                            
+                            <div className="flex justify-end gap-3 mt-8">
+                                <Button variant="outline" onClick={() => setEditingMetric(null)}>Cancelar</Button>
+                                <Button onClick={handleEditSave} className="bg-blue-600 hover:bg-blue-700 text-white border-none">
+                                    <Save className="w-4 h-4 mr-2" /> Salvar Alterações
+                                </Button>
+                            </div>
+                        </Card>
+                    </div>
+                )}
+            </Card>
+        );
+    };
+
     return (
         <div className={`min-h-screen font-sans flex flex-col items-center transition-colors duration-1000 ${isDarkMode ? "bg-[#050505] text-gray-200" : "bg-[#f5f5f7] text-gray-800"}`}>
             <AIBackground isDarkMode={isDarkMode} />
@@ -451,7 +671,9 @@ export default function MetricasPage() {
                     <p className={`text-lg max-w-2xl mx-auto font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
                         {activeTab === 'form' 
                             ? 'Preencha o formulário abaixo para registrar os dados das análises realizadas.'
-                            : 'Visualize o desempenho de cada revisor com gráficos comparativos.'
+                            : activeTab === 'charts'
+                            ? 'Visualize o desempenho de cada revisor com gráficos comparativos.'
+                            : 'Visualize, edite ou exclua métricas já registradas no sistema.'
                         }
                     </p>
                 </div>
@@ -478,23 +700,26 @@ export default function MetricasPage() {
                                     : isDarkMode ? 'text-gray-400 hover:text-white hover:bg-white/5' : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'
                             }`}
                         >
-                            <BarChart3 className="w-4 h-4" />
+                            <TrendingUp className="w-4 h-4" />
                             Análise Gráfica
+                        </button>
+                        <button
+                            onClick={() => setActiveTab('tabela')}
+                            className={`flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-bold transition-all duration-300 ${
+                                activeTab === 'tabela'
+                                    ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg shadow-blue-500/25'
+                                    : isDarkMode ? 'text-gray-400 hover:text-white hover:bg-white/5' : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'
+                            }`}
+                        >
+                            <TableIcon className="w-4 h-4" />
+                            Tabela de Dados
                         </button>
                     </div>
                 </div>
 
                 {/* CONTENT */}
-                {activeTab === 'charts' ? (
-                    <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-                        {renderChartsSection()}
-                    </div>
-                ) : (
-                    <Card className={`p-8 md:p-10 rounded-2xl border backdrop-blur-xl shadow-2xl animate-in zoom-in-95 duration-700 delay-150 fill-mode-both max-w-4xl mx-auto w-full ${
-                        isDarkMode 
-                            ? 'bg-[#111]/60 border-white/10 shadow-black/50' 
-                            : 'bg-white/80 border-gray-200 shadow-gray-200/50'
-                    }`}>
+                {activeTab === 'form' && (
+                    <Card className={`p-6 md:p-10 rounded-3xl border shadow-2xl backdrop-blur-xl animate-in slide-in-from-bottom-4 fade-in duration-500 ${isDarkMode ? 'bg-[#111]/80 border-white/10 shadow-black/50' : 'bg-white/90 border-gray-200 shadow-gray-200/50'}`}>
                         <form onSubmit={handleSubmit} className="space-y-10">
                             
                             {/* Tipo de Métrica */}
@@ -804,6 +1029,10 @@ export default function MetricasPage() {
                         </form>
                     </Card>
                 )}
+                
+                {activeTab === 'charts' && renderChartsSection()}
+                
+                {activeTab === 'tabela' && renderTableSection()}
             </div>
         </div>
     );
