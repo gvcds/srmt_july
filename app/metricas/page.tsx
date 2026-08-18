@@ -28,7 +28,9 @@ import {
   Trash2,
   Edit2,
   X,
-  Save
+  Save,
+  EyeOff,
+  Filter
 } from 'lucide-react';
 import {
   LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
@@ -132,6 +134,17 @@ const GroupedBarChart = ({
     const textColor = isDarkMode ? '#9ca3af' : '#6b7280';
     const gridColor = isDarkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.06)';
 
+    const firstData = data[0] || {};
+    let sum = 0;
+    let count = 0;
+    dataKeys.forEach(key => {
+        if (firstData[key] !== undefined && typeof firstData[key] === 'number') {
+            sum += firstData[key];
+            count++;
+        }
+    });
+    const avg = count > 0 ? sum / count : 0;
+
     return (
         <div className={`p-5 rounded-xl border ${isDarkMode ? 'bg-black/30 border-white/5' : 'bg-white/60 border-gray-100'}`}>
             <h4 className={`text-sm font-bold tracking-wide mb-4 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>{title}</h4>
@@ -150,6 +163,9 @@ const GroupedBarChart = ({
                         }} 
                     />
                     <Legend iconType="circle" wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }} />
+                    {avg > 0 && (
+                        <ReferenceLine y={avg} stroke="#ef4444" strokeDasharray="6 4" strokeWidth={2} label={{ value: `Média: ${avg.toFixed(1)}`, fill: '#ef4444', fontSize: 10, position: 'insideTopRight' }} />
+                    )}
                     {dataKeys.map((key) => {
                         const originalKey = Object.keys(REVISORES).find(k => REVISORES[k] === key) || key;
                         const fill = CHART_COLORS[originalKey as keyof typeof CHART_COLORS]?.bar || '#60a5fa';
@@ -189,6 +205,14 @@ export default function MetricasPage() {
     
     // Edição
     const [editingMetric, setEditingMetric] = useState<MetricRecord | null>(null);
+
+    // Filtro de revisores ocultos
+    const [hiddenRevisores, setHiddenRevisores] = useState<string[]>([]);
+    const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
+
+    const toggleRevisorFilter = (name: string) => {
+        setHiddenRevisores(prev => prev.includes(name) ? prev.filter(n => n !== name) : [...prev, name]);
+    };
 
     // Usa rota de proxy do Next.js (mesmo servidor, sem problemas de rede)
     const fetchMetrics = useCallback(async () => {
@@ -284,19 +308,19 @@ export default function MetricasPage() {
     };
 
     // --- HELPERS PARA GRÁFICOS ACUMULADOS ---
-    const buildAccumulatedCharts = (tipo: string, allOfType: MetricRecord[]) => {
+    const buildAccumulatedCharts = (tipo: string, allOfType: MetricRecord[], hiddenRevisores: string[]) => {
         const charts: { subTitle: string; data: any[]; dataKeys: string[] }[] = [];
         
         const sumField = (records: MetricRecord[], field: keyof MetricRecord) => {
             return records.reduce((acc, r) => acc + ((r[field] as number) || 0), 0);
         };
         
-        const revisores = [...new Set(allOfType.map(m => m.revisor))];
-        const getNames = () => revisores.map(r => REVISORES[r] || r);
+        const revisoresRaw = [...new Set(allOfType.map(m => m.revisor))];
+        const getNames = () => revisoresRaw.map(r => REVISORES[r] || r).filter(n => !hiddenRevisores.includes(n));
         
         const buildDataObj = (records: MetricRecord[], field: keyof MetricRecord) => {
             const obj: any = { name: '' };
-            revisores.forEach(rev => {
+            revisoresRaw.forEach(rev => {
                 const revRecords = records.filter(r => r.revisor === rev);
                 obj[REVISORES[rev] || rev] = sumField(revRecords, field);
             });
@@ -312,7 +336,7 @@ export default function MetricasPage() {
             
             const buildCountObj = (records: MetricRecord[]) => {
                 const obj: any = { name: '' };
-                revisores.forEach(rev => {
+                revisoresRaw.forEach(rev => {
                     obj[REVISORES[rev] || rev] = records.filter(r => r.revisor === rev).length;
                 });
                 return [obj];
@@ -379,7 +403,7 @@ export default function MetricasPage() {
                     const allOfType = metricsData.filter(m => m.tipo === cat.tipo);
                     if (allOfType.length === 0) return null;
 
-                    const charts = buildAccumulatedCharts(cat.tipo, allOfType);
+                    const charts = buildAccumulatedCharts(cat.tipo, allOfType, hiddenRevisores);
 
                     return (
                         <Card key={cat.tipo} className={`p-6 md:p-8 rounded-2xl border backdrop-blur-xl shadow-xl animate-in zoom-in-95 duration-500 ${
@@ -622,7 +646,7 @@ export default function MetricasPage() {
                 </div>
 
                 {/* Tab Switcher */}
-                <div className="flex justify-center mb-10">
+                <div className="flex flex-col items-center mb-10 gap-4">
                     <div className={`inline-flex rounded-2xl p-1.5 border shadow-lg ${isDarkMode ? 'bg-white/5 border-white/10' : 'bg-white border-gray-200'}`}>
                         <button
                             onClick={() => setActiveTab('form')}
@@ -658,6 +682,21 @@ export default function MetricasPage() {
                             Tabela de Dados
                         </button>
                     </div>
+                    
+                    {/* Botão de Filtro - Só visível na aba de gráficos */}
+                    {activeTab === 'charts' && (
+                        <div className="animate-in fade-in zoom-in-95 duration-300">
+                            <Button 
+                                variant="outline" 
+                                size="sm" 
+                                onClick={() => setIsFilterModalOpen(true)}
+                                className={`rounded-full px-5 h-9 text-xs font-bold border shadow-sm ${isDarkMode ? 'border-white/10 text-gray-300 hover:bg-white/5 hover:text-white' : 'border-gray-200 text-gray-600 hover:bg-gray-50 hover:text-gray-900'}`}
+                            >
+                                <Filter className="w-3.5 h-3.5 mr-2" />
+                                {hiddenRevisores.length > 0 ? `${hiddenRevisores.length} Nome(s) Oculto(s)` : 'Ocultar Nomes'}
+                            </Button>
+                        </div>
+                    )}
                 </div>
 
                 {/* CONTENT */}
@@ -976,6 +1015,38 @@ export default function MetricasPage() {
                 {activeTab === 'charts' && renderChartsSection()}
                 
                 {activeTab === 'tabela' && renderTableSection()}
+                {/* Modal de Ocultar Nomes */}
+                {isFilterModalOpen && (
+                    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+                        <Card className={`w-full max-w-sm rounded-2xl border shadow-2xl p-6 ${isDarkMode ? 'bg-[#111] border-white/10 text-white' : 'bg-white border-gray-200 text-gray-900'}`}>
+                            <div className="flex justify-between items-center mb-6">
+                                <h2 className="text-xl font-bold flex items-center gap-2">
+                                    <Filter className="w-5 h-5" /> Ocultar Nomes
+                                </h2>
+                                <button onClick={() => setIsFilterModalOpen(false)} className={`p-2 rounded-full transition-colors ${isDarkMode ? 'hover:bg-white/10' : 'hover:bg-gray-100'}`}>
+                                    <X className="w-4 h-4" />
+                                </button>
+                            </div>
+                            <div className="space-y-3 mb-6 max-h-[40vh] overflow-y-auto pr-1">
+                                {Object.values(REVISORES).map(nome => {
+                                    const isHidden = hiddenRevisores.includes(nome);
+                                    return (
+                                        <label key={nome} className={`flex items-center justify-between p-3 rounded-xl border cursor-pointer transition-all ${isHidden ? (isDarkMode ? 'border-red-500/30 bg-red-500/10' : 'border-red-300 bg-red-50') : (isDarkMode ? 'border-white/10 bg-white/5 hover:bg-white/10' : 'border-gray-200 bg-white hover:bg-gray-50')}`}>
+                                            <span className={`font-medium text-sm transition-colors ${isHidden ? (isDarkMode ? 'text-red-400' : 'text-red-600 line-through opacity-70') : ''}`}>{nome}</span>
+                                            <input type="checkbox" className="sr-only" checked={isHidden} onChange={() => toggleRevisorFilter(nome)} />
+                                            <div className={`w-5 h-5 rounded-md flex items-center justify-center border transition-all ${isHidden ? 'bg-red-500 border-red-500 text-white' : (isDarkMode ? 'border-gray-600' : 'border-gray-300')}`}>
+                                                {isHidden && <EyeOff className="w-3 h-3" />}
+                                            </div>
+                                        </label>
+                                    );
+                                })}
+                            </div>
+                            <Button className="w-full h-12 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold" onClick={() => setIsFilterModalOpen(false)}>
+                                Aplicar e Fechar
+                            </Button>
+                        </Card>
+                    </div>
+                )}
             </div>
         </div>
     );
