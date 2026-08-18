@@ -249,7 +249,7 @@ export default function MetricasPage() {
     const fetchMetrics = useCallback(async () => {
         setChartsLoading(true);
         try {
-            const res = await fetch('http://127.0.0.1:8001/metrics');
+            const res = await fetch(`http://${window.location.hostname}:8001/metrics`);
             if (res.ok) {
                 const json = await res.json();
                 setMetricsData(json.metrics || []);
@@ -287,7 +287,7 @@ export default function MetricasPage() {
                 requests: toIntOrNull(requests) 
             };
             
-            const response = await fetch('http://127.0.0.1:8001/metrics', {
+            const response = await fetch(`http://${window.location.hostname}:8001/metrics`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
