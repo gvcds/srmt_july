@@ -120,108 +120,44 @@ const CHART_COLORS = {
     'edgard.cunha': { line: '#a855f7', bar: '#c084fc' }
 };
 
-// --- COMPONENTE DE GRÁFICO DUPLO (Linha + Barra) ---
-const DualChart = ({ 
-    title, data, dataKey, isDarkMode, teamAvg, color
+// --- COMPONENTE DE GRÁFICO DE BARRAS AGRUPADAS ---
+const GroupedBarChart = ({ 
+    title, data, dataKeys, isDarkMode 
 }: { 
     title: string; 
-    data: { name: string; value: number }[]; 
-    dataKey: string; 
+    data: any[]; 
+    dataKeys: string[]; 
     isDarkMode: boolean; 
-    teamAvg: number;
-    color: { line: string; bar: string };
 }) => {
     const textColor = isDarkMode ? '#9ca3af' : '#6b7280';
     const gridColor = isDarkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.06)';
 
     return (
-        <div className="space-y-4">
-            <h4 className={`text-sm font-bold tracking-wide ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>{title}</h4>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                {/* Line Chart */}
-                <div className={`p-4 rounded-xl border ${isDarkMode ? 'bg-black/30 border-white/5' : 'bg-white/60 border-gray-100'}`}>
-                    <p className={`text-[10px] font-bold uppercase tracking-widest mb-3 flex items-center gap-1.5 ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`}>
-                        <TrendingUp className="w-3 h-3" /> Gráfico de Linhas
-                    </p>
-                    <ResponsiveContainer width="100%" height={220}>
-                        <LineChart data={data} margin={{ top: 5, right: 10, left: -15, bottom: 5 }}>
-                            <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
-                            <XAxis dataKey="name" tick={{ fill: textColor, fontSize: 10 }} tickLine={false} axisLine={{ stroke: gridColor }} />
-                            <YAxis tick={{ fill: textColor, fontSize: 10 }} tickLine={false} axisLine={{ stroke: gridColor }} allowDecimals={false} />
-                            <Tooltip 
-                                contentStyle={{ 
-                                    backgroundColor: isDarkMode ? '#1f2937' : '#fff', 
-                                    border: `1px solid ${isDarkMode ? '#374151' : '#e5e7eb'}`, 
-                                    borderRadius: '12px',
-                                    fontSize: '12px',
-                                    boxShadow: '0 10px 25px rgba(0,0,0,0.15)'
-                                }} 
-                            />
-                            <ReferenceLine y={teamAvg} stroke="#ef4444" strokeDasharray="6 4" strokeWidth={2} label={{ value: `Média: ${teamAvg.toFixed(1)}`, fill: '#ef4444', fontSize: 10, position: 'insideTopRight' }} />
-                            <Line type="monotone" dataKey="value" stroke={color.line} strokeWidth={3} dot={{ fill: color.line, r: 5, strokeWidth: 2, stroke: isDarkMode ? '#111' : '#fff' }} activeDot={{ r: 7, strokeWidth: 2 }} />
-                        </LineChart>
-                    </ResponsiveContainer>
-                </div>
-                {/* Bar Chart */}
-                <div className={`p-4 rounded-xl border ${isDarkMode ? 'bg-black/30 border-white/5' : 'bg-white/60 border-gray-100'}`}>
-                    <p className={`text-[10px] font-bold uppercase tracking-widest mb-3 flex items-center gap-1.5 ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`}>
-                        <BarChart3 className="w-3 h-3" /> Gráfico de Barras
-                    </p>
-                    <ResponsiveContainer width="100%" height={220}>
-                        <BarChart data={data} margin={{ top: 5, right: 10, left: -15, bottom: 5 }}>
-                            <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
-                            <XAxis dataKey="name" tick={{ fill: textColor, fontSize: 10 }} tickLine={false} axisLine={{ stroke: gridColor }} />
-                            <YAxis tick={{ fill: textColor, fontSize: 10 }} tickLine={false} axisLine={{ stroke: gridColor }} allowDecimals={false} />
-                            <Tooltip 
-                                contentStyle={{ 
-                                    backgroundColor: isDarkMode ? '#1f2937' : '#fff', 
-                                    border: `1px solid ${isDarkMode ? '#374151' : '#e5e7eb'}`, 
-                                    borderRadius: '12px',
-                                    fontSize: '12px',
-                                    boxShadow: '0 10px 25px rgba(0,0,0,0.15)'
-                                }} 
-                            />
-                            <ReferenceLine y={teamAvg} stroke="#ef4444" strokeDasharray="6 4" strokeWidth={2} label={{ value: `Média: ${teamAvg.toFixed(1)}`, fill: '#ef4444', fontSize: 10, position: 'insideTopRight' }} />
-                            <Bar dataKey="value" fill={color.bar} radius={[6, 6, 0, 0]} />
-                        </BarChart>
-                    </ResponsiveContainer>
-                </div>
-            </div>
+        <div className={`p-5 rounded-xl border ${isDarkMode ? 'bg-black/30 border-white/5' : 'bg-white/60 border-gray-100'}`}>
+            <h4 className={`text-sm font-bold tracking-wide mb-4 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>{title}</h4>
+            <ResponsiveContainer width="100%" height={180}>
+                <BarChart data={data} margin={{ top: 5, right: 10, left: -15, bottom: 5 }} barGap={12}>
+                    <CartesianGrid strokeDasharray="3 3" stroke={gridColor} vertical={false} />
+                    <YAxis tick={{ fill: textColor, fontSize: 11 }} tickLine={false} axisLine={false} allowDecimals={false} />
+                    <Tooltip 
+                        cursor={{ fill: isDarkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.02)' }}
+                        contentStyle={{ 
+                            backgroundColor: isDarkMode ? '#1f2937' : '#fff', 
+                            border: `1px solid ${isDarkMode ? '#374151' : '#e5e7eb'}`, 
+                            borderRadius: '12px',
+                            fontSize: '13px',
+                            boxShadow: '0 10px 25px rgba(0,0,0,0.15)'
+                        }} 
+                    />
+                    <Legend iconType="circle" wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }} />
+                    {dataKeys.map((key) => {
+                        const originalKey = Object.keys(REVISORES).find(k => REVISORES[k] === key) || key;
+                        const fill = CHART_COLORS[originalKey as keyof typeof CHART_COLORS]?.bar || '#60a5fa';
+                        return <Bar key={key} dataKey={key} fill={fill} radius={[6, 6, 0, 0]} maxBarSize={60} />;
+                    })}
+                </BarChart>
+            </ResponsiveContainer>
         </div>
-    );
-};
-
-// --- COMPONENTE CARD DO REVISOR ---
-const ReviewerCard = ({
-    revisorKey, charts, isDarkMode, accentColor
-}: {
-    revisorKey: string;
-    charts: { title: string; data: { name: string; value: number }[]; teamAvg: number }[];
-    isDarkMode: boolean;
-    accentColor: string;
-}) => {
-    const name = REVISORES[revisorKey] || revisorKey;
-    const colors = CHART_COLORS[revisorKey as keyof typeof CHART_COLORS] || { line: '#3b82f6', bar: '#60a5fa' };
-
-    return (
-        <Card className={`p-6 md:p-8 rounded-2xl border backdrop-blur-xl shadow-xl mb-8 ${
-            isDarkMode ? 'bg-[#111]/60 border-white/10 shadow-black/30' : 'bg-white/80 border-gray-200 shadow-gray-200/50'
-        }`}>
-            <div className="flex items-center gap-3 mb-6">
-                <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-black text-sm`} style={{ backgroundColor: accentColor }}>
-                    {name.split(' ').map(n => n[0]).join('')}
-                </div>
-                <div>
-                    <h3 className="text-lg font-black tracking-tight">{name}</h3>
-                    <p className={`text-xs ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`}>Métricas individuais</p>
-                </div>
-            </div>
-            <div className="space-y-8">
-                {charts.map((chart, i) => (
-                    <DualChart key={i} title={chart.title} data={chart.data} dataKey="value" isDarkMode={isDarkMode} teamAvg={chart.teamAvg} color={colors} />
-                ))}
-            </div>
-        </Card>
     );
 };
 
@@ -313,14 +249,6 @@ export default function MetricasPage() {
         }
     };
 
-    // --- HELPERS PARA GRÁFICOS ---
-    const buildChartData = (records: MetricRecord[], valueField: keyof MetricRecord): { name: string; value: number }[] => {
-        return records.map((r, i) => ({
-            name: r.created_at ? new Date(r.created_at).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }) : `#${i + 1}`,
-            value: (r[valueField] as number) || 0
-        }));
-    };
-
     const handleDelete = async (id: number) => {
         if (!confirm('Tem certeza que deseja excluir esta métrica? Esta ação não pode ser desfeita.')) return;
         
@@ -354,50 +282,60 @@ export default function MetricasPage() {
             alert(`Falha ao atualizar: ${error.message}`);
         }
     };
-    const calcTeamAvg = (allRecords: MetricRecord[], valueField: keyof MetricRecord): number => {
-        const values = allRecords.map(r => (r[valueField] as number) || 0).filter(v => v > 0);
-        if (values.length === 0) return 0;
-        return values.reduce((a, b) => a + b, 0) / values.length;
-    };
 
-    const buildReviewerCharts = (
-        tipo: string,
-        revisorKey: string,
-        allOfType: MetricRecord[]
-    ): { title: string; data: { name: string; value: number }[]; teamAvg: number }[] => {
-        const charts: { title: string; data: { name: string; value: number }[]; teamAvg: number }[] = [];
-        const mine = allOfType.filter(m => m.revisor === revisorKey);
+    // --- HELPERS PARA GRÁFICOS ACUMULADOS ---
+    const buildAccumulatedCharts = (tipo: string, allOfType: MetricRecord[]) => {
+        const charts: { subTitle: string; data: any[]; dataKeys: string[] }[] = [];
+        
+        const sumField = (records: MetricRecord[], field: keyof MetricRecord) => {
+            return records.reduce((acc, r) => acc + ((r[field] as number) || 0), 0);
+        };
+        
+        const revisores = [...new Set(allOfType.map(m => m.revisor))];
+        const getNames = () => revisores.map(r => REVISORES[r] || r);
+        
+        const buildDataObj = (records: MetricRecord[], field: keyof MetricRecord) => {
+            const obj: any = { name: '' };
+            revisores.forEach(rev => {
+                const revRecords = records.filter(r => r.revisor === rev);
+                obj[REVISORES[rev] || rev] = sumField(revRecords, field);
+            });
+            return [obj];
+        };
 
         if (tipo === 'Revisao Manual UG') {
-            const ingles = mine.filter(m => m.idiomaUG === 'Revisao Ingles-Latin');
-            const espanhol = mine.filter(m => m.idiomaUG === 'Revisao Espanhol-Latin');
-            const allIngles = allOfType.filter(m => m.idiomaUG === 'Revisao Ingles-Latin');
-            const allEspanhol = allOfType.filter(m => m.idiomaUG === 'Revisao Espanhol-Latin');
-
-            charts.push({ title: 'Issues Encontradas — Inglês-Latin', data: buildChartData(ingles, 'issues'), teamAvg: calcTeamAvg(allIngles, 'issues') });
-            charts.push({ title: 'Issues Encontradas — Espanhol-Latin', data: buildChartData(espanhol, 'issues'), teamAvg: calcTeamAvg(allEspanhol, 'issues') });
-            // Modelos revisados: count per entry
-            charts.push({ title: 'Modelos Revisados — Inglês-Latin', data: ingles.map((r, i) => ({ name: r.created_at ? new Date(r.created_at).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }) : `#${i+1}`, value: 1 })), teamAvg: allIngles.length > 0 ? allIngles.length / Object.keys(REVISORES).length : 0 });
-            charts.push({ title: 'Modelos Revisados — Espanhol-Latin', data: espanhol.map((r, i) => ({ name: r.created_at ? new Date(r.created_at).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }) : `#${i+1}`, value: 1 })), teamAvg: allEspanhol.length > 0 ? allEspanhol.length / Object.keys(REVISORES).length : 0 });
+            const ingles = allOfType.filter(m => m.idiomaUG === 'Revisao Ingles-Latin');
+            const espanhol = allOfType.filter(m => m.idiomaUG === 'Revisao Espanhol-Latin');
+            
+            charts.push({ subTitle: 'Issues Encontradas — Inglês-Latin', data: buildDataObj(ingles, 'issues'), dataKeys: getNames() });
+            charts.push({ subTitle: 'Issues Encontradas — Espanhol-Latin', data: buildDataObj(espanhol, 'issues'), dataKeys: getNames() });
+            
+            const buildCountObj = (records: MetricRecord[]) => {
+                const obj: any = { name: '' };
+                revisores.forEach(rev => {
+                    obj[REVISORES[rev] || rev] = records.filter(r => r.revisor === rev).length;
+                });
+                return [obj];
+            };
+            charts.push({ subTitle: 'Modelos Revisados — Inglês-Latin', data: buildCountObj(ingles), dataKeys: getNames() });
+            charts.push({ subTitle: 'Modelos Revisados — Espanhol-Latin', data: buildCountObj(espanhol), dataKeys: getNames() });
         } else if (tipo === 'Revisao STMS') {
-            const ptBr = mine.filter(m => m.idiomaSTMS === 'Revisao Portugues-Brasil');
-            const esLat = mine.filter(m => m.idiomaSTMS === 'Revisao Espanhol-Latin');
-            const allPtBr = allOfType.filter(m => m.idiomaSTMS === 'Revisao Portugues-Brasil');
-            const allEsLat = allOfType.filter(m => m.idiomaSTMS === 'Revisao Espanhol-Latin');
+            const ptBr = allOfType.filter(m => m.idiomaSTMS === 'Revisao Portugues-Brasil');
+            const esLat = allOfType.filter(m => m.idiomaSTMS === 'Revisao Espanhol-Latin');
 
-            charts.push({ title: 'Strings Revisadas — Português-Brasil', data: buildChartData(ptBr, 'stringsRevisadas'), teamAvg: calcTeamAvg(allPtBr, 'stringsRevisadas') });
-            charts.push({ title: 'Strings Revisadas — Espanhol-Latin', data: buildChartData(esLat, 'stringsRevisadas'), teamAvg: calcTeamAvg(allEsLat, 'stringsRevisadas') });
-            charts.push({ title: 'Issues Encontradas — Português-Brasil', data: buildChartData(ptBr, 'issues'), teamAvg: calcTeamAvg(allPtBr, 'issues') });
-            charts.push({ title: 'Issues Encontradas — Espanhol-Latin', data: buildChartData(esLat, 'issues'), teamAvg: calcTeamAvg(allEsLat, 'issues') });
+            charts.push({ subTitle: 'Strings Revisadas — Português-Brasil', data: buildDataObj(ptBr, 'stringsRevisadas'), dataKeys: getNames() });
+            charts.push({ subTitle: 'Strings Revisadas — Espanhol-Latin', data: buildDataObj(esLat, 'stringsRevisadas'), dataKeys: getNames() });
+            charts.push({ subTitle: 'Issues Encontradas — Português-Brasil', data: buildDataObj(ptBr, 'issues'), dataKeys: getNames() });
+            charts.push({ subTitle: 'Issues Encontradas — Espanhol-Latin', data: buildDataObj(esLat, 'issues'), dataKeys: getNames() });
         } else if (tipo === 'Desenvolvimento QSG') {
-            charts.push({ title: 'QSG Criados', data: buildChartData(mine, 'qsgCriados'), teamAvg: calcTeamAvg(allOfType, 'qsgCriados') });
+            charts.push({ subTitle: 'QSG Criados', data: buildDataObj(allOfType, 'qsgCriados'), dataKeys: getNames() });
         } else if (tipo === 'Desenvolvimento UG') {
-            charts.push({ title: 'UG Criados', data: buildChartData(mine, 'ugCriados'), teamAvg: calcTeamAvg(allOfType, 'ugCriados') });
+            charts.push({ subTitle: 'UG Criados', data: buildDataObj(allOfType, 'ugCriados'), dataKeys: getNames() });
         } else if (tipo === 'Proofread accessories') {
-            charts.push({ title: 'Revisões Realizadas', data: buildChartData(mine, 'revisoes'), teamAvg: calcTeamAvg(allOfType, 'revisoes') });
-            charts.push({ title: 'Issues Encontradas', data: buildChartData(mine, 'issues'), teamAvg: calcTeamAvg(allOfType, 'issues') });
+            charts.push({ subTitle: 'Revisões Realizadas', data: buildDataObj(allOfType, 'revisoes'), dataKeys: getNames() });
+            charts.push({ subTitle: 'Issues Encontradas', data: buildDataObj(allOfType, 'issues'), dataKeys: getNames() });
         } else if (tipo === 'TEM Request') {
-            charts.push({ title: 'Requests Realizados', data: buildChartData(mine, 'requests'), teamAvg: calcTeamAvg(allOfType, 'requests') });
+            charts.push({ subTitle: 'Requests Realizados', data: buildDataObj(allOfType, 'requests'), dataKeys: getNames() });
         }
 
         return charts;
@@ -441,29 +379,33 @@ export default function MetricasPage() {
                     const allOfType = metricsData.filter(m => m.tipo === cat.tipo);
                     if (allOfType.length === 0) return null;
 
-                    const uniqueRevisores = [...new Set(allOfType.map(m => m.revisor))];
+                    const charts = buildAccumulatedCharts(cat.tipo, allOfType);
 
                     return (
-                        <div key={cat.tipo}>
-                            <div className="flex items-center gap-3 mb-6">
-                                <div className="w-10 h-10 rounded-full flex items-center justify-center text-white" style={{ backgroundColor: cat.accent }}>
+                        <Card key={cat.tipo} className={`p-6 md:p-8 rounded-2xl border backdrop-blur-xl shadow-xl animate-in zoom-in-95 duration-500 ${
+                            isDarkMode ? 'bg-[#111]/60 border-white/10 shadow-black/30' : 'bg-white/80 border-gray-200 shadow-gray-200/50'
+                        }`}>
+                            <div className="flex items-center gap-3 mb-8">
+                                <div className="w-12 h-12 rounded-full flex items-center justify-center text-white shadow-lg" style={{ backgroundColor: cat.accent }}>
                                     {cat.icon}
                                 </div>
                                 <div>
                                     <h2 className="text-2xl font-black tracking-tight">{cat.label}</h2>
-                                    <p className={`text-xs ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`}>{allOfType.length} registros</p>
+                                    <p className={`text-sm font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>{allOfType.length} registros acumulados</p>
                                 </div>
                             </div>
-                            {uniqueRevisores.map(rev => (
-                                <ReviewerCard
-                                    key={rev}
-                                    revisorKey={rev}
-                                    charts={buildReviewerCharts(cat.tipo, rev, allOfType)}
-                                    isDarkMode={isDarkMode}
-                                    accentColor={cat.accent}
-                                />
-                            ))}
-                        </div>
+                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                {charts.map((chart, i) => (
+                                    <GroupedBarChart
+                                        key={i}
+                                        title={chart.subTitle}
+                                        data={chart.data}
+                                        dataKeys={chart.dataKeys}
+                                        isDarkMode={isDarkMode}
+                                    />
+                                ))}
+                            </div>
+                        </Card>
                     );
                 })}
             </div>
