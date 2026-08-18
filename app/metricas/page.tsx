@@ -246,13 +246,16 @@ export default function MetricasPage() {
     const [metricsData, setMetricsData] = useState<MetricRecord[]>([]);
     const [chartsLoading, setChartsLoading] = useState(false);
 
-    // Refazendo do zero com 127.0.0.1 direto para ignorar falhas de DNS do Windows
-    const API_URL = "http://127.0.0.1:8001";
+    // Mesmo padrão usado por login, time-semanal e férias (que funcionam)
+    const getApiBaseUrl = () => {
+        if (typeof window !== "undefined") return `${window.location.protocol}//${window.location.hostname}:8001`;
+        return "http://localhost:8001";
+    };
 
     const fetchMetrics = useCallback(async () => {
         setChartsLoading(true);
         try {
-            const res = await fetch(API_URL + '/metrics');
+            const res = await fetch(`${getApiBaseUrl()}/metrics`);
             const json = await res.json();
             if (res.ok) {
                 setMetricsData(json.metrics || []);
@@ -260,7 +263,7 @@ export default function MetricasPage() {
                 console.error("Erro do servidor:", json);
             }
         } catch (err) {
-            console.error('Falha crítica de conexão ao buscar métricas:', err);
+            console.error('Falha de conexão ao buscar métricas:', err);
         } finally {
             setChartsLoading(false);
         }
@@ -276,24 +279,24 @@ export default function MetricasPage() {
         e.preventDefault();
         setIsLoading(true);
         try {
-            const rawPayload = { 
-                tipo: tipo, 
-                revisor: revisor, 
-                modelo: modelo, 
-                issues: issues, 
-                idiomaUG: idiomaUG, 
-                idiomaSTMS: idiomaSTMS, 
-                stringsRevisadas: stringsRevisadas, 
-                qsgCriados: qsgCriados, 
-                ugCriados: ugCriados, 
-                revisoes: revisoes, 
-                requests: requests 
+            const payload = { 
+                tipo, 
+                revisor, 
+                modelo, 
+                issues, 
+                idiomaUG, 
+                idiomaSTMS, 
+                stringsRevisadas, 
+                qsgCriados, 
+                ugCriados, 
+                revisoes, 
+                requests 
             };
             
-            const response = await fetch(API_URL + '/metrics', {
+            const response = await fetch(`${getApiBaseUrl()}/metrics`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(rawPayload)
+                body: JSON.stringify(payload)
             });
 
             if (!response.ok) {
@@ -309,7 +312,7 @@ export default function MetricasPage() {
             
         } catch (error: any) {
             console.error(error);
-            alert(`FALHA CRÍTICA AO SALVAR:\n\n${error.message}\n\nVerifique se o terminal do Python está aberto e se a página foi atualizada.`);
+            alert(`Falha ao salvar:\n\n${error.message}\n\nVerifique se o backend (server.py) está rodando.`);
         } finally {
             setIsLoading(false);
         }
