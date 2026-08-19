@@ -111,6 +111,15 @@ class Vacation(Base):
         CheckConstraint("status in ('pending', 'approved', 'rejected', 'conflict', 'fluig_approved', 'downloaded')", name="ck_vacation_status"),
     )
 
+class AccessLog(Base):
+    __tablename__ = "access_logs"
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), index=True, nullable=True)
+    user_name = Column(String, nullable=True)
+    action = Column(String, default="login") # 'login', 'page_view'
+    page = Column(String, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
 class Ticket(Base):
     __tablename__ = "tickets"
     id = Column(Integer, primary_key=True, index=True)
@@ -893,6 +902,52 @@ def delete_metric(metric_id: int):
         return {"status": "success", "message": "Métrica deletada com sucesso"}
     except Exception as e:
         db.rollback()
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        db.close()
+
+class AccessLogCreate(BaseModel):
+    user_id: Optional[int] = None
+    user_name: Optional[str] = None
+    action: str
+    page: Optional[str] = None
+
+@app.post("/access-logs")
+def create_access_log(data: AccessLogCreate):
+    db = SessionLocal()
+    try:
+        new_log = AccessLog(
+            user_id=data.user_id,
+            user_name=data.user_name,
+            action=data.action,
+            page=data.page
+        )
+        db.add(new_log)
+        db.commit()
+        db.refresh(new_log)
+        return {"status": "success", "id": new_log.id}
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        db.close()
+
+@app.get("/access-logs")
+def get_access_logs():
+    db = SessionLocal()
+    try:
+        logs = db.query(AccessLog).order_by(AccessLog.created_at.desc()).limit(1000).all()
+        return [
+            {
+                "id": l.id,
+                "user_id": l.user_id,
+                "user_name": l.user_name,
+                "action": l.action,
+                "page": l.page,
+                "created_at": l.created_at.isoformat() if l.created_at else None
+            } for l in logs
+        ]
+    except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     finally:
         db.close()
