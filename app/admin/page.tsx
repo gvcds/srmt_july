@@ -74,6 +74,8 @@ export default function AdminPage() {
     // Profile Modal
     const [selectedUser, setSelectedUser] = useState<any | null>(null);
     const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+    const [profileForm, setProfileForm] = useState<any>({});
+    const [profileSaving, setProfileSaving] = useState(false);
 
     // Inline Editing
     const [editingUserId, setEditingUserId] = useState<number | null>(null);
@@ -151,13 +153,15 @@ export default function AdminPage() {
 
     // Open profile modal with full data
     const handleOpenProfile = async (user: any) => {
-        // Immediately show modal with what we have
         setSelectedUser(user);
+        setProfileForm({ ...user });
         setIsProfileModalOpen(true);
-        // Then fetch full data (which includes sidia_id, is_specialist, etc.)
+        // Fetch full data (which includes sidia_id, is_specialist, etc.)
         const fullData = await fetchFullUserData(user.id);
         if (fullData) {
-            setSelectedUser({ ...user, ...fullData });
+            const merged = { ...user, ...fullData };
+            setSelectedUser(merged);
+            setProfileForm(merged);
         }
     };
 
@@ -191,21 +195,33 @@ export default function AdminPage() {
         }
     };
 
-    const handleProfileUpdate = async (field: string, value: any) => {
+    // Update profileForm locally (no network calls)
+    const handleProfileFieldChange = (field: string, value: any) => {
+        setProfileForm((prev: any) => ({ ...prev, [field]: value }));
+    };
+
+    // Save all profile changes at once
+    const handleProfileSave = async () => {
         if (!selectedUser) return;
+        setProfileSaving(true);
         try {
             const res = await fetch(`${API_URL}/users/${selectedUser.id}`, {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ [field]: value })
+                body: JSON.stringify(profileForm)
             });
             if (res.ok) {
-                const updatedUser = { ...selectedUser, [field]: value };
+                const updatedUser = { ...selectedUser, ...profileForm };
                 setSelectedUser(updatedUser);
-                setUsers(prev => prev.map(u => u.id === updatedUser.id ? updatedUser : u));
+                setUsers(prev => prev.map(u => String(u.id) === String(updatedUser.id) ? { ...u, ...profileForm } : u));
+                setIsProfileModalOpen(false);
+            } else {
+                alert("Erro ao salvar as alterações.");
             }
         } catch (e) {
-            console.error(e);
+            alert("Erro de rede ao salvar.");
+        } finally {
+            setProfileSaving(false);
         }
     };
 
@@ -417,7 +433,7 @@ export default function AdminPage() {
                     <Card className={`w-full max-w-4xl max-h-[90vh] overflow-y-auto p-8 rounded-[2rem] border shadow-2xl ${isDarkMode ? 'bg-[#111] border-white/10' : 'bg-white border-gray-200'}`}>
                         <div className="flex justify-between items-center mb-8 border-b pb-4 border-white/10">
                             <h2 className="text-2xl font-black flex items-center gap-3">
-                                <UserIcon className="w-6 h-6 text-blue-500" /> Perfil: {selectedUser.name}
+                                <UserIcon className="w-6 h-6 text-blue-500" /> Perfil: {profileForm.name || selectedUser.name}
                             </h2>
                             <button onClick={() => setIsProfileModalOpen(false)} className={`p-2 rounded-xl transition-colors ${isDarkMode ? 'hover:bg-white/10 text-gray-400' : 'hover:bg-gray-100 text-gray-500'}`}>
                                 <X className="w-6 h-6" />
@@ -429,13 +445,13 @@ export default function AdminPage() {
                             <div className="space-y-4">
                                 <div>
                                     <Label className="text-xs uppercase font-bold opacity-60 mb-1 block">Nome</Label>
-                                    <Input value={selectedUser.name || ''} onChange={e => handleProfileUpdate('name', e.target.value)} className={isDarkMode ? "bg-black/50 border-white/10" : ""} />
+                                    <Input value={profileForm.name || ''} onChange={e => handleProfileFieldChange('name', e.target.value)} className={isDarkMode ? "bg-black/50 border-white/10" : ""} />
                                 </div>
                                 <div>
                                     <Label className="text-xs uppercase font-bold opacity-60 mb-1 block">Cargo</Label>
                                     <select 
-                                        value={selectedUser.role || ''} 
-                                        onChange={e => handleProfileUpdate('role', e.target.value)}
+                                        value={profileForm.role || ''} 
+                                        onChange={e => handleProfileFieldChange('role', e.target.value)}
                                         className={`w-full h-10 px-3 rounded-md border text-sm ${isDarkMode ? 'bg-black/50 border-white/10 text-white' : 'bg-white border-gray-300'}`}
                                     >
                                         <option value="">Selecionar...</option>
@@ -458,15 +474,15 @@ export default function AdminPage() {
                                 </div>
                                 <div>
                                     <Label className="text-xs uppercase font-bold opacity-60 mb-1 block">E-mail</Label>
-                                    <Input value={selectedUser.email || ''} onChange={e => handleProfileUpdate('email', e.target.value)} className={isDarkMode ? "bg-black/50 border-white/10" : ""} />
+                                    <Input value={profileForm.email || ''} onChange={e => handleProfileFieldChange('email', e.target.value)} className={isDarkMode ? "bg-black/50 border-white/10" : ""} />
                                 </div>
                                 <div>
                                     <Label className="text-xs uppercase font-bold opacity-60 mb-1 block">Matrícula SIDIA</Label>
-                                    <Input value={selectedUser.sidia_id || ''} onChange={e => handleProfileUpdate('sidia_id', e.target.value)} className={isDarkMode ? "bg-black/50 border-white/10" : ""} />
+                                    <Input value={profileForm.sidia_id || ''} onChange={e => handleProfileFieldChange('sidia_id', e.target.value)} className={isDarkMode ? "bg-black/50 border-white/10" : ""} />
                                 </div>
                                 <div>
                                     <Label className="text-xs uppercase font-bold opacity-60 mb-1 block">Célula</Label>
-                                    <Input value={selectedUser.cell || ''} onChange={e => handleProfileUpdate('cell', e.target.value)} className={isDarkMode ? "bg-black/50 border-white/10" : ""} />
+                                    <Input value={profileForm.cell || ''} onChange={e => handleProfileFieldChange('cell', e.target.value)} className={isDarkMode ? "bg-black/50 border-white/10" : ""} />
                                 </div>
                             </div>
                             
@@ -474,17 +490,17 @@ export default function AdminPage() {
                             <div className="space-y-4">
                                 <div>
                                     <Label className="text-xs uppercase font-bold opacity-60 mb-1 block">Equipe</Label>
-                                    <Input value={selectedUser.team || ''} onChange={e => handleProfileUpdate('team', e.target.value)} className={isDarkMode ? "bg-black/50 border-white/10" : ""} />
+                                    <Input value={profileForm.team || ''} onChange={e => handleProfileFieldChange('team', e.target.value)} className={isDarkMode ? "bg-black/50 border-white/10" : ""} />
                                 </div>
                                 <div>
                                     <Label className="text-xs uppercase font-bold opacity-60 mb-1 block">KP</Label>
-                                    <Input value={selectedUser.kp || ''} onChange={e => handleProfileUpdate('kp', e.target.value)} className={isDarkMode ? "bg-black/50 border-white/10" : ""} />
+                                    <Input value={profileForm.kp || ''} onChange={e => handleProfileFieldChange('kp', e.target.value)} className={isDarkMode ? "bg-black/50 border-white/10" : ""} />
                                 </div>
                                 <div>
                                     <Label className="text-xs uppercase font-bold opacity-60 mb-1 block">KP Type</Label>
                                     <select 
-                                        value={selectedUser.kp_type || ''} 
-                                        onChange={e => handleProfileUpdate('kp_type', e.target.value)}
+                                        value={profileForm.kp_type || ''} 
+                                        onChange={e => handleProfileFieldChange('kp_type', e.target.value)}
                                         className={`w-full h-10 px-3 rounded-md border text-sm ${isDarkMode ? 'bg-black/50 border-white/10 text-white' : 'bg-white border-gray-300'}`}
                                     >
                                         <option value="">Selecionar...</option>
@@ -495,8 +511,8 @@ export default function AdminPage() {
                                 <div>
                                     <Label className="text-xs uppercase font-bold opacity-60 mb-1 block">É Backup?</Label>
                                     <select 
-                                        value={selectedUser.is_backup ? "true" : "false"} 
-                                        onChange={e => handleProfileUpdate('is_backup', e.target.value === 'true')}
+                                        value={profileForm.is_backup ? "true" : "false"} 
+                                        onChange={e => handleProfileFieldChange('is_backup', e.target.value === 'true')}
                                         className={`w-full h-10 px-3 rounded-md border text-sm ${isDarkMode ? 'bg-black/50 border-white/10 text-white' : 'bg-white border-gray-300'}`}
                                     >
                                         <option value="true">Sim</option>
@@ -506,8 +522,8 @@ export default function AdminPage() {
                                 <div>
                                     <Label className="text-xs uppercase font-bold opacity-60 mb-1 block">É Especialista?</Label>
                                     <select 
-                                        value={selectedUser.is_specialist ? "true" : "false"} 
-                                        onChange={e => handleProfileUpdate('is_specialist', e.target.value === 'true')}
+                                        value={profileForm.is_specialist ? "true" : "false"} 
+                                        onChange={e => handleProfileFieldChange('is_specialist', e.target.value === 'true')}
                                         className={`w-full h-10 px-3 rounded-md border text-sm ${isDarkMode ? 'bg-black/50 border-white/10 text-white' : 'bg-white border-gray-300'}`}
                                     >
                                         <option value="true">Sim</option>
@@ -521,15 +537,37 @@ export default function AdminPage() {
                             <div>
                                 <Label className="text-xs uppercase font-bold opacity-60 mb-1 block">Bio / Mini Currículo</Label>
                                 <textarea 
-                                    className={`w-full p-3 rounded-xl border text-sm min-h-[100px] ${isDarkMode ? 'bg-black/50 border-white/10' : 'bg-white border-gray-300'}`}
-                                    value={selectedUser.bio || ''} 
-                                    onChange={e => handleProfileUpdate('bio', e.target.value)}
+                                    className={`w-full p-3 rounded-xl border text-sm min-h-[100px] ${isDarkMode ? 'bg-black/50 border-white/10 text-white' : 'bg-white border-gray-300'}`}
+                                    value={profileForm.bio || ''} 
+                                    onChange={e => handleProfileFieldChange('bio', e.target.value)}
                                 />
                             </div>
                             <div>
                                 <Label className="text-xs uppercase font-bold opacity-60 mb-1 block">Habilidades</Label>
-                                <Input value={selectedUser.skills || ''} onChange={e => handleProfileUpdate('skills', e.target.value)} className={isDarkMode ? "bg-black/50 border-white/10" : ""} placeholder="Separadas por vírgula" />
+                                <Input value={profileForm.skills || ''} onChange={e => handleProfileFieldChange('skills', e.target.value)} className={isDarkMode ? "bg-black/50 border-white/10" : ""} placeholder="Separadas por vírgula" />
                             </div>
+                        </div>
+
+                        {/* Save / Cancel Buttons */}
+                        <div className="mt-8 flex justify-end gap-3 border-t pt-6 border-white/10">
+                            <button 
+                                onClick={() => setIsProfileModalOpen(false)}
+                                className={`px-6 py-3 rounded-xl text-sm font-bold transition-all ${isDarkMode ? 'bg-white/5 hover:bg-white/10 text-gray-300' : 'bg-gray-100 hover:bg-gray-200 text-gray-700'}`}
+                            >
+                                Cancelar
+                            </button>
+                            <button 
+                                onClick={handleProfileSave}
+                                disabled={profileSaving}
+                                className="px-8 py-3 rounded-xl text-sm font-black uppercase tracking-wider bg-gradient-to-r from-blue-600 to-indigo-600 text-white hover:from-blue-500 hover:to-indigo-500 shadow-lg shadow-blue-500/25 transition-all flex items-center gap-2 disabled:opacity-50"
+                            >
+                                {profileSaving ? (
+                                    <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+                                ) : (
+                                    <Save className="w-4 h-4" />
+                                )}
+                                Salvar Alterações
+                            </button>
                         </div>
                     </Card>
                 </div>
