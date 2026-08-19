@@ -149,6 +149,12 @@ export default function TimeSemanalPage() {
   const [isMemberModalOpen, setIsMemberModalOpen] = useState(false);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
+
+  // Absence Modal states
+  const [isAbsenceModalOpen, setIsAbsenceModalOpen] = useState(false);
+  const [selectedAbsenceMember, setSelectedAbsenceMember] = useState<TeamBoardMember | null>(null);
+  const [absenceForm, setAbsenceForm] = useState({ date: new Date().toISOString().split('T')[0], reason: 'Falta não planejada' });
+  const [memberAbsences, setMemberAbsences] = useState<Record<number, boolean>>({});
   const [selectedArea, setSelectedArea] = useState<TeamBoardArea | null>(null);
   const [editingArea, setEditingArea] = useState<Partial<TeamBoardArea> | null>(null);
   const [editingMember, setEditingMember] = useState<Partial<TeamBoardMember> | null>(null);
@@ -587,6 +593,25 @@ export default function TimeSemanalPage() {
     }
   };
 
+  const handleSaveAbsence = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedAbsenceMember) return;
+    try {
+      const res = await fetch(`${getApiBaseUrl()}/team-board/members/${selectedAbsenceMember.id}/absences`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(absenceForm)
+      });
+      if (res.ok) {
+        showToast("Justificativa salva com sucesso!", "success");
+        setIsAbsenceModalOpen(false);
+        setSelectedAbsenceMember(null);
+      }
+    } catch (error) {
+      showToast("Erro ao salvar justificativa.", "error");
+    }
+  };
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'intern': return 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20';
@@ -624,7 +649,21 @@ export default function TimeSemanalPage() {
     }
 
     return (
-      <div key={member.id} className={`group relative ${isDragged ? 'opacity-20' : ''}`} draggable onDragStart={(e) => handleDragStart(e, member.id)} onDragOver={handleDragOver} onDrop={(e) => handleDrop(e, member.id)}>
+      <div 
+        key={member.id} 
+        className={`group relative ${isDragged ? 'opacity-20' : ''}`} 
+        draggable 
+        onDragStart={(e) => handleDragStart(e, member.id)} 
+        onDragOver={handleDragOver} 
+        onDrop={(e) => handleDrop(e, member.id)}
+        onDoubleClick={(e) => {
+          e.stopPropagation();
+          if (activeTab === 'fixed' || activeTab === 'current') {
+            setSelectedAbsenceMember(member);
+            setIsAbsenceModalOpen(true);
+          }
+        }}
+      >
         <div className={`flex items-center gap-3 p-2 rounded-xl border transition-all ${highlightClass} ${level > 0 ? 'ml-6 border-l-2' : ''}`}>
           <div className={`flex-shrink-0 w-8 h-8 rounded-lg ${isHighlighted ? 'bg-white/10' : 'bg-white/50 dark:bg-black/20'} flex items-center justify-center overflow-hidden`}>
             {avatarToUse ? (
@@ -1050,6 +1089,45 @@ export default function TimeSemanalPage() {
             <div className="p-8 border-b flex justify-between items-center"><div className="flex items-center gap-4"><div className="w-12 h-12 rounded-xl bg-blue-500/10 text-blue-500 flex items-center justify-center border border-blue-500/20"><Users className="w-6 h-6" /></div><div><h2 className="text-3xl font-black tracking-tighter uppercase">{selectedArea.name}</h2><p className="text-[10px] font-black uppercase tracking-widest opacity-40">{selectedArea.section} • {members.filter(m => m.area_id === selectedArea.id).length} Membros</p></div></div><button onClick={() => setIsDetailModalOpen(false)} className="p-3 rounded-xl hover:bg-black/5 opacity-40 hover:opacity-100 transition-all"><X className="w-6 h-6" /></button></div>
             <div className="flex-grow p-8 overflow-y-auto custom-scrollbar"><div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">{members.filter(m => m.area_id === selectedArea.id && !m.parent_id).map(m => <div key={m.id} className="space-y-4">{renderMemberRow(m)}</div>)}</div>{members.filter(m => m.area_id === selectedArea.id).length === 0 && <div className="h-full flex flex-col items-center justify-center opacity-20 space-y-4"><Users className="w-20 h-20" /><p className="text-xl font-black uppercase tracking-[0.3em]">Nenhum Membro</p></div>}</div>
             <div className="p-6 border-t bg-black/5 dark:bg-white/5 flex justify-end gap-3"><Button onClick={() => { setEditingMember({ area_id: selectedArea.id, status: 'normal' }); setIsMemberModalOpen(true); }} className="rounded-xl font-black text-[10px] uppercase bg-blue-600 hover:bg-blue-700">Adicionar Membro</Button><Button variant="ghost" onClick={() => setIsDetailModalOpen(false)} className="rounded-xl font-black text-[10px] uppercase">Fechar</Button></div>
+          </Card>
+        </div>
+      )}
+
+      {isAbsenceModalOpen && selectedAbsenceMember && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-md" onClick={() => setIsAbsenceModalOpen(false)} />
+          <Card className={`relative w-full max-w-md p-8 border-none shadow-2xl animate-in zoom-in-95 duration-200 ${isDarkMode ? 'bg-[#0a0a0a] text-white' : 'bg-white'}`}>
+            <h2 className="text-2xl font-black tracking-tighter mb-6">Justificar Falta</h2>
+            <p className="text-sm font-bold text-blue-500 mb-6 uppercase tracking-widest">{selectedAbsenceMember.name}</p>
+            <form onSubmit={handleSaveAbsence} className="space-y-6">
+              <div className="space-y-2">
+                <label className="text-[10px] font-black uppercase opacity-40">Data da Falta</label>
+                <Input 
+                  type="date"
+                  value={absenceForm.date} 
+                  onChange={e => setAbsenceForm({ ...absenceForm, date: e.target.value })} 
+                  className={`h-12 font-bold ${isDarkMode ? 'bg-white/5 border-white/10' : ''}`} 
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-[10px] font-black uppercase opacity-40">Motivo</label>
+                <select 
+                  value={absenceForm.reason} 
+                  onChange={e => setAbsenceForm({ ...absenceForm, reason: e.target.value })} 
+                  className={`w-full h-12 rounded-xl border px-4 text-xs font-bold outline-none ${isDarkMode ? 'bg-white/5 border-white/10' : 'bg-white border-black/10'}`}
+                >
+                  <option value="Atestado">Atestado</option>
+                  <option value="Falta planejada">Falta planejada</option>
+                  <option value="Falta não planejada">Falta não planejada</option>
+                  <option value="Férias">Férias</option>
+                </select>
+              </div>
+              <div className="flex gap-3 pt-4">
+                <Button type="button" variant="ghost" onClick={() => setIsAbsenceModalOpen(false)} className="flex-1 h-12 rounded-xl font-black text-[10px] uppercase">Cancelar</Button>
+                <Button type="submit" className="flex-[2] h-12 rounded-xl font-black text-[10px] uppercase bg-blue-600 hover:bg-blue-700 shadow-xl shadow-blue-600/20">Salvar Justificativa</Button>
+              </div>
+            </form>
           </Card>
         </div>
       )}

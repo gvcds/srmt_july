@@ -202,6 +202,14 @@ class TeamBoardMember(Base):
     position = Column(Integer, default=0)
     created_at = Column(DateTime, default=datetime.utcnow)
 
+class MemberAbsence(Base):
+    __tablename__ = "member_absences"
+    id = Column(Integer, primary_key=True, index=True)
+    member_id = Column(Integer, ForeignKey("team_board_members.id", ondelete="CASCADE"), nullable=False)
+    date = Column(String, nullable=False)
+    reason = Column(String, nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
 class TeamBoardProject(Base):
     __tablename__ = "team_board_projects"
     id = Column(Integer, primary_key=True, index=True)
@@ -1797,7 +1805,34 @@ def update_project_members(project_id: int, data: ProjectMemberUpdate, db: Sessi
 def delete_project(project_id: int, db: Session = Depends(get_db)):
     db.query(TeamBoardProject).filter(TeamBoardProject.id == project_id).delete()
     db.commit()
+    db.commit()
     return {"status": "success"}
+
+# --- ROTAS DE FALTAS DE MEMBROS (MEMBER ABSENCES) ---
+class MemberAbsenceCreate(BaseModel):
+    date: str
+    reason: str
+
+@app.get("/team-board/members/{member_id}/absences")
+def get_member_absences(member_id: int, db: Session = Depends(get_db)):
+    absences = db.query(MemberAbsence).filter(MemberAbsence.member_id == member_id).order_by(MemberAbsence.date.desc()).all()
+    return absences
+
+@app.post("/team-board/members/{member_id}/absences")
+def create_member_absence(member_id: int, data: MemberAbsenceCreate, db: Session = Depends(get_db)):
+    member = db.query(TeamBoardMember).filter(TeamBoardMember.id == member_id).first()
+    if not member:
+        raise HTTPException(status_code=404, detail="Membro não encontrado")
+    
+    absence = MemberAbsence(
+        member_id=member_id,
+        date=data.date,
+        reason=data.reason
+    )
+    db.add(absence)
+    db.commit()
+    db.refresh(absence)
+    return absence
 
 # --- ROTAS DE AVISOS DO SISTEMA (SYSTEM NOTICES) ---
 
