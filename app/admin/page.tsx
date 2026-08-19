@@ -62,10 +62,11 @@ const AIBackground = ({ isDarkMode }: { isDarkMode: boolean }) => {
 
 export default function AdminPage() {
     const { isDarkMode } = useTheme();
-    const [activeTab, setActiveTab] = useState<'users' | 'charts'>('users');
+    const [activeTab, setActiveTab] = useState<'users' | 'charts' | 'absences'>('users');
     const [mounted, setMounted] = useState(false);
     const [users, setUsers] = useState<any[]>([]);
     const [logs, setLogs] = useState<any[]>([]);
+    const [absences, setAbsences] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     
     // Auth state (reuse metricas logic)
@@ -77,9 +78,13 @@ export default function AdminPage() {
     const [profileForm, setProfileForm] = useState<any>({});
     const [profileSaving, setProfileSaving] = useState(false);
 
-    // Inline Editing
+    // Inline Editing Users
     const [editingUserId, setEditingUserId] = useState<number | null>(null);
     const [editForm, setEditForm] = useState<any>({});
+
+    // Inline Editing Absences
+    const [editingAbsenceId, setEditingAbsenceId] = useState<number | null>(null);
+    const [editAbsenceForm, setEditAbsenceForm] = useState<any>({});
 
     const API_URL = typeof window !== 'undefined'
         ? `${window.location.protocol}//${window.location.hostname}:8001`
@@ -105,9 +110,10 @@ export default function AdminPage() {
     const fetchData = useCallback(async () => {
         setLoading(true);
         try {
-            const [usersRes, logsRes] = await Promise.all([
+            const [usersRes, logsRes, absencesRes] = await Promise.all([
                 fetch(`${API_URL}/users`),
-                fetch('/api/access-logs')
+                fetch('/api/access-logs'),
+                fetch(`${API_URL}/team-board/absences`)
             ]);
             
             if (usersRes.ok) {
@@ -121,6 +127,9 @@ export default function AdminPage() {
             }
             if (logsRes.ok) {
                 setLogs(await logsRes.json());
+            }
+            if (absencesRes.ok) {
+                setAbsences(await absencesRes.json());
             }
         } catch (error) {
             console.error("Erro ao carregar dados admin:", error);
@@ -189,6 +198,49 @@ export default function AdminPage() {
                 }
             } else {
                 alert("Erro ao salvar.");
+            }
+        } catch (e) {
+            alert("Erro de rede.");
+        }
+    };
+
+    // Handle Inline Edit Start Absences
+    const handleEditAbsenceStart = (absence: any) => {
+        setEditingAbsenceId(absence.id);
+        setEditAbsenceForm({ ...absence });
+    };
+
+    // Handle Inline Edit Save Absences
+    const handleEditAbsenceSave = async () => {
+        if (!editingAbsenceId) return;
+        try {
+            const res = await fetch(`${API_URL}/team-board/absences/${editingAbsenceId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    date: editAbsenceForm.date,
+                    reason: editAbsenceForm.reason
+                })
+            });
+            if (res.ok) {
+                setAbsences(prev => prev.map(a => a.id === editingAbsenceId ? { ...a, ...editAbsenceForm } : a));
+                setEditingAbsenceId(null);
+            } else {
+                alert("Erro ao salvar falta.");
+            }
+        } catch (e) {
+            alert("Erro de rede.");
+        }
+    };
+
+    const handleDeleteAbsence = async (id: number) => {
+        if (!confirm("Tem certeza que deseja deletar esta falta?")) return;
+        try {
+            const res = await fetch(`${API_URL}/team-board/absences/${id}`, { method: 'DELETE' });
+            if (res.ok) {
+                setAbsences(prev => prev.filter(a => a.id !== id));
+            } else {
+                alert("Erro ao deletar falta.");
             }
         } catch (e) {
             alert("Erro de rede.");
@@ -313,6 +365,100 @@ export default function AdminPage() {
         );
     };
 
+    // --- RENDER TAB 1.5: ABSENCES TABLE ---
+    const renderAbsencesTable = () => {
+        return (
+            <Card className={`p-6 rounded-[2rem] border shadow-2xl backdrop-blur-xl animate-in slide-in-from-bottom-4 duration-500 ${isDarkMode ? 'bg-[#111]/80 border-white/10 shadow-black/50' : 'bg-white/90 border-gray-200 shadow-gray-200/50'}`}>
+                <div className="overflow-x-auto">
+                    <table className="w-full text-sm text-left">
+                        <thead className={`text-xs uppercase font-bold tracking-wider ${isDarkMode ? 'bg-white/5 text-gray-400' : 'bg-gray-100 text-gray-600'}`}>
+                            <tr>
+                                <th className="px-4 py-3 rounded-tl-lg">ID</th>
+                                <th className="px-4 py-3">Nome do Membro</th>
+                                <th className="px-4 py-3">Data da Falta</th>
+                                <th className="px-4 py-3">Motivo</th>
+                                <th className="px-4 py-3">Registrado em</th>
+                                <th className="px-4 py-3 rounded-tr-lg text-right">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {absences.map((a: any) => {
+                                const isEditing = editingAbsenceId === a.id;
+                                return (
+                                    <tr key={a.id} className={`border-b last:border-0 ${isDarkMode ? 'border-white/5 hover:bg-white/5' : 'border-gray-100 hover:bg-gray-50'}`}>
+                                        <td className="px-4 py-3 font-medium">#{a.id}</td>
+                                        
+                                        {/* Member Name - Readonly */}
+                                        <td className="px-4 py-3 font-bold text-blue-500">
+                                            {a.member_name}
+                                        </td>
+
+                                        {/* Date */}
+                                        <td className="px-4 py-3">
+                                            {isEditing ? (
+                                                <Input type="date" value={editAbsenceForm.date || ''} onChange={e => setEditAbsenceForm({...editAbsenceForm, date: e.target.value})} className="h-8 text-xs" />
+                                            ) : (
+                                                a.date
+                                            )}
+                                        </td>
+
+                                        {/* Reason */}
+                                        <td className="px-4 py-3">
+                                            {isEditing ? (
+                                                <select 
+                                                    value={editAbsenceForm.reason || ''} 
+                                                    onChange={e => setEditAbsenceForm({...editAbsenceForm, reason: e.target.value})} 
+                                                    className={`h-8 px-2 rounded-md border text-xs outline-none ${isDarkMode ? 'bg-white/5 border-white/10' : 'bg-white border-black/10'}`}
+                                                >
+                                                    <option value="Atestado">Atestado</option>
+                                                    <option value="Falta planejada">Falta planejada</option>
+                                                    <option value="Falta não planejada">Falta não planejada</option>
+                                                    <option value="Férias">Férias</option>
+                                                </select>
+                                            ) : (
+                                                a.reason
+                                            )}
+                                        </td>
+                                        
+                                        {/* Created At */}
+                                        <td className="px-4 py-3 opacity-60 text-xs">
+                                            {new Date(a.created_at).toLocaleString('pt-BR')}
+                                        </td>
+
+                                        <td className="px-4 py-3 text-right whitespace-nowrap">
+                                            {isEditing ? (
+                                                <div className="flex items-center justify-end gap-2">
+                                                    <button onClick={handleEditAbsenceSave} className="p-1.5 text-green-500 hover:bg-green-500/10 rounded-lg" title="Salvar"><Save className="w-4 h-4" /></button>
+                                                    <button onClick={() => setEditingAbsenceId(null)} className="p-1.5 text-gray-500 hover:bg-gray-500/10 rounded-lg" title="Cancelar"><X className="w-4 h-4" /></button>
+                                                </div>
+                                            ) : (
+                                                <div className="flex items-center justify-end gap-2">
+                                                    <button onClick={() => handleEditAbsenceStart(a)} className="p-1.5 text-blue-500 hover:bg-blue-500/10 rounded-lg" title="Editar">
+                                                        <Edit2 className="w-4 h-4" />
+                                                    </button>
+                                                    <button onClick={() => handleDeleteAbsence(a.id)} className="p-1.5 text-red-500 hover:bg-red-500/10 rounded-lg" title="Deletar">
+                                                        <Trash2 className="w-4 h-4" />
+                                                    </button>
+                                                </div>
+                                            )}
+                                        </td>
+                                    </tr>
+                                );
+                            })}
+                            {absences.length === 0 && (
+                                <tr>
+                                    <td colSpan={6} className="px-4 py-8 text-center opacity-50 italic">
+                                        Nenhuma falta registrada.
+                                    </td>
+                                </tr>
+                            )}
+                        </tbody>
+                    </table>
+                </div>
+            </Card>
+        );
+    };
+
     // --- RENDER TAB 2: CHARTS ---
     const renderCharts = () => {
         // Prepare mock logic if no logs
@@ -421,10 +567,19 @@ export default function AdminPage() {
                         >
                             <BarChart3 className="w-4 h-4" /> Métricas de Acesso
                         </button>
+                        <button
+                            onClick={() => setActiveTab('absences')}
+                            className={`flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-bold transition-all duration-300 ${activeTab === 'absences'
+                                ? 'bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-lg shadow-purple-500/25'
+                                : isDarkMode ? 'text-gray-400 hover:text-white hover:bg-white/5' : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'
+                            }`}
+                        >
+                            <FileText className="w-4 h-4" /> Gerenciar Faltas
+                        </button>
                     </div>
                 </div>
 
-                {activeTab === 'users' ? renderUsersTable() : renderCharts()}
+                {activeTab === 'users' ? renderUsersTable() : activeTab === 'absences' ? renderAbsencesTable() : renderCharts()}
             </div>
 
             {/* PROFILE MODAL (Admin Edit) - Exact same fields as PerfilPage */}

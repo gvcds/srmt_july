@@ -1834,6 +1834,52 @@ def create_member_absence(member_id: int, data: MemberAbsenceCreate, db: Session
     db.refresh(absence)
     return absence
 
+class MemberAbsenceUpdate(BaseModel):
+    date: Optional[str] = None
+    reason: Optional[str] = None
+
+@app.get("/team-board/absences")
+def get_all_absences(db: Session = Depends(get_db)):
+    results = db.query(MemberAbsence, TeamBoardMember).join(
+        TeamBoardMember, MemberAbsence.member_id == TeamBoardMember.id
+    ).order_by(MemberAbsence.created_at.desc()).all()
+    
+    absences = []
+    for absence, member in results:
+        absences.append({
+            "id": absence.id,
+            "member_id": absence.member_id,
+            "member_name": member.name,
+            "date": absence.date,
+            "reason": absence.reason,
+            "created_at": absence.created_at
+        })
+    return absences
+
+@app.put("/team-board/absences/{absence_id}")
+def update_absence(absence_id: int, data: MemberAbsenceUpdate, db: Session = Depends(get_db)):
+    absence = db.query(MemberAbsence).filter(MemberAbsence.id == absence_id).first()
+    if not absence:
+        raise HTTPException(status_code=404, detail="Falta não encontrada")
+    
+    if data.date is not None:
+        absence.date = data.date
+    if data.reason is not None:
+        absence.reason = data.reason
+        
+    db.commit()
+    db.refresh(absence)
+    return absence
+
+@app.delete("/team-board/absences/{absence_id}")
+def delete_absence(absence_id: int, db: Session = Depends(get_db)):
+    absence = db.query(MemberAbsence).filter(MemberAbsence.id == absence_id).first()
+    if not absence:
+        raise HTTPException(status_code=404, detail="Falta não encontrada")
+    db.delete(absence)
+    db.commit()
+    return {"status": "success", "message": "Falta removida com sucesso"}
+
 # --- ROTAS DE AVISOS DO SISTEMA (SYSTEM NOTICES) ---
 
 @app.get("/system-notices")
