@@ -109,7 +109,12 @@ export default function AdminPage() {
             ]);
             
             if (usersRes.ok) {
-                setUsers(await usersRes.json());
+                const fetchedUsers = await usersRes.json();
+                const mappedUsers = fetchedUsers.map((u: any) => ({
+                    ...u,
+                    sidia_id: u.sidia_id || u.department || ''
+                }));
+                setUsers(mappedUsers);
             }
             if (logsRes.ok) {
                 setLogs(await logsRes.json());
@@ -189,7 +194,7 @@ export default function AdminPage() {
                                 <th className="px-4 py-3">Cargo</th>
                                 <th className="px-4 py-3">Equipe</th>
                                 <th className="px-4 py-3">Célula</th>
-                                <th className="px-4 py-3">Sidia ID</th>
+                                <th className="px-4 py-3">Matrícula SIDIA</th>
                                 <th className="px-4 py-3 rounded-tr-lg text-right">Ações</th>
                             </tr>
                         </thead>
@@ -416,7 +421,7 @@ export default function AdminPage() {
                                     <Input value={selectedUser.email || ''} onChange={e => handleProfileUpdate('email', e.target.value)} className={isDarkMode ? "bg-black/50 border-white/10" : ""} />
                                 </div>
                                 <div>
-                                    <Label className="text-xs uppercase font-bold opacity-60 mb-1 block">Sidia ID</Label>
+                                    <Label className="text-xs uppercase font-bold opacity-60 mb-1 block">Matrícula SIDIA</Label>
                                     <Input value={selectedUser.sidia_id || ''} onChange={e => handleProfileUpdate('sidia_id', e.target.value)} className={isDarkMode ? "bg-black/50 border-white/10" : ""} />
                                 </div>
                                 <div>
