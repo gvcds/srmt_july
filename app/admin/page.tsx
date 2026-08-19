@@ -105,14 +105,15 @@ export default function AdminPage() {
         try {
             const [usersRes, logsRes] = await Promise.all([
                 fetch(`${API_URL}/users`),
-                fetch('/api/access-logs') // Using NextJS proxy for this one
+                fetch('/api/access-logs')
             ]);
             
             if (usersRes.ok) {
                 const fetchedUsers = await usersRes.json();
+                // GET /users returns 'area' instead of 'team', so we map it
                 const mappedUsers = fetchedUsers.map((u: any) => ({
                     ...u,
-                    sidia_id: u.sidia_id || u.department || ''
+                    team: u.team || u.area || '',
                 }));
                 setUsers(mappedUsers);
             }
@@ -131,6 +132,34 @@ export default function AdminPage() {
             fetchData();
         }
     }, [isAuthorized, fetchData]);
+
+    // Fetch full user data from /users/{id} (includes sidia_id, is_specialist, etc.)
+    const fetchFullUserData = async (userId: number | string) => {
+        try {
+            const res = await fetch(`${API_URL}/users/${userId}`);
+            if (res.ok) {
+                const fullData = await res.json();
+                // Update the user in the users list with the full data
+                setUsers(prev => prev.map(u => String(u.id) === String(userId) ? { ...u, ...fullData } : u));
+                return fullData;
+            }
+        } catch (e) {
+            console.error('Erro ao buscar dados completos do usuário:', e);
+        }
+        return null;
+    };
+
+    // Open profile modal with full data
+    const handleOpenProfile = async (user: any) => {
+        // Immediately show modal with what we have
+        setSelectedUser(user);
+        setIsProfileModalOpen(true);
+        // Then fetch full data (which includes sidia_id, is_specialist, etc.)
+        const fullData = await fetchFullUserData(user.id);
+        if (fullData) {
+            setSelectedUser({ ...user, ...fullData });
+        }
+    };
 
     // Handle Inline Edit Start
     const handleEditStart = (user: any) => {
@@ -211,7 +240,7 @@ export default function AdminPage() {
                                                 <Input value={editForm.name || ''} onChange={e => setEditForm({...editForm, name: e.target.value})} className="h-8 text-xs" />
                                             ) : (
                                                 <span 
-                                                    onClick={() => { setSelectedUser(u); setIsProfileModalOpen(true); }}
+                                                    onClick={() => handleOpenProfile(u)}
                                                     className="font-bold text-blue-500 cursor-pointer hover:underline flex items-center gap-2"
                                                 >
                                                     {u.avatar ? <img src={u.avatar} className="w-6 h-6 rounded-full" /> : <div className="w-6 h-6 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-500">{u.name?.charAt(0)}</div>}
@@ -382,7 +411,7 @@ export default function AdminPage() {
                 {activeTab === 'users' ? renderUsersTable() : renderCharts()}
             </div>
 
-            {/* PROFILE MODAL (Admin Edit) */}
+            {/* PROFILE MODAL (Admin Edit) - Exact same fields as PerfilPage */}
             {isProfileModalOpen && selectedUser && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-in fade-in">
                     <Card className={`w-full max-w-4xl max-h-[90vh] overflow-y-auto p-8 rounded-[2rem] border shadow-2xl ${isDarkMode ? 'bg-[#111] border-white/10' : 'bg-white border-gray-200'}`}>
@@ -395,7 +424,8 @@ export default function AdminPage() {
                             </button>
                         </div>
                         
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            {/* Column 1: Informações do Sistema */}
                             <div className="space-y-4">
                                 <div>
                                     <Label className="text-xs uppercase font-bold opacity-60 mb-1 block">Nome</Label>
@@ -403,19 +433,29 @@ export default function AdminPage() {
                                 </div>
                                 <div>
                                     <Label className="text-xs uppercase font-bold opacity-60 mb-1 block">Cargo</Label>
-                                    <Input value={selectedUser.role || ''} onChange={e => handleProfileUpdate('role', e.target.value)} className={isDarkMode ? "bg-black/50 border-white/10" : ""} />
+                                    <select 
+                                        value={selectedUser.role || ''} 
+                                        onChange={e => handleProfileUpdate('role', e.target.value)}
+                                        className={`w-full h-10 px-3 rounded-md border text-sm ${isDarkMode ? 'bg-black/50 border-white/10 text-white' : 'bg-white border-gray-300'}`}
+                                    >
+                                        <option value="">Selecionar...</option>
+                                        <option value="Tester I">Tester I</option>
+                                        <option value="Tester II">Tester II</option>
+                                        <option value="Tester III">Tester III</option>
+                                        <option value="Tester IV">Tester IV</option>
+                                        <option value="Especialista I">Especialista I</option>
+                                        <option value="Especialista II">Especialista II</option>
+                                        <option value="Especialista III">Especialista III</option>
+                                        <option value="Coordenador">Coordenador</option>
+                                        <option value="Gerente Tec.">Gerente Tec.</option>
+                                        <option value="Gerente Tec. Sr.">Gerente Tec. Sr.</option>
+                                        <option value="LDAP">LDAP</option>
+                                    </select>
                                 </div>
                                 <div>
-                                    <Label className="text-xs uppercase font-bold opacity-60 mb-1 block">Equipe</Label>
-                                    <Input value={selectedUser.team || ''} onChange={e => handleProfileUpdate('team', e.target.value)} className={isDarkMode ? "bg-black/50 border-white/10" : ""} />
+                                    <Label className="text-xs uppercase font-bold opacity-60 mb-1 block">ID do Sistema</Label>
+                                    <Input value={`#${selectedUser.id}`} disabled className={`opacity-60 ${isDarkMode ? "bg-black/50 border-white/10" : ""}`} />
                                 </div>
-                                <div>
-                                    <Label className="text-xs uppercase font-bold opacity-60 mb-1 block">Célula</Label>
-                                    <Input value={selectedUser.cell || ''} onChange={e => handleProfileUpdate('cell', e.target.value)} className={isDarkMode ? "bg-black/50 border-white/10" : ""} />
-                                </div>
-                            </div>
-                            
-                            <div className="space-y-4">
                                 <div>
                                     <Label className="text-xs uppercase font-bold opacity-60 mb-1 block">E-mail</Label>
                                     <Input value={selectedUser.email || ''} onChange={e => handleProfileUpdate('email', e.target.value)} className={isDarkMode ? "bg-black/50 border-white/10" : ""} />
@@ -423,6 +463,18 @@ export default function AdminPage() {
                                 <div>
                                     <Label className="text-xs uppercase font-bold opacity-60 mb-1 block">Matrícula SIDIA</Label>
                                     <Input value={selectedUser.sidia_id || ''} onChange={e => handleProfileUpdate('sidia_id', e.target.value)} className={isDarkMode ? "bg-black/50 border-white/10" : ""} />
+                                </div>
+                                <div>
+                                    <Label className="text-xs uppercase font-bold opacity-60 mb-1 block">Célula</Label>
+                                    <Input value={selectedUser.cell || ''} onChange={e => handleProfileUpdate('cell', e.target.value)} className={isDarkMode ? "bg-black/50 border-white/10" : ""} />
+                                </div>
+                            </div>
+                            
+                            {/* Column 2: Dados Complementares */}
+                            <div className="space-y-4">
+                                <div>
+                                    <Label className="text-xs uppercase font-bold opacity-60 mb-1 block">Equipe</Label>
+                                    <Input value={selectedUser.team || ''} onChange={e => handleProfileUpdate('team', e.target.value)} className={isDarkMode ? "bg-black/50 border-white/10" : ""} />
                                 </div>
                                 <div>
                                     <Label className="text-xs uppercase font-bold opacity-60 mb-1 block">KP</Label>
@@ -433,10 +485,33 @@ export default function AdminPage() {
                                     <select 
                                         value={selectedUser.kp_type || ''} 
                                         onChange={e => handleProfileUpdate('kp_type', e.target.value)}
-                                        className={`w-full h-10 px-3 rounded-md border text-sm ${isDarkMode ? 'bg-black/50 border-white/10' : 'bg-white border-gray-300'}`}
+                                        className={`w-full h-10 px-3 rounded-md border text-sm ${isDarkMode ? 'bg-black/50 border-white/10 text-white' : 'bg-white border-gray-300'}`}
                                     >
+                                        <option value="">Selecionar...</option>
                                         <option value="projeto">Projeto</option>
                                         <option value="especialista">Especialista</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <Label className="text-xs uppercase font-bold opacity-60 mb-1 block">É Backup?</Label>
+                                    <select 
+                                        value={selectedUser.is_backup ? "true" : "false"} 
+                                        onChange={e => handleProfileUpdate('is_backup', e.target.value === 'true')}
+                                        className={`w-full h-10 px-3 rounded-md border text-sm ${isDarkMode ? 'bg-black/50 border-white/10 text-white' : 'bg-white border-gray-300'}`}
+                                    >
+                                        <option value="true">Sim</option>
+                                        <option value="false">Não</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <Label className="text-xs uppercase font-bold opacity-60 mb-1 block">É Especialista?</Label>
+                                    <select 
+                                        value={selectedUser.is_specialist ? "true" : "false"} 
+                                        onChange={e => handleProfileUpdate('is_specialist', e.target.value === 'true')}
+                                        className={`w-full h-10 px-3 rounded-md border text-sm ${isDarkMode ? 'bg-black/50 border-white/10 text-white' : 'bg-white border-gray-300'}`}
+                                    >
+                                        <option value="true">Sim</option>
+                                        <option value="false">Não</option>
                                     </select>
                                 </div>
                             </div>
@@ -444,7 +519,7 @@ export default function AdminPage() {
 
                         <div className="mt-8 space-y-4">
                             <div>
-                                <Label className="text-xs uppercase font-bold opacity-60 mb-1 block">Bio</Label>
+                                <Label className="text-xs uppercase font-bold opacity-60 mb-1 block">Bio / Mini Currículo</Label>
                                 <textarea 
                                     className={`w-full p-3 rounded-xl border text-sm min-h-[100px] ${isDarkMode ? 'bg-black/50 border-white/10' : 'bg-white border-gray-300'}`}
                                     value={selectedUser.bio || ''} 
