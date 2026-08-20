@@ -813,6 +813,13 @@ def create_metric(data: dict):
             try: return int(v)
             except: return None
 
+        created_at_val = None
+        if data.get("created_at"):
+            try:
+                created_at_val = datetime.fromisoformat(data["created_at"].replace("Z", "+00:00"))
+            except Exception:
+                pass
+
         new_metric = Metric(
             tipo=data.get("tipo", ""),
             revisor=data.get("revisor", ""),
@@ -824,14 +831,9 @@ def create_metric(data: dict):
             qsg_criados=safe_int(data.get("qsgCriados")),
             ug_criados=safe_int(data.get("ugCriados")),
             revisoes=safe_int(data.get("revisoes")),
-            requests=safe_int(data.get("requests"))
+            requests=safe_int(data.get("requests")),
+            created_at=created_at_val if created_at_val else datetime.utcnow()
         )
-        if data.get("created_at"):
-            try:
-                dt = datetime.fromisoformat(data["created_at"].replace("Z", "+00:00"))
-                new_metric.created_at = dt
-            except Exception:
-                pass
         
         db.add(new_metric)
         db.commit()

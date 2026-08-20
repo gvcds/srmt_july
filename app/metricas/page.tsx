@@ -530,7 +530,7 @@ export default function MetricasPage() {
                                 <th className="px-4 py-3 rounded-tl-lg">ID</th>
                                 <th className="px-4 py-3">Tipo</th>
                                 <th className="px-4 py-3">Revisor</th>
-                                <th className="px-4 py-3">Data</th>
+                                <th className="px-4 py-3">Data da Métrica</th>
                                 <th className="px-4 py-3 rounded-tr-lg text-right">Ações</th>
                             </tr>
                         </thead>
