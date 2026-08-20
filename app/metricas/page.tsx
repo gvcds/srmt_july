@@ -407,6 +407,25 @@ export default function MetricasPage() {
         return charts;
     };
 
+    const filteredMetrics = metricsData.filter(m => {
+        if (!m.created_at) return true;
+        const dateStr = m.created_at.split('T')[0]; // Ex: "2023-10-01"
+
+        if (dateFilterType === 'period') {
+            if (!dateStart && !dateEnd) return true;
+            if (dateStart && dateEnd) return dateStr >= dateStart && dateStr <= dateEnd;
+            if (dateStart) return dateStr >= dateStart;
+            if (dateEnd) return dateStr <= dateEnd;
+        }
+        if (dateFilterType === 'month' && dateMonth) {
+            return dateStr.startsWith(dateMonth);
+        }
+        if (dateFilterType === 'day' && dateDay) {
+            return dateStr === dateDay;
+        }
+        return true;
+    });
+
     // --- RENDER SEÇÃO DE GRÁFICOS ---
     const renderChartsSection = () => {
         if (chartsLoading) {
@@ -439,24 +458,6 @@ export default function MetricasPage() {
             { tipo: 'TEM Request', label: 'TEM Request', accent: '#06b6d4', icon: <FileUp className="w-5 h-5" /> },
         ];
 
-        const filteredMetrics = metricsData.filter(m => {
-            if (!m.created_at) return true;
-            const dateStr = m.created_at.split('T')[0]; // Ex: "2023-10-01"
-
-            if (dateFilterType === 'period') {
-                if (!dateStart && !dateEnd) return true;
-                if (dateStart && dateEnd) return dateStr >= dateStart && dateStr <= dateEnd;
-                if (dateStart) return dateStr >= dateStart;
-                if (dateEnd) return dateStr <= dateEnd;
-            }
-            if (dateFilterType === 'month' && dateMonth) {
-                return dateStr.startsWith(dateMonth);
-            }
-            if (dateFilterType === 'day' && dateDay) {
-                return dateStr === dateDay;
-            }
-            return true;
-        });
 
         return (
             <div className="space-y-12">
