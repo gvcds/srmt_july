@@ -439,21 +439,21 @@ export default function MetricasPage() {
             { tipo: 'TEM Request', label: 'TEM Request', accent: '#06b6d4', icon: <FileUp className="w-5 h-5" /> },
         ];
 
-        const filteredMetricsForCharts = metricsData.filter(m => {
+        const filteredMetrics = metricsData.filter(m => {
             if (!m.created_at) return true;
-            const mDate = new Date(m.created_at);
-            if (dateFilterType === 'period' && dateStart && dateEnd) {
-                const s = new Date(dateStart + 'T00:00:00');
-                const e = new Date(dateEnd + 'T23:59:59');
-                return mDate >= s && mDate <= e;
+            const dateStr = m.created_at.split('T')[0]; // Ex: "2023-10-01"
+
+            if (dateFilterType === 'period') {
+                if (!dateStart && !dateEnd) return true;
+                if (dateStart && dateEnd) return dateStr >= dateStart && dateStr <= dateEnd;
+                if (dateStart) return dateStr >= dateStart;
+                if (dateEnd) return dateStr <= dateEnd;
             }
             if (dateFilterType === 'month' && dateMonth) {
-                const [y, mo] = dateMonth.split('-');
-                return mDate.getFullYear() === parseInt(y) && (mDate.getMonth() + 1) === parseInt(mo);
+                return dateStr.startsWith(dateMonth);
             }
             if (dateFilterType === 'day' && dateDay) {
-                const [y, mo, d] = dateDay.split('-');
-                return mDate.getFullYear() === parseInt(y) && (mDate.getMonth() + 1) === parseInt(mo) && mDate.getDate() === parseInt(d);
+                return dateStr === dateDay;
             }
             return true;
         });
@@ -461,7 +461,7 @@ export default function MetricasPage() {
         return (
             <div className="space-y-12">
                 {categories.map(cat => {
-                    const allOfType = filteredMetricsForCharts.filter(m => m.tipo === cat.tipo);
+                    const allOfType = filteredMetrics.filter(m => m.tipo === cat.tipo);
                     if (allOfType.length === 0) return null;
 
                     const charts = buildAccumulatedCharts(cat.tipo, allOfType, hiddenRevisores);
@@ -507,7 +507,7 @@ export default function MetricasPage() {
             );
         }
 
-        if (metricsData.length === 0) {
+        if (filteredMetrics.length === 0) {
             return (
                 <div className="text-center py-20 animate-in fade-in slide-in-from-bottom-4 duration-700">
                     <TableIcon className={`w-16 h-16 mx-auto mb-6 opacity-20 ${isDarkMode ? 'text-white' : 'text-black'}`} />
@@ -534,12 +534,12 @@ export default function MetricasPage() {
                             </tr>
                         </thead>
                         <tbody>
-                            {metricsData.slice().reverse().map(m => (
+                            {filteredMetrics.slice().reverse().map(m => (
                                 <tr key={m.id} className={`border-b last:border-0 ${isDarkMode ? 'border-white/5 hover:bg-white/5' : 'border-gray-100 hover:bg-gray-50'}`}>
                                     <td className="px-4 py-3 font-medium">#{m.id}</td>
                                     <td className="px-4 py-3">{m.tipo}</td>
                                     <td className="px-4 py-3">{REVISORES[m.revisor] || m.revisor}</td>
-                                    <td className="px-4 py-3">{m.created_at ? new Date(m.created_at).toLocaleDateString('pt-BR') : '-'}</td>
+                                    <td className="px-4 py-3">{m.created_at ? m.created_at.split('T')[0].split('-').reverse().join('/') : '-'}</td>
                                     <td className="px-4 py-3 text-right">
                                         <button onClick={() => setEditingMetric(m)} className="p-2 text-blue-500 hover:bg-blue-500/10 rounded-lg transition-colors mr-2">
                                             <Edit2 className="w-4 h-4" />
@@ -797,29 +797,31 @@ export default function MetricasPage() {
                         </button>
                     </div>
 
-                    {/* Botões de Filtro - Só visível na aba de gráficos */}
-                    {activeTab === 'charts' && (
+                    {/* Botões de Filtro - Visível em Gráficos e Tabela */}
+                    {(activeTab === 'charts' || activeTab === 'tabela') && (
                         <div className="flex flex-col items-center gap-4 animate-in fade-in zoom-in-95 duration-300 w-full max-w-4xl">
-                            <div className="flex items-center gap-3">
-                                <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => setIsAnonymizeModalOpen(true)}
-                                    className={`rounded-full px-5 h-9 text-xs font-bold border shadow-sm ${isDarkMode ? 'border-white/10 text-gray-300 hover:bg-white/5 hover:text-white' : 'border-gray-200 text-gray-600 hover:bg-gray-50 hover:text-gray-900'}`}
-                                >
-                                    <EyeOff className="w-3.5 h-3.5 mr-2" />
-                                    {anonymizedRevisores.length > 0 ? `${anonymizedRevisores.length} Nome(s) Oculto(s)` : 'Ocultar Nomes'}
-                                </Button>
-                                <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => setIsFilterModalOpen(true)}
-                                    className={`rounded-full px-5 h-9 text-xs font-bold border shadow-sm ${isDarkMode ? 'border-white/10 text-gray-300 hover:bg-white/5 hover:text-white' : 'border-gray-200 text-gray-600 hover:bg-gray-50 hover:text-gray-900'}`}
-                                >
-                                    <Filter className="w-3.5 h-3.5 mr-2" />
-                                    {hiddenRevisores.length > 0 ? `${hiddenRevisores.length} Barra(s) Oculta(s)` : 'Ocultar Barras'}
-                                </Button>
-                            </div>
+                            {activeTab === 'charts' && (
+                                <div className="flex items-center gap-3">
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => setIsAnonymizeModalOpen(true)}
+                                        className={`rounded-full px-5 h-9 text-xs font-bold border shadow-sm ${isDarkMode ? 'border-white/10 text-gray-300 hover:bg-white/5 hover:text-white' : 'border-gray-200 text-gray-600 hover:bg-gray-50 hover:text-gray-900'}`}
+                                    >
+                                        <EyeOff className="w-3.5 h-3.5 mr-2" />
+                                        {anonymizedRevisores.length > 0 ? `${anonymizedRevisores.length} Nome(s) Oculto(s)` : 'Ocultar Nomes'}
+                                    </Button>
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => setIsFilterModalOpen(true)}
+                                        className={`rounded-full px-5 h-9 text-xs font-bold border shadow-sm ${isDarkMode ? 'border-white/10 text-gray-300 hover:bg-white/5 hover:text-white' : 'border-gray-200 text-gray-600 hover:bg-gray-50 hover:text-gray-900'}`}
+                                    >
+                                        <Filter className="w-3.5 h-3.5 mr-2" />
+                                        {hiddenRevisores.length > 0 ? `${hiddenRevisores.length} Barra(s) Oculta(s)` : 'Ocultar Barras'}
+                                    </Button>
+                                </div>
+                            )}
                             
                             <div className={`p-4 rounded-xl border w-full flex flex-wrap items-center justify-center gap-4 ${isDarkMode ? 'bg-white/5 border-white/10' : 'bg-white border-gray-200'}`}>
                                 <div className="flex items-center gap-2">
