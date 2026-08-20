@@ -221,6 +221,14 @@ export default function MetricasPage() {
     const [ugCriados, setUgCriados] = useState('');
     const [revisoes, setRevisoes] = useState('');
     const [requests, setRequests] = useState('');
+    const [dataMetrica, setDataMetrica] = useState(() => new Date().toISOString().split('T')[0]);
+
+    // Estados do Filtro de Data
+    const [dateFilterType, setDateFilterType] = useState<'all' | 'period' | 'month' | 'day'>('all');
+    const [dateStart, setDateStart] = useState('');
+    const [dateEnd, setDateEnd] = useState('');
+    const [dateMonth, setDateMonth] = useState('');
+    const [dateDay, setDateDay] = useState('');
 
     const [isLoading, setIsLoading] = useState(false);
 
@@ -278,7 +286,8 @@ export default function MetricasPage() {
             const payload = {
                 tipo, revisor, modelo, issues,
                 idiomaUG, idiomaSTMS, stringsRevisadas,
-                qsgCriados, ugCriados, revisoes, requests
+                qsgCriados, ugCriados, revisoes, requests,
+                created_at: dataMetrica
             };
 
             const response = await fetch('/api/metrics', {
@@ -430,10 +439,29 @@ export default function MetricasPage() {
             { tipo: 'TEM Request', label: 'TEM Request', accent: '#06b6d4', icon: <FileUp className="w-5 h-5" /> },
         ];
 
+        const filteredMetricsForCharts = metricsData.filter(m => {
+            if (!m.created_at) return true;
+            const mDate = new Date(m.created_at);
+            if (dateFilterType === 'period' && dateStart && dateEnd) {
+                const s = new Date(dateStart + 'T00:00:00');
+                const e = new Date(dateEnd + 'T23:59:59');
+                return mDate >= s && mDate <= e;
+            }
+            if (dateFilterType === 'month' && dateMonth) {
+                const [y, mo] = dateMonth.split('-');
+                return mDate.getFullYear() === parseInt(y) && (mDate.getMonth() + 1) === parseInt(mo);
+            }
+            if (dateFilterType === 'day' && dateDay) {
+                const [y, mo, d] = dateDay.split('-');
+                return mDate.getFullYear() === parseInt(y) && (mDate.getMonth() + 1) === parseInt(mo) && mDate.getDate() === parseInt(d);
+            }
+            return true;
+        });
+
         return (
             <div className="space-y-12">
                 {categories.map(cat => {
-                    const allOfType = metricsData.filter(m => m.tipo === cat.tipo);
+                    const allOfType = filteredMetricsForCharts.filter(m => m.tipo === cat.tipo);
                     if (allOfType.length === 0) return null;
 
                     const charts = buildAccumulatedCharts(cat.tipo, allOfType, hiddenRevisores);
@@ -553,6 +581,15 @@ export default function MetricasPage() {
                                         <option value="denise.martins">Denise Martins</option>
                                         <option value="edgard.cunha">Edgard Cunha</option>
                                     </select>
+                                </div>
+                                <div>
+                                    <Label className="mb-1 block">Data da Métrica</Label>
+                                    <Input 
+                                        type="date"
+                                        value={editingMetric.created_at ? editingMetric.created_at.split('T')[0] : ''} 
+                                        onChange={e => setEditingMetric({ ...editingMetric, created_at: e.target.value })}
+                                        className={`w-full h-10 px-3 rounded-md border text-sm ${isDarkMode ? 'bg-black border-white/20' : 'bg-white border-gray-300'}`}
+                                    />
                                 </div>
 
                                 {editingMetric.tipo === 'Revisao Manual UG' && (
@@ -762,25 +799,61 @@ export default function MetricasPage() {
 
                     {/* Botões de Filtro - Só visível na aba de gráficos */}
                     {activeTab === 'charts' && (
-                        <div className="flex items-center gap-3 animate-in fade-in zoom-in-95 duration-300">
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => setIsAnonymizeModalOpen(true)}
-                                className={`rounded-full px-5 h-9 text-xs font-bold border shadow-sm ${isDarkMode ? 'border-white/10 text-gray-300 hover:bg-white/5 hover:text-white' : 'border-gray-200 text-gray-600 hover:bg-gray-50 hover:text-gray-900'}`}
-                            >
-                                <EyeOff className="w-3.5 h-3.5 mr-2" />
-                                {anonymizedRevisores.length > 0 ? `${anonymizedRevisores.length} Nome(s) Oculto(s)` : 'Ocultar Nomes'}
-                            </Button>
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => setIsFilterModalOpen(true)}
-                                className={`rounded-full px-5 h-9 text-xs font-bold border shadow-sm ${isDarkMode ? 'border-white/10 text-gray-300 hover:bg-white/5 hover:text-white' : 'border-gray-200 text-gray-600 hover:bg-gray-50 hover:text-gray-900'}`}
-                            >
-                                <Filter className="w-3.5 h-3.5 mr-2" />
-                                {hiddenRevisores.length > 0 ? `${hiddenRevisores.length} Barra(s) Oculta(s)` : 'Ocultar Barras'}
-                            </Button>
+                        <div className="flex flex-col items-center gap-4 animate-in fade-in zoom-in-95 duration-300 w-full max-w-4xl">
+                            <div className="flex items-center gap-3">
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => setIsAnonymizeModalOpen(true)}
+                                    className={`rounded-full px-5 h-9 text-xs font-bold border shadow-sm ${isDarkMode ? 'border-white/10 text-gray-300 hover:bg-white/5 hover:text-white' : 'border-gray-200 text-gray-600 hover:bg-gray-50 hover:text-gray-900'}`}
+                                >
+                                    <EyeOff className="w-3.5 h-3.5 mr-2" />
+                                    {anonymizedRevisores.length > 0 ? `${anonymizedRevisores.length} Nome(s) Oculto(s)` : 'Ocultar Nomes'}
+                                </Button>
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => setIsFilterModalOpen(true)}
+                                    className={`rounded-full px-5 h-9 text-xs font-bold border shadow-sm ${isDarkMode ? 'border-white/10 text-gray-300 hover:bg-white/5 hover:text-white' : 'border-gray-200 text-gray-600 hover:bg-gray-50 hover:text-gray-900'}`}
+                                >
+                                    <Filter className="w-3.5 h-3.5 mr-2" />
+                                    {hiddenRevisores.length > 0 ? `${hiddenRevisores.length} Barra(s) Oculta(s)` : 'Ocultar Barras'}
+                                </Button>
+                            </div>
+                            
+                            <div className={`p-4 rounded-xl border w-full flex flex-wrap items-center justify-center gap-4 ${isDarkMode ? 'bg-white/5 border-white/10' : 'bg-white border-gray-200'}`}>
+                                <div className="flex items-center gap-2">
+                                    <Label className="text-xs font-bold">Filtrar Data:</Label>
+                                    <select 
+                                        value={dateFilterType} 
+                                        onChange={e => setDateFilterType(e.target.value as any)}
+                                        className={`h-9 px-3 rounded-lg border text-sm font-medium ${isDarkMode ? 'bg-black border-white/20' : 'bg-white border-gray-300'}`}
+                                    >
+                                        <option value="all">Todas as datas</option>
+                                        <option value="period">Por Período</option>
+                                        <option value="month">Por Mês</option>
+                                        <option value="day">Por Dia Específico</option>
+                                    </select>
+                                </div>
+                                
+                                {dateFilterType === 'period' && (
+                                    <div className="flex items-center gap-2 animate-in fade-in">
+                                        <Input type="date" value={dateStart} onChange={e => setDateStart(e.target.value)} className={`h-9 w-36 ${isDarkMode ? 'bg-black border-white/20' : ''}`} />
+                                        <span className="text-sm">até</span>
+                                        <Input type="date" value={dateEnd} onChange={e => setDateEnd(e.target.value)} className={`h-9 w-36 ${isDarkMode ? 'bg-black border-white/20' : ''}`} />
+                                    </div>
+                                )}
+                                {dateFilterType === 'month' && (
+                                    <div className="flex items-center gap-2 animate-in fade-in">
+                                        <Input type="month" value={dateMonth} onChange={e => setDateMonth(e.target.value)} className={`h-9 w-40 ${isDarkMode ? 'bg-black border-white/20' : ''}`} />
+                                    </div>
+                                )}
+                                {dateFilterType === 'day' && (
+                                    <div className="flex items-center gap-2 animate-in fade-in">
+                                        <Input type="date" value={dateDay} onChange={e => setDateDay(e.target.value)} className={`h-9 w-40 ${isDarkMode ? 'bg-black border-white/20' : ''}`} />
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     )}
                 </div>
@@ -843,30 +916,48 @@ export default function MetricasPage() {
                             {tipo !== '' && (
                                 <div className="space-y-8 animate-in slide-in-from-top-4 fade-in duration-500 pt-4 border-t border-white/5">
                                     {/* Revisor (Always Visible) */}
-                                    <div className="space-y-3">
-                                        <Label className="flex items-center gap-2 text-base font-semibold">
-                                            <div className={`p-1.5 rounded-md ${isDarkMode ? 'bg-gray-500/20 text-gray-400' : 'bg-gray-100 text-gray-600'}`}>
-                                                <User className="w-4 h-4" />
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <div className="space-y-3">
+                                            <Label className="flex items-center gap-2 text-base font-semibold">
+                                                <div className={`p-1.5 rounded-md ${isDarkMode ? 'bg-gray-500/20 text-gray-400' : 'bg-gray-100 text-gray-600'}`}>
+                                                    <User className="w-4 h-4" />
+                                                </div>
+                                                Revisor
+                                            </Label>
+                                            <div className="relative">
+                                                <select
+                                                    value={revisor}
+                                                    onChange={(e) => setRevisor(e.target.value)}
+                                                    required
+                                                    className={`w-full h-12 px-4 py-2 rounded-xl border appearance-none outline-none transition-all font-medium ${isDarkMode
+                                                            ? 'bg-black/50 border-white/10 focus:border-gray-500 focus:ring-2 focus:ring-gray-500/20 text-white'
+                                                            : 'bg-white border-gray-300 focus:border-gray-500 focus:ring-2 focus:ring-gray-500/20 text-gray-900 shadow-sm'
+                                                        }`}
+                                                >
+                                                    <option value="" disabled>Selecione um revisor...</option>
+                                                    <option value="denise.martins">Denise Martins</option>
+                                                    <option value="edgard.cunha">Edgard Cunha</option>
+                                                </select>
+                                                <div className={`absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none opacity-50 ${isDarkMode ? 'text-white' : 'text-black'}`}>
+                                                    ▼
+                                                </div>
                                             </div>
-                                            Revisor
-                                        </Label>
-                                        <div className="relative">
-                                            <select
-                                                value={revisor}
-                                                onChange={(e) => setRevisor(e.target.value)}
+                                        </div>
+                                        
+                                        <div className="space-y-3">
+                                            <Label className="flex items-center gap-2 text-base font-semibold">
+                                                <div className={`p-1.5 rounded-md ${isDarkMode ? 'bg-indigo-500/20 text-indigo-400' : 'bg-indigo-100 text-indigo-600'}`}>
+                                                    <FileText className="w-4 h-4" />
+                                                </div>
+                                                Data da Métrica
+                                            </Label>
+                                            <Input 
+                                                type="date"
+                                                value={dataMetrica}
+                                                onChange={e => setDataMetrica(e.target.value)}
                                                 required
-                                                className={`w-full h-12 px-4 py-2 rounded-xl border appearance-none outline-none transition-all font-medium ${isDarkMode
-                                                        ? 'bg-black/50 border-white/10 focus:border-gray-500 focus:ring-2 focus:ring-gray-500/20 text-white'
-                                                        : 'bg-white border-gray-300 focus:border-gray-500 focus:ring-2 focus:ring-gray-500/20 text-gray-900 shadow-sm'
-                                                    }`}
-                                            >
-                                                <option value="" disabled>Selecione um revisor...</option>
-                                                <option value="denise.martins">Denise Martins</option>
-                                                <option value="edgard.cunha">Edgard Cunha</option>
-                                            </select>
-                                            <div className={`absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none opacity-50 ${isDarkMode ? 'text-white' : 'text-black'}`}>
-                                                ▼
-                                            </div>
+                                                className={`w-full h-12 rounded-xl border font-medium ${isDarkMode ? 'bg-black/50 border-white/10 text-white' : 'bg-white shadow-sm'}`}
+                                            />
                                         </div>
                                     </div>
 

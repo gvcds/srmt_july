@@ -826,6 +826,13 @@ def create_metric(data: dict):
             revisoes=safe_int(data.get("revisoes")),
             requests=safe_int(data.get("requests"))
         )
+        if data.get("created_at"):
+            try:
+                dt = datetime.fromisoformat(data["created_at"].replace("Z", "+00:00"))
+                new_metric.created_at = dt
+            except Exception:
+                pass
+        
         db.add(new_metric)
         db.commit()
         db.refresh(new_metric)
@@ -889,6 +896,13 @@ def update_metric(metric_id: int, data: dict):
         if "ugCriados" in data: metric.ug_criados = safe_int(data["ugCriados"])
         if "revisoes" in data: metric.revisoes = safe_int(data["revisoes"])
         if "requests" in data: metric.requests = safe_int(data["requests"])
+        
+        if "created_at" in data and data["created_at"]:
+            try:
+                dt = datetime.fromisoformat(data["created_at"].replace("Z", "+00:00"))
+                metric.created_at = dt
+            except Exception:
+                pass
 
         db.commit()
         return {"status": "success", "message": "Métrica atualizada com sucesso"}
