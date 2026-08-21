@@ -41,18 +41,60 @@ const getApiBaseUrl = () => {
 };
 
 // --- BACKGROUND ---
-const AIBackground = ({ isDarkMode }: { isDarkMode: boolean }) => (
+const AIBackground = ({ isDarkMode }: { isDarkMode: boolean }) => {
+  const [stars, setStars] = useState<{ top: string; left: string; delay: string; duration: string; opacity: number; scale: number }[]>([]);
+
+  useEffect(() => {
+    const newStars = Array.from({ length: 50 }).map(() => ({
+      top: `${Math.random() * 100}%`,
+      left: `${Math.random() * 100}%`,
+      delay: `${Math.random() * 5}s`,
+      duration: `${3 + Math.random() * 7}s`,
+      opacity: 0.1 + Math.random() * 0.5,
+      scale: 0.5 + Math.random()
+    }));
+    setStars(newStars);
+  }, []);
+
+  return (
     <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
-        <div className={`absolute top-[-10%] left-[-10%] w-[60%] h-[60%] rounded-lg blur-[120px] opacity-20 animate-pulse 
-            ${isDarkMode ? 'bg-blue-600' : 'bg-blue-400'}`} 
-            style={{ animationDuration: '8s' }} 
-        />
-        <div className={`absolute bottom-[-10%] right-[-10%] w-[60%] h-[60%] rounded-lg blur-[120px] opacity-20 animate-pulse
-            ${isDarkMode ? 'bg-indigo-600' : 'bg-indigo-400'}`} 
-            style={{ animationDuration: '12s', animationDelay: '2s' }} 
-        />
+      <div className={`absolute top-[-10%] left-[-10%] w-[60%] h-[60%] rounded-lg blur-[120px] opacity-20 animate-pulse 
+        ${isDarkMode ? 'bg-blue-600' : 'bg-blue-400'}`} 
+        style={{ animationDuration: '8s' }} 
+      />
+      <div className={`absolute bottom-[-10%] right-[-10%] w-[60%] h-[60%] rounded-lg blur-[120px] opacity-20 animate-pulse
+        ${isDarkMode ? 'bg-indigo-600' : 'bg-indigo-400'}`} 
+        style={{ animationDuration: '12s', animationDelay: '2s' }} 
+      />
+      <div className="absolute inset-0" style={{ backgroundImage: 'radial-gradient(circle at center, transparent 0%, rgba(0,0,0,0.1) 100%)' }}>
+        <div className="stars-container w-full h-full relative">
+          {stars.map((star, i) => (
+            <div 
+              key={i} 
+              className={`absolute w-0.5 h-0.5 rounded-full ${isDarkMode ? 'bg-white' : 'bg-blue-500'}`} 
+              style={{ 
+                top: star.top, 
+                left: star.left, 
+                animation: `float ${star.duration} linear infinite`,
+                animationDelay: star.delay, 
+                opacity: star.opacity, 
+                transform: `scale(${star.scale})` 
+              }} 
+            />
+          ))}
+        </div>
+      </div>
+      <style jsx>{`
+        @keyframes float {
+          0% { transform: translateY(0) translateX(0); opacity: 0; }
+          20% { opacity: 1; }
+          80% { opacity: 1; }
+          100% { transform: translateY(-100px) translateX(20px); opacity: 0; }
+        }
+      `}</style>
     </div>
-);
+  );
+};
 
 export default function WorkloadPage() {
   const { isDarkMode } = useTheme();

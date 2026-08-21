@@ -35,7 +35,7 @@ import {
 } from 'lucide-react';
 import {
     LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
-    ResponsiveContainer, ReferenceLine
+    ResponsiveContainer, ReferenceLine, LabelList
 } from 'recharts';
 
 // --- COMPONENTE DE FUNDO ANIMADO ---
@@ -173,7 +173,11 @@ const GroupedBarChart = ({
                         const fill = CHART_COLORS[originalKey as keyof typeof CHART_COLORS]?.bar || '#60a5fa';
                         const isAnonymized = anonymizedRevisores.includes(key);
                         const displayName = isAnonymized ? `Revisor ${index + 1}` : key;
-                        return <Bar key={key} dataKey={key} name={displayName} fill={fill} radius={[6, 6, 0, 0]} maxBarSize={60} />;
+                        return (
+                            <Bar key={key} dataKey={key} name={displayName} fill={fill} radius={[6, 6, 0, 0]} maxBarSize={60}>
+                                <LabelList dataKey={key} position="top" fill={textColor} fontSize={11} fontWeight="bold" />
+                            </Bar>
+                        );
                     })}
                 </BarChart>
             </ResponsiveContainer>
