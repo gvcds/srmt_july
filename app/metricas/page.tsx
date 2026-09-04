@@ -383,7 +383,10 @@ export default function MetricasPage() {
         const charts: { subTitle: string; data: any[]; dataKeys: string[] }[] = [];
 
         const sumField = (records: MetricRecord[], field: keyof MetricRecord) => {
-            return records.reduce((acc, r) => acc + ((r[field] as number) || 0), 0);
+            return records.reduce((acc, r) => {
+                const val = Number(r[field]) || 0;
+                return acc + val;
+            }, 0);
         };
 
         const revisoresRaw = [...new Set(allOfType.map(m => m.revisor))];
@@ -402,8 +405,8 @@ export default function MetricasPage() {
             const ingles = allOfType.filter(m => m.idiomaUG === 'Revisao Ingles-Latin');
             const espanhol = allOfType.filter(m => m.idiomaUG === 'Revisao Espanhol-Latin');
 
-            charts.push({ subTitle: 'Issues Encontradas — Inglês-Latin', data: buildDataObj(ingles, 'issues'), dataKeys: getNames() });
-            charts.push({ subTitle: 'Issues Encontradas — Espanhol-Latin', data: buildDataObj(espanhol, 'issues'), dataKeys: getNames() });
+            // Issues: usa allOfType (sem split por idioma) para garantir que todos os registros sejam contabilizados
+            charts.push({ subTitle: 'Issues Encontradas', data: buildDataObj(allOfType, 'issues'), dataKeys: getNames() });
 
             const buildCountObj = (records: MetricRecord[]) => {
                 const obj: any = { name: '' };
@@ -420,8 +423,8 @@ export default function MetricasPage() {
 
             charts.push({ subTitle: 'Strings Revisadas — Português-Brasil', data: buildDataObj(ptBr, 'stringsRevisadas'), dataKeys: getNames() });
             charts.push({ subTitle: 'Strings Revisadas — Espanhol-Latin', data: buildDataObj(esLat, 'stringsRevisadas'), dataKeys: getNames() });
-            charts.push({ subTitle: 'Issues Encontradas — Português-Brasil', data: buildDataObj(ptBr, 'issues'), dataKeys: getNames() });
-            charts.push({ subTitle: 'Issues Encontradas — Espanhol-Latin', data: buildDataObj(esLat, 'issues'), dataKeys: getNames() });
+            // Issues: usa allOfType (sem split por idioma) para garantir que todos os registros sejam contabilizados
+            charts.push({ subTitle: 'Issues Encontradas', data: buildDataObj(allOfType, 'issues'), dataKeys: getNames() });
         } else if (tipo === 'Desenvolvimento QSG') {
             charts.push({ subTitle: 'QSG Criados', data: buildDataObj(allOfType, 'qsgCriados'), dataKeys: getNames() });
         } else if (tipo === 'Desenvolvimento UG') {
