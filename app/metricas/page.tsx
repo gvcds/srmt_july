@@ -405,8 +405,9 @@ export default function MetricasPage() {
             const ingles = allOfType.filter(m => m.idiomaUG === 'Revisao Ingles-Latin');
             const espanhol = allOfType.filter(m => m.idiomaUG === 'Revisao Espanhol-Latin');
 
-            // Issues: usa allOfType (sem split por idioma) para garantir que todos os registros sejam contabilizados
-            charts.push({ subTitle: 'Issues Encontradas', data: buildDataObj(allOfType, 'issues'), dataKeys: getNames() });
+            // Issues separadas por idioma
+            charts.push({ subTitle: 'Issues Encontradas — Inglês-Latin', data: buildDataObj(ingles, 'issues'), dataKeys: getNames() });
+            charts.push({ subTitle: 'Issues Encontradas — Espanhol-Latin', data: buildDataObj(espanhol, 'issues'), dataKeys: getNames() });
 
             const buildCountObj = (records: MetricRecord[]) => {
                 const obj: any = { name: '' };
@@ -423,8 +424,9 @@ export default function MetricasPage() {
 
             charts.push({ subTitle: 'Strings Revisadas — Português-Brasil', data: buildDataObj(ptBr, 'stringsRevisadas'), dataKeys: getNames() });
             charts.push({ subTitle: 'Strings Revisadas — Espanhol-Latin', data: buildDataObj(esLat, 'stringsRevisadas'), dataKeys: getNames() });
-            // Issues: usa allOfType (sem split por idioma) para garantir que todos os registros sejam contabilizados
-            charts.push({ subTitle: 'Issues Encontradas', data: buildDataObj(allOfType, 'issues'), dataKeys: getNames() });
+            // Issues separadas por idioma
+            charts.push({ subTitle: 'Issues Encontradas — Português-Brasil', data: buildDataObj(ptBr, 'issues'), dataKeys: getNames() });
+            charts.push({ subTitle: 'Issues Encontradas — Espanhol-Latin', data: buildDataObj(esLat, 'issues'), dataKeys: getNames() });
         } else if (tipo === 'Desenvolvimento QSG') {
             charts.push({ subTitle: 'QSG Criados', data: buildDataObj(allOfType, 'qsgCriados'), dataKeys: getNames() });
         } else if (tipo === 'Desenvolvimento UG') {
