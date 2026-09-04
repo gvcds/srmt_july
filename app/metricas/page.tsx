@@ -136,7 +136,23 @@ const GroupedBarChart = ({
     const textColor = isDarkMode ? '#9ca3af' : '#6b7280';
     const gridColor = isDarkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.06)';
 
+    // Check if there are actually any visible dataKeys with data
     const firstData = data[0] || {};
+    const hasAnyData = dataKeys.some(key => (firstData[key] ?? 0) > 0);
+    
+    // If no dataKeys or no data at all, show an empty state
+    if (dataKeys.length === 0 || !hasAnyData) {
+        return (
+            <div className={`p-5 rounded-xl border ${isDarkMode ? 'bg-black/30 border-white/5' : 'bg-white/60 border-gray-100'}`}>
+                <h4 className={`text-sm font-bold tracking-wide mb-4 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>{title}</h4>
+                <div className={`flex flex-col items-center justify-center py-8 ${isDarkMode ? 'text-gray-600' : 'text-gray-400'}`}>
+                    <BarChart3 className="w-8 h-8 mb-2 opacity-40" />
+                    <span className="text-xs font-medium">Sem dados para exibir</span>
+                </div>
+            </div>
+        );
+    }
+
     let sum = 0;
     let count = 0;
     dataKeys.forEach(key => {
@@ -147,13 +163,22 @@ const GroupedBarChart = ({
     });
     const avg = count > 0 ? sum / count : 0;
 
+    // Calculate max value for proper YAxis domain
+    let maxVal = 0;
+    dataKeys.forEach(key => {
+        const val = firstData[key] ?? 0;
+        if (val > maxVal) maxVal = val;
+    });
+    const yDomainMax = maxVal > 0 ? Math.ceil(maxVal * 1.2) : 10;
+
     return (
         <div className={`p-5 rounded-xl border ${isDarkMode ? 'bg-black/30 border-white/5' : 'bg-white/60 border-gray-100'}`}>
             <h4 className={`text-sm font-bold tracking-wide mb-4 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>{title}</h4>
-            <ResponsiveContainer width="100%" height={180}>
-                <BarChart data={data} margin={{ top: 5, right: 10, left: -15, bottom: 5 }} barGap={12}>
+            <ResponsiveContainer width="100%" height={200}>
+                <BarChart data={data} margin={{ top: 20, right: 10, left: -15, bottom: 5 }} barGap={12}>
                     <CartesianGrid strokeDasharray="3 3" stroke={gridColor} vertical={false} />
-                    <YAxis tick={{ fill: textColor, fontSize: 11 }} tickLine={false} axisLine={false} allowDecimals={false} />
+                    <XAxis dataKey="name" tick={{ fill: textColor, fontSize: 11 }} tickLine={false} axisLine={false} />
+                    <YAxis tick={{ fill: textColor, fontSize: 11 }} tickLine={false} axisLine={false} allowDecimals={false} domain={[0, yDomainMax]} />
                     <Tooltip
                         cursor={{ fill: isDarkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.02)' }}
                         contentStyle={{
@@ -524,6 +549,40 @@ export default function MetricasPage() {
             );
         }
 
+        // Helper to get the detail value label based on metric type
+        const getMetricDetailColumns = (m: MetricRecord): { label: string; value: string | number | null }[] => {
+            const cols: { label: string; value: string | number | null }[] = [];
+            
+            switch (m.tipo) {
+                case 'Revisao Manual UG':
+                    cols.push({ label: 'Modelo', value: m.modelo });
+                    cols.push({ label: 'Idioma', value: m.idiomaUG ? m.idiomaUG.replace('Revisao ', '') : null });
+                    cols.push({ label: 'Issues', value: m.issues });
+                    break;
+                case 'Revisao STMS':
+                    cols.push({ label: 'Idioma', value: m.idiomaSTMS ? m.idiomaSTMS.replace('Revisao ', '') : null });
+                    cols.push({ label: 'Strings', value: m.stringsRevisadas });
+                    cols.push({ label: 'Issues', value: m.issues });
+                    break;
+                case 'Desenvolvimento QSG':
+                    cols.push({ label: 'Modelo', value: m.modelo });
+                    cols.push({ label: 'QSG Criados', value: m.qsgCriados });
+                    break;
+                case 'Desenvolvimento UG':
+                    cols.push({ label: 'Modelo', value: m.modelo });
+                    cols.push({ label: 'UG Criados', value: m.ugCriados });
+                    break;
+                case 'Proofread accessories':
+                    cols.push({ label: 'Revisões', value: m.revisoes });
+                    cols.push({ label: 'Issues', value: m.issues });
+                    break;
+                case 'TEM Request':
+                    cols.push({ label: 'Requests', value: m.requests });
+                    break;
+            }
+            return cols;
+        };
+
         return (
             <Card className={`p-6 md:p-8 rounded-2xl border backdrop-blur-xl shadow-xl animate-in fade-in slide-in-from-bottom-4 duration-500 ${isDarkMode ? 'bg-[#111]/60 border-white/10 shadow-black/30' : 'bg-white/80 border-gray-200 shadow-gray-200/50'
                 }`}>
@@ -534,27 +593,70 @@ export default function MetricasPage() {
                                 <th className="px-4 py-3 rounded-tl-lg">ID</th>
                                 <th className="px-4 py-3">Tipo</th>
                                 <th className="px-4 py-3">Revisor</th>
-                                <th className="px-4 py-3">Data da Métrica</th>
+                                <th className="px-4 py-3">Data</th>
+                                <th className="px-4 py-3">Detalhes</th>
                                 <th className="px-4 py-3 rounded-tr-lg text-right">Ações</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {filteredMetrics.slice().reverse().map(m => (
-                                <tr key={m.id} className={`border-b last:border-0 ${isDarkMode ? 'border-white/5 hover:bg-white/5' : 'border-gray-100 hover:bg-gray-50'}`}>
-                                    <td className="px-4 py-3 font-medium">#{m.id}</td>
-                                    <td className="px-4 py-3">{m.tipo}</td>
-                                    <td className="px-4 py-3">{REVISORES[m.revisor] || m.revisor}</td>
-                                    <td className="px-4 py-3">{m.created_at ? m.created_at.split('T')[0].split('-').reverse().join('/') : '-'}</td>
-                                    <td className="px-4 py-3 text-right">
-                                        <button onClick={() => setEditingMetric(m)} className="p-2 text-blue-500 hover:bg-blue-500/10 rounded-lg transition-colors mr-2">
-                                            <Edit2 className="w-4 h-4" />
-                                        </button>
-                                        <button onClick={() => handleDelete(m.id)} className="p-2 text-red-500 hover:bg-red-500/10 rounded-lg transition-colors">
-                                            <Trash2 className="w-4 h-4" />
-                                        </button>
-                                    </td>
-                                </tr>
-                            ))}
+                            {filteredMetrics.slice().reverse().map(m => {
+                                const details = getMetricDetailColumns(m);
+                                return (
+                                    <tr key={m.id} className={`border-b last:border-0 ${isDarkMode ? 'border-white/5 hover:bg-white/5' : 'border-gray-100 hover:bg-gray-50'}`}>
+                                        <td className="px-4 py-3 font-medium">#{m.id}</td>
+                                        <td className="px-4 py-3">
+                                            <span className={`inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold ${
+                                                m.tipo === 'Revisao Manual UG' ? (isDarkMode ? 'bg-blue-500/15 text-blue-400' : 'bg-blue-50 text-blue-700') :
+                                                m.tipo === 'Revisao STMS' ? (isDarkMode ? 'bg-purple-500/15 text-purple-400' : 'bg-purple-50 text-purple-700') :
+                                                m.tipo === 'Desenvolvimento QSG' ? (isDarkMode ? 'bg-teal-500/15 text-teal-400' : 'bg-teal-50 text-teal-700') :
+                                                m.tipo === 'Desenvolvimento UG' ? (isDarkMode ? 'bg-orange-500/15 text-orange-400' : 'bg-orange-50 text-orange-700') :
+                                                m.tipo === 'Proofread accessories' ? (isDarkMode ? 'bg-pink-500/15 text-pink-400' : 'bg-pink-50 text-pink-700') :
+                                                m.tipo === 'TEM Request' ? (isDarkMode ? 'bg-cyan-500/15 text-cyan-400' : 'bg-cyan-50 text-cyan-700') :
+                                                (isDarkMode ? 'bg-white/10 text-gray-400' : 'bg-gray-100 text-gray-600')
+                                            }`}>
+                                                {m.tipo}
+                                            </span>
+                                        </td>
+                                        <td className="px-4 py-3">{REVISORES[m.revisor] || m.revisor}</td>
+                                        <td className="px-4 py-3 whitespace-nowrap">{m.created_at ? m.created_at.split('T')[0].split('-').reverse().join('/') : '-'}</td>
+                                        <td className="px-4 py-3">
+                                            <div className="flex flex-wrap gap-2">
+                                                {details.map((d, i) => (
+                                                    d.value !== null && d.value !== undefined && d.value !== '' && d.value !== 0 ? (
+                                                        <span key={i} className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold ${
+                                                            d.label === 'Issues' 
+                                                                ? (isDarkMode ? 'bg-red-500/15 text-red-400' : 'bg-red-50 text-red-600')
+                                                                : d.label === 'Strings' 
+                                                                    ? (isDarkMode ? 'bg-purple-500/15 text-purple-400' : 'bg-purple-50 text-purple-600')
+                                                                    : d.label === 'Modelo'
+                                                                        ? (isDarkMode ? 'bg-indigo-500/15 text-indigo-400' : 'bg-indigo-50 text-indigo-600')
+                                                                        : d.label === 'Idioma'
+                                                                            ? (isDarkMode ? 'bg-sky-500/15 text-sky-400' : 'bg-sky-50 text-sky-600')
+                                                                            : (isDarkMode ? 'bg-white/10 text-gray-300' : 'bg-gray-100 text-gray-700')
+                                                        }`}>
+                                                            <span className="opacity-70">{d.label}:</span>
+                                                            <span className="font-bold">{d.value}</span>
+                                                        </span>
+                                                    ) : null
+                                                ))}
+                                                {details.every(d => d.value === null || d.value === undefined || d.value === '' || d.value === 0) && (
+                                                    <span className={`text-xs italic ${isDarkMode ? 'text-gray-600' : 'text-gray-400'}`}>—</span>
+                                                )}
+                                            </div>
+                                        </td>
+                                        <td className="px-4 py-3 text-right">
+                                            <div className="flex items-center justify-end gap-1">
+                                                <button onClick={() => setEditingMetric(m)} className="p-2 text-blue-500 hover:bg-blue-500/10 rounded-lg transition-colors">
+                                                    <Edit2 className="w-4 h-4" />
+                                                </button>
+                                                <button onClick={() => handleDelete(m.id)} className="p-2 text-red-500 hover:bg-red-500/10 rounded-lg transition-colors">
+                                                    <Trash2 className="w-4 h-4" />
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                );
+                            })}
                         </tbody>
                     </table>
                 </div>
