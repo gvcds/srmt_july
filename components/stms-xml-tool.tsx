@@ -214,9 +214,14 @@ export function STMSXmlTool({ onFocusChange }: { onFocusChange?: (focused: boole
  }, [searchTerm, columnFilters]);
 
  useEffect(() => {
- const handleClickOutside = () => setOpenFilter(null);
- document.addEventListener('click', handleClickOutside);
- return () => document.removeEventListener('click', handleClickOutside);
+ const handleClickOutside = (e: MouseEvent) => {
+ const target = e.target as HTMLElement;
+ if (!target.closest('.filter-container')) {
+ setOpenFilter(null);
+ }
+ };
+ document.addEventListener('mousedown', handleClickOutside);
+ return () => document.removeEventListener('mousedown', handleClickOutside);
  }, []);
 
  useEffect(() => {
@@ -672,7 +677,7 @@ Brazil Ui [BUYER]
  <table className="w-full text-sm text-left border-separate border-spacing-0">
  <thead>
   <tr className="bg-black/[0.02] dark:bg-white/[0.03]">
-  <th onDoubleClick={() => handleSort('en')} className="relative p-4 align-top border-b border-black/5 dark:border-white/5 w-[25%] cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 transition-colors group select-none" title="Duplo clique para ordenar">
+  <th onDoubleClick={() => handleSort('en')} className="filter-container relative p-4 align-top border-b border-black/5 dark:border-white/5 w-[25%] cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 transition-colors group select-none" title="Duplo clique para ordenar">
     <div className="flex flex-col gap-2">
       <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-[0.2em] opacity-40 group-hover:opacity-100 transition-opacity">
         <span>{t.tableHeaderEn}</span>
@@ -688,7 +693,7 @@ Brazil Ui [BUYER]
       {renderFilterDropdown('en')}
     </div>
   </th>
-  <th onDoubleClick={() => handleSort('pt')} className="relative p-4 align-top border-b border-black/5 dark:border-white/5 w-[25%] cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 transition-colors group select-none" title="Duplo clique para ordenar">
+  <th onDoubleClick={() => handleSort('pt')} className="filter-container relative p-4 align-top border-b border-black/5 dark:border-white/5 w-[25%] cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 transition-colors group select-none" title="Duplo clique para ordenar">
     <div className="flex flex-col gap-2">
       <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-[0.2em] opacity-40 group-hover:opacity-100 transition-opacity">
         <span>{t.tableHeaderPt}</span>
@@ -704,7 +709,7 @@ Brazil Ui [BUYER]
       {renderFilterDropdown('pt')}
     </div>
   </th>
-  <th onDoubleClick={() => handleSort('analysis')} className="relative p-4 align-top border-b border-black/5 dark:border-white/5 w-[20%] cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 transition-colors group select-none" title="Duplo clique para ordenar">
+  <th onDoubleClick={() => handleSort('analysis')} className="filter-container relative p-4 align-top border-b border-black/5 dark:border-white/5 w-[20%] cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 transition-colors group select-none" title="Duplo clique para ordenar">
     <div className="flex flex-col gap-2">
       <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-[0.2em] opacity-40 group-hover:opacity-100 transition-opacity">
         <span>{t.tableHeaderAnalysis}</span>
@@ -720,7 +725,7 @@ Brazil Ui [BUYER]
       {renderFilterDropdown('analysis')}
     </div>
   </th>
-  <th onDoubleClick={() => handleSort('ai')} className="relative p-4 align-top border-b border-black/5 dark:border-white/5 w-[30%] text-blue-500 cursor-pointer hover:bg-blue-500/5 transition-colors group select-none" title="Duplo clique para ordenar">
+  <th onDoubleClick={() => handleSort('ai')} className="filter-container relative p-4 align-top border-b border-black/5 dark:border-white/5 w-[30%] text-blue-500 cursor-pointer hover:bg-blue-500/5 transition-colors group select-none" title="Duplo clique para ordenar">
     <div className="flex flex-col gap-2">
       <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-[0.2em] opacity-80 group-hover:opacity-100 transition-opacity">
         <span>{t.tableHeaderAi}</span>
