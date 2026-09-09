@@ -374,9 +374,9 @@ export function STMSXmlTool({ onFocusChange }: { onFocusChange?: (focused: boole
  });
 
  const renderAdvice = (pt: string, advice: string) => {
- if (advice === 'Mantido' || !advice) return <span className="text-gray-500 italic">{t.maintained}</span>;
+ if (advice === 'OK / Sem sugestão' || advice === 'Mantido' || advice === 'Correto' || !advice) return <span className="text-gray-500 italic">OK / Sem sugestão</span>;
  if (advice === 'ERRO') return <span className="text-red-500 font-bold">ERRO</span>;
- if (advice === 'Sem sugestão') return <span className="text-gray-500 italic">{t.noSuggestion}</span>;
+ if (advice === 'Sem sugestão') return <span className="text-gray-500 italic">OK / Sem sugestão</span>;
  
  const differences = diffWords(pt.trim(), advice.trim());
  return (
@@ -759,7 +759,7 @@ Brazil Ui [BUYER]
  <td className="p-6 align-top">
  <div className="flex flex-col gap-2">
  <span className={`inline-flex px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest w-fit border transition-all ${
- res.advice !== 'Mantido' && res.advice !== 'Sem sugestão' && res.advice !== 'ERRO' 
+ res.advice !== 'Mantido' && res.advice !== 'OK / Sem sugestão' && res.advice !== 'Sem sugestão' && res.advice !== 'ERRO' 
  ? (isDarkMode ? 'bg-white/5 border-white/10 text-gray-200' : 'bg-gray-50 border-gray-200 text-gray-800')
  : (isDarkMode ? 'bg-white/5 text-gray-500 border-white/10' : 'bg-gray-100 text-gray-700 border-gray-200')
  }`}>
