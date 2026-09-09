@@ -188,7 +188,8 @@ export function STMSXmlTool({ onFocusChange }: { onFocusChange?: (focused: boole
  const [elapsedTime, setElapsedTime] = useState(0);
 
  const [searchTerm, setSearchTerm] = useState('');
- const [sortConfig, setSortConfig] = useState<{ key: keyof TranslationResult; direction: 'asc' | 'desc' | null }>({ key: 'app_name', direction: null });
+ const [columnFilters, setColumnFilters] = useState({ en: '', pt: '', analysis: '', ai: '' });
+ const [sortConfig, setSortConfig] = useState<{ key: keyof TranslationResult | 'analysis' | 'ai'; direction: 'asc' | 'desc' | null }>({ key: 'app_name', direction: null });
 
  const [selectedIssue, setSelectedIssue] = useState<TranslationResult | null>(null);
  const [selectedDetail, setSelectedDetail] = useState<TranslationResult | null>(null);
@@ -206,7 +207,7 @@ export function STMSXmlTool({ onFocusChange }: { onFocusChange?: (focused: boole
  // Reset pagination on search
  useEffect(() => {
  setCurrentPage(1);
- }, [searchTerm]);
+ }, [searchTerm, columnFilters]);
 
  useEffect(() => {
  if (isFocusMode) {
@@ -272,7 +273,7 @@ export function STMSXmlTool({ onFocusChange }: { onFocusChange?: (focused: boole
  }
  };
 
- const handleSort = (key: keyof TranslationResult) => {
+ const handleSort = (key: keyof TranslationResult | 'analysis' | 'ai') => {
  let direction: 'asc' | 'desc' = 'asc';
  if (sortConfig.key === key && sortConfig.direction === 'asc') direction = 'desc';
  setSortConfig({ key, direction });
@@ -280,13 +281,32 @@ export function STMSXmlTool({ onFocusChange }: { onFocusChange?: (focused: boole
 
  const filteredAndSortedResults = finalResults
  .filter(item => {
- return searchTerm === '' || Object.values(item).some(val => String(val).toLowerCase().includes(searchTerm.toLowerCase()));
+ const matchesGlobal = searchTerm === '' || Object.values(item).some(val => String(val).toLowerCase().includes(searchTerm.toLowerCase()));
+ const matchesEn = columnFilters.en === '' || item.en.toLowerCase().includes(columnFilters.en.toLowerCase());
+ const matchesPt = columnFilters.pt === '' || item.pt.toLowerCase().includes(columnFilters.pt.toLowerCase());
+ const analysisText = `${item.simplyReason || ''} ${item.reason || ''}`.toLowerCase();
+ const matchesAnalysis = columnFilters.analysis === '' || analysisText.includes(columnFilters.analysis.toLowerCase());
+ const matchesAi = columnFilters.ai === '' || item.advice.toLowerCase().includes(columnFilters.ai.toLowerCase());
+ 
+ return matchesGlobal && matchesEn && matchesPt && matchesAnalysis && matchesAi;
  })
  .sort((a, b) => {
  if (!sortConfig.direction) return 0;
- const key = sortConfig.key;
- const valA = String(a[key]).toLowerCase();
- const valB = String(b[key]).toLowerCase();
+ 
+ let valA = '';
+ let valB = '';
+ 
+ if (sortConfig.key === 'analysis') {
+ valA = `${a.simplyReason || ''} ${a.reason || ''}`.toLowerCase();
+ valB = `${b.simplyReason || ''} ${b.reason || ''}`.toLowerCase();
+ } else if (sortConfig.key === 'ai') {
+ valA = String(a.advice || '').toLowerCase();
+ valB = String(b.advice || '').toLowerCase();
+ } else {
+ valA = String(a[sortConfig.key as keyof TranslationResult] || '').toLowerCase();
+ valB = String(b[sortConfig.key as keyof TranslationResult] || '').toLowerCase();
+ }
+ 
  if (valA < valB) return sortConfig.direction === 'asc' ? -1 : 1;
  if (valA > valB) return sortConfig.direction === 'asc' ? 1 : -1;
  return 0;
@@ -590,13 +610,73 @@ Brazil Ui [BUYER]
  <div className={`overflow-y-auto overflow-x-auto rounded-xl border border-black/5 dark:border-white/10 bg-black/5 dark:bg-white/[0.02] custom-scrollbar ${isFocusMode ? 'flex-1 min-h-0' : ''}`}>
  <table className="w-full text-sm text-left border-separate border-spacing-0">
  <thead>
- <tr className="bg-black/[0.02] dark:bg-white/[0.03]">
- <th className="p-6 text-[10px] font-black uppercase tracking-[0.2em] opacity-40 border-b border-black/5 dark:border-white/5 w-[25%]">{t.tableHeaderEn}</th>
- <th className="p-6 text-[10px] font-black uppercase tracking-[0.2em] opacity-40 border-b border-black/5 dark:border-white/5 w-[25%]">{t.tableHeaderPt}</th>
- <th className="p-6 text-[10px] font-black uppercase tracking-[0.2em] opacity-40 border-b border-black/5 dark:border-white/5 w-[20%]">{t.tableHeaderAnalysis}</th>
- <th className="p-6 text-[10px] font-black uppercase tracking-[0.2em] opacity-40 border-b border-black/5 dark:border-white/5 w-[30%] text-blue-500">{t.tableHeaderAi}</th>
- </tr>
- </thead>
+  <tr className="bg-black/[0.02] dark:bg-white/[0.03]">
+  <th onDoubleClick={() => handleSort('en')} className="p-4 align-top border-b border-black/5 dark:border-white/5 w-[25%] cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 transition-colors group select-none" title="Duplo clique para ordenar">
+    <div className="flex flex-col gap-2">
+      <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-[0.2em] opacity-40 group-hover:opacity-100 transition-opacity">
+        <span>{t.tableHeaderEn}</span>
+        <span>{sortConfig.key === 'en' ? (sortConfig.direction === 'asc' ? '↑' : '↓') : '↕'}</span>
+      </div>
+      <input 
+        type="text"
+        placeholder="Filtrar..." 
+        value={columnFilters.en}
+        onChange={e => setColumnFilters(prev => ({...prev, en: e.target.value}))}
+        onClick={e => e.stopPropagation()}
+        className={`w-full h-8 px-3 text-xs rounded border-none outline-none ${isDarkMode ? 'bg-white/5 focus:bg-white/10 text-white' : 'bg-black/5 focus:bg-black/10 text-black'}`}
+      />
+    </div>
+  </th>
+  <th onDoubleClick={() => handleSort('pt')} className="p-4 align-top border-b border-black/5 dark:border-white/5 w-[25%] cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 transition-colors group select-none" title="Duplo clique para ordenar">
+    <div className="flex flex-col gap-2">
+      <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-[0.2em] opacity-40 group-hover:opacity-100 transition-opacity">
+        <span>{t.tableHeaderPt}</span>
+        <span>{sortConfig.key === 'pt' ? (sortConfig.direction === 'asc' ? '↑' : '↓') : '↕'}</span>
+      </div>
+      <input 
+        type="text"
+        placeholder="Filtrar..." 
+        value={columnFilters.pt}
+        onChange={e => setColumnFilters(prev => ({...prev, pt: e.target.value}))}
+        onClick={e => e.stopPropagation()}
+        className={`w-full h-8 px-3 text-xs rounded border-none outline-none ${isDarkMode ? 'bg-white/5 focus:bg-white/10 text-white' : 'bg-black/5 focus:bg-black/10 text-black'}`}
+      />
+    </div>
+  </th>
+  <th onDoubleClick={() => handleSort('analysis')} className="p-4 align-top border-b border-black/5 dark:border-white/5 w-[20%] cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 transition-colors group select-none" title="Duplo clique para ordenar">
+    <div className="flex flex-col gap-2">
+      <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-[0.2em] opacity-40 group-hover:opacity-100 transition-opacity">
+        <span>{t.tableHeaderAnalysis}</span>
+        <span>{sortConfig.key === 'analysis' ? (sortConfig.direction === 'asc' ? '↑' : '↓') : '↕'}</span>
+      </div>
+      <input 
+        type="text"
+        placeholder="Filtrar..." 
+        value={columnFilters.analysis}
+        onChange={e => setColumnFilters(prev => ({...prev, analysis: e.target.value}))}
+        onClick={e => e.stopPropagation()}
+        className={`w-full h-8 px-3 text-xs rounded border-none outline-none ${isDarkMode ? 'bg-white/5 focus:bg-white/10 text-white' : 'bg-black/5 focus:bg-black/10 text-black'}`}
+      />
+    </div>
+  </th>
+  <th onDoubleClick={() => handleSort('ai')} className="p-4 align-top border-b border-black/5 dark:border-white/5 w-[30%] text-blue-500 cursor-pointer hover:bg-blue-500/5 transition-colors group select-none" title="Duplo clique para ordenar">
+    <div className="flex flex-col gap-2">
+      <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-[0.2em] opacity-80 group-hover:opacity-100 transition-opacity">
+        <span>{t.tableHeaderAi}</span>
+        <span>{sortConfig.key === 'ai' ? (sortConfig.direction === 'asc' ? '↑' : '↓') : '↕'}</span>
+      </div>
+      <input 
+        type="text"
+        placeholder="Filtrar..." 
+        value={columnFilters.ai}
+        onChange={e => setColumnFilters(prev => ({...prev, ai: e.target.value}))}
+        onClick={e => e.stopPropagation()}
+        className={`w-full h-8 px-3 text-xs rounded border-none outline-none ${isDarkMode ? 'bg-blue-500/10 focus:bg-blue-500/20 text-blue-400' : 'bg-blue-50 focus:bg-blue-100 text-blue-600'}`}
+      />
+    </div>
+  </th>
+  </tr>
+  </thead>
  <tbody className="divide-y divide-black/5 dark:divide-white/5">
  {filteredAndSortedResults.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map((res, i) => (
  <tr 
