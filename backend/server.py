@@ -689,11 +689,13 @@ INSTRUÇÕES (LEIA COM ATENÇÃO):
 - Analise SEVERAMENTE o texto '{lang_code}' atual. Ele atende ao Tom de Voz da Samsung, regras gramaticais e de design ({design_type}) listadas acima?
 - Se o '{lang_code}' violar QUALQUER regra (ex: falta de espaço na unidade, erro gramatical), corrija-o obrigatoriamente.
 - Se a Regra de Ouro do Glossário estiver presente, ELA É SOBERANA.
+- NÃO DEVEM TER SUGESTÕES DE MELHORIAS DE ESTILO OU SINÔNIMOS, SOMENTE ERROS REAIS, APENAS ERROS GRAVES DEVEM GERAR UMA SUGESTÃO.
+- REGRA DE PONTUAÇÃO: FALTA DE PONTO FINAL, OU QUALQUER COISA ENVOLVENDO PONTO FINAL DEVE SER COMPLETAMENTE IGNORADA! NUNCA GERE UMA SUGESTÃO POR CAUSA DE PONTO FINAL.
 - Responda EXATAMENTE neste formato XML: 
-<advice>sugestão corrigida ou 'Mantido' se estiver perfeito</advice>
-<reason>motivo detalhado da alteração baseada na regra. IMPORTANTE: Escreva sempre em Português (PT-BR).</reason>
-<simplyReason>resumo curto do erro (ex: 'Falta de espaço'). Retorne 'Correto' SOMENTE SE advice for 'Mantido'. IMPORTANTE: Escreva sempre em Português (PT-BR).</simplyReason>
-Revise o texto priorizando a fidelidade ao original em inglês. Mantenha o texto o mais próximo possível do original, removendo apenas redundâncias óbvias e corrigindo erros graves de pontuação, gramática ou formatação. Preserve termos técnicos, jargões e abreviações, e evite adicionar palavras ou sinônimos que alterem o significado. Corrija apenas o necessário para garantir clareza e fidelidade ao original.
+<advice>texto corrigido OU 'OK / Sem sugestão' se não houver erro real.</advice>
+<reason>motivo detalhado da alteração baseada na regra. IMPORTANTE: Escreva sempre em Português (PT-BR). Se não houver erro, retorne vazio.</reason>
+<simplyReason>resumo curto do erro (ex: 'Falta de espaço'). Retorne 'OK / Sem sugestão' SOMENTE SE não houver erro. IMPORTANTE: Escreva sempre em Português (PT-BR).</simplyReason>
+Revise o texto priorizando a fidelidade ao original em inglês. Mantenha o texto o mais próximo possível do original, removendo apenas redundâncias óbvias e corrigindo erros graves de gramática ou formatação (exceto ponto final). Preserve termos técnicos, jargões e abreviações, e evite adicionar palavras ou sinônimos que alterem o significado.
 """
 
     user_content = f"Chave: {key} | Contexto: {design_type}\nEN: {en_content}\n{lang_code}: {pt_content}{glossary_hint}"
@@ -722,13 +724,27 @@ Revise o texto priorizando a fidelidade ao original em inglês. Mantenha o texto
                     content = ''
                 
                 match = re.search(r'<advice>(.*?)</advice>.*?<reason>(.*?)</reason>.*?<simplyReason>(.*?)</simplyReason>', content, re.DOTALL)
-                advice = match.group(1).strip() if match else "Sem sugestão"
+                advice = match.group(1).strip() if match else "OK / Sem sugestão"
                 reason = match.group(2).strip() if match else "Tradução OK"
                 simply = match.group(3).strip() if match else reason
                 
-                # Trava de segurança no Python: se alterou algo (inclusive uma vírgula), NÃO pode ser 'Correto'
-                if advice != "Mantido" and advice != pt_content:
-                    if simply.lower() in ["correto", "preciso", "ok", "perfeito"]:
+                # Tratamento de legados ou IA respondendo "Mantido" / "Correto"
+                if advice.lower() in ["mantido", "correto", "ok", "perfeito"]:
+                    advice = "OK / Sem sugestão"
+                    simply = "OK / Sem sugestão"
+                    reason = ""
+                
+                # Tratamento: se for idêntico ao original ignorando pontos finais
+                pt_clean = pt_content.rstrip('.')
+                adv_clean = advice.rstrip('.')
+                if adv_clean == pt_clean and advice != "OK / Sem sugestão":
+                     advice = "OK / Sem sugestão"
+                     simply = "OK / Sem sugestão"
+                     reason = ""
+                
+                # Trava de segurança no Python: se alterou algo (inclusive uma vírgula), NÃO pode ser 'OK / Sem sugestão'
+                if advice != "OK / Sem sugestão" and advice != pt_content:
+                    if simply.lower() in ["correto", "preciso", "ok", "perfeito", "ok / sem sugestão"]:
                         simply = "Alteração de formatação/pontuação"
                 
                 return {**item, "advice": advice, "reason": reason, "simplyReason": simply}
