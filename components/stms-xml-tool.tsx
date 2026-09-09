@@ -294,12 +294,22 @@ export function STMSXmlTool({ onFocusChange }: { onFocusChange?: (focused: boole
  setSortConfig({ key, direction });
  };
 
- const uniqueValues = {
- en: Array.from(new Set(finalResults.map(r => r.en))).sort(),
- pt: Array.from(new Set(finalResults.map(r => r.pt))).sort(),
- analysis: Array.from(new Set(finalResults.map(r => r.simplyReason || r.reason || ''))).sort(),
- ai: Array.from(new Set(finalResults.map(r => r.advice || ''))).sort()
- };
+  const normalizeAdvice = (advice: string | undefined) => {
+  if (advice === 'OK / Sem sugestão' || advice === 'Mantido' || advice === 'Correto' || advice === 'Sem sugestão' || !advice) return 'OK / Sem sugestão';
+  return advice;
+  };
+
+  const normalizeAnalysis = (item: TranslationResult) => {
+  if (normalizeAdvice(item.advice) === 'OK / Sem sugestão') return 'OK / Sem sugestão';
+  return item.simplyReason || item.reason || '';
+  };
+
+  const uniqueValues = {
+  en: Array.from(new Set(finalResults.map(r => r.en))).sort(),
+  pt: Array.from(new Set(finalResults.map(r => r.pt))).sort(),
+  analysis: Array.from(new Set(finalResults.map(r => normalizeAnalysis(r)))).sort(),
+  ai: Array.from(new Set(finalResults.map(r => normalizeAdvice(r.advice)))).sort()
+  };
 
  const toggleFilter = (col: 'en' | 'pt' | 'analysis' | 'ai', val: string) => {
  setColumnFilters(prev => {
@@ -350,11 +360,11 @@ export function STMSXmlTool({ onFocusChange }: { onFocusChange?: (focused: boole
  const matchesGlobal = searchTerm === '' || Object.values(item).some(val => String(val).toLowerCase().includes(searchTerm.toLowerCase()));
  const matchesEn = columnFilters.en.length === 0 || columnFilters.en.includes(item.en);
  const matchesPt = columnFilters.pt.length === 0 || columnFilters.pt.includes(item.pt);
- const analysisText = item.simplyReason || item.reason || '';
- const matchesAnalysis = columnFilters.analysis.length === 0 || columnFilters.analysis.includes(analysisText);
- const matchesAi = columnFilters.ai.length === 0 || columnFilters.ai.includes(item.advice || '');
- 
- return matchesGlobal && matchesEn && matchesPt && matchesAnalysis && matchesAi;
+  const analysisText = normalizeAnalysis(item);
+  const matchesAnalysis = columnFilters.analysis.length === 0 || columnFilters.analysis.includes(analysisText);
+  const matchesAi = columnFilters.ai.length === 0 || columnFilters.ai.includes(normalizeAdvice(item.advice));
+  
+  return matchesGlobal && matchesEn && matchesPt && matchesAnalysis && matchesAi;
  })
  .sort((a, b) => {
  if (!sortConfig.direction) return 0;
@@ -705,7 +715,7 @@ Brazil Ui [BUYER]
  </Button>
  </div>
  )}
- <div className={`overflow-y-auto overflow-x-auto rounded-xl border border-black/5 dark:border-white/10 bg-black/5 dark:bg-white/[0.02] custom-scrollbar ${isFocusMode ? 'flex-1 min-h-0' : ''}`}>
+ <div className={`overflow-y-auto overflow-x-auto pb-64 rounded-xl border border-black/5 dark:border-white/10 bg-black/5 dark:bg-white/[0.02] custom-scrollbar ${isFocusMode ? 'flex-1 min-h-0' : ''}`}>
  <table className="w-full text-sm text-left border-separate border-spacing-0">
  <thead>
   <tr className="bg-black/[0.02] dark:bg-white/[0.03]">
