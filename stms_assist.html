@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>stms_assist.md</title>
+<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+
+<style>
+/* https://github.com/microsoft/vscode/blob/master/extensions/markdown-language-features/media/markdown.css */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+body {
+	font-family: var(--vscode-markdown-font-family, -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif);
+	font-size: var(--vscode-markdown-font-size, 14px);
+	padding: 0 26px;
+	line-height: var(--vscode-markdown-line-height, 22px);
+	word-wrap: break-word;
+}
+
+#code-csp-warning {
+	position: fixed;
+	top: 0;
+	right: 0;
+	color: white;
+	margin: 16px;
+	text-align: center;
+	font-size: 12px;
+	font-family: sans-serif;
+	background-color:#444444;
+	cursor: pointer;
+	padding: 6px;
+	box-shadow: 1px 1px 1px rgba(0,0,0,.25);
+}
+
+#code-csp-warning:hover {
+	text-decoration: none;
+	background-color:#007acc;
+	box-shadow: 2px 2px 2px rgba(0,0,0,.25);
+}
+
+body.scrollBeyondLastLine {
+	margin-bottom: calc(100vh - 22px);
+}
+
+body.showEditorSelection .code-line {
+	position: relative;
+}
+
+body.showEditorSelection .code-active-line:before,
+body.showEditorSelection .code-line:hover:before {
+	content: "";
+	display: block;
+	position: absolute;
+	top: 0;
+	left: -12px;
+	height: 100%;
+}
+
+body.showEditorSelection li.code-active-line:before,
+body.showEditorSelection li.code-line:hover:before {
+	left: -30px;
+}
+
+.vscode-light.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.15);
+}
+
+.vscode-light.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.40);
+}
+
+.vscode-light.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-dark.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.4);
+}
+
+.vscode-dark.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.60);
+}
+
+.vscode-dark.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-high-contrast.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 160, 0, 0.7);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 160, 0, 1);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+img {
+	max-width: 100%;
+	max-height: 100%;
+}
+
+a {
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+a:focus,
+input:focus,
+select:focus,
+textarea:focus {
+	outline: 1px solid -webkit-focus-ring-color;
+	outline-offset: -1px;
+}
+
+hr {
+	border: 0;
+	height: 2px;
+	border-bottom: 2px solid;
+}
+
+h1 {
+	padding-bottom: 0.3em;
+	line-height: 1.2;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+}
+
+h1, h2, h3 {
+	font-weight: normal;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+table > thead > tr > th {
+	text-align: left;
+	border-bottom: 1px solid;
+}
+
+table > thead > tr > th,
+table > thead > tr > td,
+table > tbody > tr > th,
+table > tbody > tr > td {
+	padding: 5px 10px;
+}
+
+table > tbody > tr + tr > td {
+	border-top: 1px solid;
+}
+
+blockquote {
+	margin: 0 7px 0 5px;
+	padding: 0 16px 0 10px;
+	border-left-width: 5px;
+	border-left-style: solid;
+}
+
+code {
+	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+	font-size: 1em;
+	line-height: 1.357em;
+}
+
+body.wordWrap pre {
+	white-space: pre-wrap;
+}
+
+pre:not(.hljs),
+pre.hljs code > div {
+	padding: 16px;
+	border-radius: 3px;
+	overflow: auto;
+}
+
+pre code {
+	color: var(--vscode-editor-foreground);
+	tab-size: 4;
+}
+
+/** Theming */
+
+.vscode-light pre {
+	background-color: rgba(220, 220, 220, 0.4);
+}
+
+.vscode-dark pre {
+	background-color: rgba(10, 10, 10, 0.4);
+}
+
+.vscode-high-contrast pre {
+	background-color: rgb(0, 0, 0);
+}
+
+.vscode-high-contrast h1 {
+	border-color: rgb(0, 0, 0);
+}
+
+.vscode-light table > thead > tr > th {
+	border-color: rgba(0, 0, 0, 0.69);
+}
+
+.vscode-dark table > thead > tr > th {
+	border-color: rgba(255, 255, 255, 0.69);
+}
+
+.vscode-light h1,
+.vscode-light hr,
+.vscode-light table > tbody > tr + tr > td {
+	border-color: rgba(0, 0, 0, 0.18);
+}
+
+.vscode-dark h1,
+.vscode-dark hr,
+.vscode-dark table > tbody > tr + tr > td {
+	border-color: rgba(255, 255, 255, 0.18);
+}
+
+</style>
+
+<style>
+/* Tomorrow Theme */
+/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
+/* Original theme - https://github.com/chriskempson/tomorrow-theme */
+
+/* Tomorrow Comment */
+.hljs-comment,
+.hljs-quote {
+	color: #8e908c;
+}
+
+/* Tomorrow Red */
+.hljs-variable,
+.hljs-template-variable,
+.hljs-tag,
+.hljs-name,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-regexp,
+.hljs-deletion {
+	color: #c82829;
+}
+
+/* Tomorrow Orange */
+.hljs-number,
+.hljs-built_in,
+.hljs-builtin-name,
+.hljs-literal,
+.hljs-type,
+.hljs-params,
+.hljs-meta,
+.hljs-link {
+	color: #f5871f;
+}
+
+/* Tomorrow Yellow */
+.hljs-attribute {
+	color: #eab700;
+}
+
+/* Tomorrow Green */
+.hljs-string,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-addition {
+	color: #718c00;
+}
+
+/* Tomorrow Blue */
+.hljs-title,
+.hljs-section {
+	color: #4271ae;
+}
+
+/* Tomorrow Purple */
+.hljs-keyword,
+.hljs-selector-tag {
+	color: #8959a8;
+}
+
+.hljs {
+	display: block;
+	overflow-x: auto;
+	color: #4d4d4c;
+	padding: 0.5em;
+}
+
+.hljs-emphasis {
+	font-style: italic;
+}
+
+.hljs-strong {
+	font-weight: bold;
+}
+</style>
+
+<style>
+/*
+ * Markdown PDF CSS
+ */
+
+ body {
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif, "Meiryo";
+	padding: 0 12px;
+}
+
+pre {
+	background-color: #f8f8f8;
+	border: 1px solid #cccccc;
+	border-radius: 3px;
+	overflow-x: auto;
+	white-space: pre-wrap;
+	overflow-wrap: break-word;
+}
+
+pre:not(.hljs) {
+	padding: 23px;
+	line-height: 19px;
+}
+
+blockquote {
+	background: rgba(127, 127, 127, 0.1);
+	border-color: rgba(0, 122, 204, 0.5);
+}
+
+.emoji {
+	height: 1.4em;
+}
+
+code {
+	font-size: 14px;
+	line-height: 19px;
+}
+
+/* for inline code */
+:not(pre):not(.hljs) > code {
+	color: #C9AE75; /* Change the old color so it seems less like an error */
+	font-size: inherit;
+}
+
+/* Page Break : use <div class="page"/> or <div class="page"></div> to insert page break
+-------------------------------------------------------- */
+.page {
+	page-break-after: always;
+}
+
+</style>
+
+<script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
+</head>
+<body>
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: document.body.classList.contains('vscode-dark') || document.body.classList.contains('vscode-high-contrast')
+          ? 'dark'
+          : 'default'
+    });
+  </script>
+<h1 id="documentacao-tecnica-stms-ai-assist">Documentacao Tecnica: STMS AI Assist</h1>
+<p>Esta documentacao descreve exclusivamente a ferramenta <strong>STMS AI Assist</strong> (assistente inteligente para suporte nas traducoes via banco de dados) e o funcionamento da integracao com a Inteligencia Artificial (LLM) no backend.</p>
+<hr>
+<h2 id="1-visao-geral-da-arquitetura">1. Visao Geral da Arquitetura</h2>
+<p>O STMS AI Assist atua como uma interface de analise em lote para traducoes armazenadas no banco de dados. O frontend fornece a listagem, os filtros e o motor de requisicao paralela, enquanto o backend aplica regras de negocio corporativas e orquestra a chamada externa de IA.</p>
+<pre><code class="language-mermaid"><div class="mermaid">sequenceDiagram
+    participant Front as Frontend (STMS AI Assist)
+    participant Back as Backend (FastAPI)
+    participant DB as Banco & Contexto
+    participant IA as Proxy Sidia (vLLM)
+
+    Front->>Back: Solicita Revisao em Lote
+    Back->>DB: Consulta Termos e Glossario
+    DB-->>Back: Retorna Regras
+    Back->>IA: Envia Prompt Formatado
+    IA-->>Back: Devolve Tags XML
+    Back->>Back: Extrai Sugestao via Regex
+    Back-->>Front: Entrega Dados para Tabela
+</div></code></pre>
+<hr>
+<h2 id="2-tecnologias-de-desenvolvimento">2. Tecnologias de Desenvolvimento</h2>
+<p>As tecnologias abaixo englobam exclusivamente o escopo do STMS AI Assist no sistema:</p>
+<h3 id="frontend">Frontend</h3>
+<ul>
+<li><strong>React.js com Next.js:</strong> Roteamento e arquitetura de componentes para a tela da ferramenta de banco de dados (<code>STMSDBTool</code>).</li>
+<li><strong>TypeScript:</strong> Tipagem forte das interfaces, como status das strings (<code>pending</code>, <code>reviewing</code>, <code>approved</code>) e respostas da API (<code>AIReviewResponse</code>).</li>
+<li><strong>Tailwind CSS:</strong> Construcao fluida e responsiva da tabela de revisao, paginacao e cores de status dinamicas (Modo Escuro / Claro).</li>
+<li><strong>Lucide React:</strong> Biblioteca responsavel pela iconografia da ferramenta (botoes de Approve, Reject, Lotes).</li>
+</ul>
+<h3 id="backend">Backend</h3>
+<ul>
+<li><strong>FastAPI:</strong> Framework Python assincrono que expoem as rotas <code>/stms/strings</code> e as rotas de IA usadas pela ferramenta.</li>
+<li><strong>PostgreSQL (SQLAlchemy e psycopg2):</strong> Orquestra o pool de conexoes para resgatar as strings originais e auditar os metadados do glossario oficial da Samsung.</li>
+<li><strong>Requests:</strong> Faz as interacoes RESTful contra o Proxy da IA corporativa.</li>
+<li><strong>Concurrent.futures (ThreadPoolExecutor):</strong> Ferramenta do Python usada para paralelizar requisicoes massivas, avaliando 15 ou mais strings simultaneamente de modo nao bloqueante.</li>
+<li><strong>Regular Expressions (re):</strong> Engine nativa usada para limpar as alucinacoes textuais do LLM e recuperar somente os padroes de tag XML requeridos.</li>
+</ul>
+<h3 id="infraestrutura-ia">Infraestrutura IA</h3>
+<ul>
+<li><strong>Sidia OpenWebUI:</strong> Proxy de interface de seguranca corporativa que padroniza os pacotes e protege as chaves.</li>
+<li><strong>vLLM:</strong> O motor que hospeda fisicamente e executa a inferencia do modelo.</li>
+</ul>
+<hr>
+<h2 id="3-interface-e-fluxo-no-frontend">3. Interface e Fluxo no Frontend</h2>
+<p>O componente responsavel por esta funcionalidade acessa a base de dados do sistema, exibe os itens traduziveis em tabela e permite que a Inteligencia Artificial faca a revisao tecnica.</p>
+<h3 id="fluxo-de-processamento">Fluxo de Processamento</h3>
+<ol>
+<li>O usuario acessa a tabela de strings e filtra os registros (ex: apenas itens &quot;Pending&quot;).</li>
+<li>Ao iniciar o processo em lote, o frontend agrupa os itens (blocos de 15) e dispara para a API de revisao.</li>
+<li>Apos a resposta da API, o frontend injeta a &quot;Sugestao&quot; e o &quot;Motivo&quot; diretamente na linha da tabela.</li>
+<li>O usuario aprova (Approve) ou rejeita (Reject) a sugestao da IA.</li>
+</ol>
+<pre><code class="language-mermaid"><div class="mermaid">graph LR
+    A[Carregar Strings] --> B[Agrupar Itens Pendentes]
+    B --> C[Envio para API]
+    C --> D[Retorno Parseado]
+    D --> E[Aprovacao Humana]
+</div></code></pre>
+<hr>
+<h2 id="4-partes-do-codigo-de-ia-llm">4. Partes do Codigo de IA (LLM)</h2>
+<p>A execucao da IA no arquivo <code>server.py</code> segue um protocolo de restricoes severas para garantir previsibilidade e precisao tecnica para traducoes complexas.</p>
+<h3 id="41-configuracao-e-proxy-corporativo">4.1 Configuracao e Proxy Corporativo</h3>
+<p>O sistema se conecta a um proxy interno e por isso ignora a certificacao SSL nativa (<code>verify=False</code>).</p>
+<pre class="hljs"><code><div>PROXY_URL = <span class="hljs-string">&quot;https://openwebui.sidia.org.br/api/chat/completions&quot;</span>
+API_KEY   = <span class="hljs-string">&#x27;API_KEY&#x27;</span>
+MODEL_ID  = <span class="hljs-string">&quot;openai/gpt-oss-120b&quot;</span>
+</div></code></pre>
+<h3 id="42-leitura-da-base-de-conhecimento">4.2 Leitura da Base de Conhecimento</h3>
+<p>Antes de montar o prompt, o sistema precisa ler os guias de estilo e o historico de erros do usuario armazenados em arquivos de texto locais (pasta <code>knowledge_base/</code>).</p>
+<p><strong>Leitura do Guia de Estilo (Tone of Voice):</strong>
+O backend le o arquivo <code>tone_of_voice.txt</code> e fragmenta o documento em secoes usando os marcadores <code>#</code>. Apenas as secoes relevantes serao injetadas no prompt.</p>
+<pre class="hljs"><code><div>kb_path = os.path.join(os.path.dirname(__file__), <span class="hljs-string">&#x27;knowledge_base&#x27;</span>, <span class="hljs-string">&#x27;tone_of_voice.txt&#x27;</span>)
+<span class="hljs-keyword">with</span> <span class="hljs-built_in">open</span>(kb_path, <span class="hljs-string">&#x27;r&#x27;</span>, encoding=<span class="hljs-string">&#x27;utf-8&#x27;</span>) <span class="hljs-keyword">as</span> f:
+    content = f.read()
+
+<span class="hljs-comment"># Logica interna fragmenta o content baseado nas hashtags &#x27;#&#x27; para extracao cirurgica</span>
+</div></code></pre>
+<p><strong>Leitura de Feedbacks Anteriores:</strong>
+Para evitar que a IA repita correcoes invalidas que o analista ja rejeitou, o sistema anexa os ultimos 50 erros reportados diretamente do arquivo de feedback.</p>
+<pre class="hljs"><code><div><span class="hljs-comment"># Injetar feedback de erros anteriores reportados pelo usuario</span>
+<span class="hljs-keyword">try</span>:
+    feedback_filename = <span class="hljs-string">f&quot;feedback_<span class="hljs-subst">{target_lang}</span>.txt&quot;</span>
+    feedback_path = os.path.join(os.path.dirname(__file__), <span class="hljs-string">&#x27;knowledge_base&#x27;</span>, feedback_filename)
+    <span class="hljs-keyword">if</span> os.path.exists(feedback_path):
+        <span class="hljs-keyword">with</span> <span class="hljs-built_in">open</span>(feedback_path, <span class="hljs-string">&#x27;r&#x27;</span>, encoding=<span class="hljs-string">&#x27;utf-8&#x27;</span>) <span class="hljs-keyword">as</span> f:
+            feedback_content = f.read().strip()
+        <span class="hljs-keyword">if</span> feedback_content:
+            <span class="hljs-comment"># Limitar para os ultimos 50 feedbacks para nao sobrecarregar o prompt (context window)</span>
+            feedback_entries = feedback_content.split(<span class="hljs-string">&quot;--- FEEDBACK&quot;</span>)
+            recent_entries = feedback_entries[-<span class="hljs-number">50</span>:] <span class="hljs-keyword">if</span> <span class="hljs-built_in">len</span>(feedback_entries) &gt; <span class="hljs-number">50</span> <span class="hljs-keyword">else</span> feedback_entries
+            trimmed_feedback = <span class="hljs-string">&quot;--- FEEDBACK&quot;</span>.join(recent_entries).strip()
+            
+            <span class="hljs-comment"># Concatena os feedbacks nas regras relevantes do LLM</span>
+            relevant_rules += <span class="hljs-string">f&quot;\n\n[ERROS ANTERIORES REPORTADOS PELO USUARIO — NAO REPITA ESTES ERROS:]\n<span class="hljs-subst">{trimmed_feedback}</span>\n&quot;</span>
+<span class="hljs-keyword">except</span> Exception <span class="hljs-keyword">as</span> e:
+    <span class="hljs-built_in">print</span>(<span class="hljs-string">f&quot;Aviso: Nao foi possivel carregar feedback: <span class="hljs-subst">{e}</span>&quot;</span>)
+</div></code></pre>
+<h3 id="43-construcao-do-system-prompt">4.3 Construcao do System Prompt</h3>
+<p>Apos filtrar as regras do <code>tone_of_voice.txt</code> e anexar os feedbacks, o backend constroi o contexto. A IA e proibida de responder fora das tags.</p>
+<pre class="hljs"><code><div><span class="hljs-comment"># O System Prompt exige que a IA se comporte como Revisor Samsung e devolva APENAS tags XML</span>
+system_prompt = <span class="hljs-string">f&quot;&quot;&quot;Voce e o Revisor de Traducao da SAMSUNG.
+DIRETRIZES APLICAVEIS PARA ESTA STRING:
+<span class="hljs-subst">{relevant_rules}</span>
+
+INSTRUCOES (LEIA COM ATENCAO):
+- O idioma alvo da revisao e obrigatoriamente <span class="hljs-subst">{lang_name}</span>.
+- Analise SEVERAMENTE o texto atual.
+- Se a Regra de Ouro do Glossario estiver presente, ELA E SOBERANA.
+- Responda EXATAMENTE neste formato XML: 
+&lt;advice&gt;sugestao corrigida ou &#x27;Mantido&#x27; se estiver perfeito&lt;/advice&gt;
+&lt;reason&gt;motivo detalhado da alteracao&lt;/reason&gt;
+&lt;simplyReason&gt;resumo curto do erro. Retorne &#x27;Correto&#x27; SOMENTE SE advice for &#x27;Mantido&#x27;&lt;/simplyReason&gt;
+&quot;&quot;&quot;</span>
+
+<span class="hljs-comment"># O texto do usuario recebe a string original e a atual que a IA deve auditar</span>
+user_content = <span class="hljs-string">f&quot;Chave: <span class="hljs-subst">{key}</span> | Contexto: <span class="hljs-subst">{design_type}</span>\nEN: <span class="hljs-subst">{en_content}</span>\nPT: <span class="hljs-subst">{pt_content}</span>\n<span class="hljs-subst">{glossary_hint}</span>&quot;</span>
+
+messages = [
+    {<span class="hljs-string">&quot;role&quot;</span>: <span class="hljs-string">&quot;system&quot;</span>, <span class="hljs-string">&quot;content&quot;</span>: system_prompt},
+    {<span class="hljs-string">&quot;role&quot;</span>: <span class="hljs-string">&quot;user&quot;</span>, <span class="hljs-string">&quot;content&quot;</span>: user_content}
+]
+</div></code></pre>
+<h3 id="44-determinismo-e-envio-payload">4.4 Determinismo e Envio (Payload)</h3>
+<p>A chave para impedir que a Inteligencia Artificial alucine ou faca resumos criativos e baixar o parametro <code>temperature</code> a um nivel estrito.</p>
+<pre class="hljs"><code><div>payload = {
+    <span class="hljs-string">&quot;model&quot;</span>: model <span class="hljs-keyword">or</span> MODEL_ID,
+    <span class="hljs-string">&quot;messages&quot;</span>: messages,
+    <span class="hljs-string">&quot;temperature&quot;</span>: <span class="hljs-number">0.1</span>,  <span class="hljs-comment"># Impede variacoes criativas</span>
+    <span class="hljs-string">&quot;stream&quot;</span>: <span class="hljs-literal">False</span>
+}
+
+headers = {
+    <span class="hljs-string">&quot;Authorization&quot;</span>: <span class="hljs-string">f&quot;Bearer <span class="hljs-subst">{API_KEY}</span>&quot;</span>,
+    <span class="hljs-string">&quot;Content-Type&quot;</span>: <span class="hljs-string">&quot;application/json&quot;</span>
+}
+</div></code></pre>
+<h3 id="45-mecanismo-de-retry-da-ia">4.5 Mecanismo de Retry da IA</h3>
+<p>Como a API externa pode enfrentar instabilidade durante avaliacoes massivas em lote, o backend conta com um laco de repeticao com &quot;backoff&quot; (espera progressiva).</p>
+<pre class="hljs"><code><div>max_retries = <span class="hljs-number">3</span>
+<span class="hljs-keyword">for</span> attempt <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(max_retries):
+    <span class="hljs-keyword">try</span>:
+        response = requests.post(PROXY_URL, headers=headers, json=payload, verify=<span class="hljs-literal">False</span>, timeout=<span class="hljs-number">200</span>)
+        
+        <span class="hljs-keyword">if</span> response.status_code == <span class="hljs-number">200</span>:
+            data = response.json()
+            content = data[<span class="hljs-string">&quot;choices&quot;</span>][<span class="hljs-number">0</span>][<span class="hljs-string">&quot;message&quot;</span>][<span class="hljs-string">&quot;content&quot;</span>]
+            <span class="hljs-keyword">break</span> <span class="hljs-comment"># Sai do loop em caso de sucesso</span>
+            
+        time.sleep(<span class="hljs-number">2</span> * (attempt + <span class="hljs-number">1</span>))  <span class="hljs-comment"># Espera progressiva: 2s, 4s...</span>
+    <span class="hljs-keyword">except</span> Exception <span class="hljs-keyword">as</span> e:
+        time.sleep(<span class="hljs-number">2</span> * (attempt + <span class="hljs-number">1</span>))
+</div></code></pre>
+<h3 id="46-extracao-xml-e-trava-de-seguranca">4.6 Extracao XML e Trava de Seguranca</h3>
+<p>Para garantir que a resposta nao seja apenas texto livre, a saida bruta da IA e dissecada usando Expressoes Regulares (Regex). Alem disso, ha uma trava logica importante: se a IA sugeriu modificacoes no texto, ela e proibida de qualificar o texto original como &quot;Correto&quot; perante as regras gramaticais.</p>
+<pre class="hljs"><code><div><span class="hljs-comment"># Disseca os nós da resposta da IA</span>
+<span class="hljs-keyword">match</span> = re.search(
+    <span class="hljs-string">r&#x27;&lt;advice&gt;(.*?)&lt;/advice&gt;.*?&lt;reason&gt;(.*?)&lt;/reason&gt;.*?&lt;simplyReason&gt;(.*?)&lt;/simplyReason&gt;&#x27;</span>,
+    content, re.DOTALL
+)
+
+<span class="hljs-keyword">if</span> <span class="hljs-keyword">match</span>:
+    advice = <span class="hljs-keyword">match</span>.group(<span class="hljs-number">1</span>).strip()
+    reason = <span class="hljs-keyword">match</span>.group(<span class="hljs-number">2</span>).strip()
+    simply = <span class="hljs-keyword">match</span>.group(<span class="hljs-number">3</span>).strip()
+
+    <span class="hljs-comment"># Trava de alucinacao: Corrige a metrica caso a IA diga que estava certo mas efetuou trocas</span>
+    <span class="hljs-keyword">if</span> advice != <span class="hljs-string">&quot;Mantido&quot;</span> <span class="hljs-keyword">and</span> advice != pt_content:
+        <span class="hljs-keyword">if</span> simply.lower() <span class="hljs-keyword">in</span> [<span class="hljs-string">&quot;correto&quot;</span>, <span class="hljs-string">&quot;preciso&quot;</span>, <span class="hljs-string">&quot;ok&quot;</span>, <span class="hljs-string">&quot;perfeito&quot;</span>]:
+            simply = <span class="hljs-string">&quot;Alteracao de formatacao/pontuacao&quot;</span>
+</div></code></pre>
+
+</body>
+</html>
