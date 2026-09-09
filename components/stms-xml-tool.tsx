@@ -199,6 +199,9 @@ export function STMSXmlTool({ onFocusChange }: { onFocusChange?: (focused: boole
  const [selectedDetail, setSelectedDetail] = useState<TranslationResult | null>(null);
  const [isFocusMode, setIsFocusModeState] = useState(false);
  
+ const [filterPos, setFilterPos] = useState({ top: 0, left: 0 });
+ const filterButtonRefs = useRef<{ [key: string]: HTMLButtonElement | null }>({ en: null, pt: null, analysis: null, ai: null });
+
  const setIsFocusMode = (focused: boolean) => {
  setIsFocusModeState(focused);
  if (onFocusChange) onFocusChange(focused);
@@ -215,14 +218,16 @@ export function STMSXmlTool({ onFocusChange }: { onFocusChange?: (focused: boole
 
  useEffect(() => {
  const handleClickOutside = (e: MouseEvent) => {
- const target = e.target as HTMLElement;
- if (!target.closest('.filter-container')) {
- setOpenFilter(null);
+ if (openFilter && filterButtonRefs.current[openFilter]?.contains(e.target as Node)) {
+ return;
  }
+ setOpenFilter(null);
  };
+ if (openFilter) {
  document.addEventListener('mousedown', handleClickOutside);
+ }
  return () => document.removeEventListener('mousedown', handleClickOutside);
- }, []);
+ }, [openFilter]);
 
  useEffect(() => {
  if (isFocusMode) {
@@ -308,7 +313,7 @@ export function STMSXmlTool({ onFocusChange }: { onFocusChange?: (focused: boole
   en: Array.from(new Set(finalResults.map(r => r.en))).sort(),
   pt: Array.from(new Set(finalResults.map(r => r.pt))).sort(),
   analysis: Array.from(new Set(finalResults.map(r => normalizeAnalysis(r)))).sort(),
-  ai: Array.from(new Set(finalResults.map(r => normalizeAdvice(r.advice)))).sort()
+  ai: Array.from(new Set(finalResults.map(r => normalizeAdvice(r.advice))))
   };
 
  const toggleFilter = (col: 'en' | 'pt' | 'analysis' | 'ai', val: string) => {
@@ -319,41 +324,55 @@ export function STMSXmlTool({ onFocusChange }: { onFocusChange?: (focused: boole
  });
  };
 
- const renderFilterDropdown = (col: 'en' | 'pt' | 'analysis' | 'ai') => {
- if (openFilter !== col) return null;
- return (
- <div 
- className={`absolute top-full left-0 mt-2 w-64 max-h-60 overflow-y-auto rounded-lg shadow-xl border z-50 p-2 ${isDarkMode ? 'bg-[#1a1a1a] border-white/10' : 'bg-white border-gray-200'}`}
- onClick={e => e.stopPropagation()}
- >
- <div className="flex items-center justify-between mb-2 pb-2 border-b border-black/5 dark:border-white/5">
- <span className="text-[10px] font-black uppercase tracking-widest opacity-60">Filtrar ({columnFilters[col].length})</span>
- <button 
- onClick={(e) => { e.stopPropagation(); setColumnFilters(prev => ({...prev, [col]: []})); setOpenFilter(null); }}
- className="text-[10px] uppercase font-black text-blue-500 hover:text-blue-400"
- >
- Limpar
- </button>
- </div>
- <div className="flex flex-col gap-1">
- {uniqueValues[col].map((val, idx) => (
- <label key={idx} className="flex items-center gap-2 text-xs cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 p-1.5 rounded transition-colors">
- <input 
- type="checkbox" 
- checked={columnFilters[col].includes(val)}
- onChange={() => toggleFilter(col, val)}
- className="rounded border-gray-300 w-3 h-3"
- />
- <span className="truncate flex-1">{val || '(Vazio)'}</span>
- </label>
- ))}
- {uniqueValues[col].length === 0 && (
- <span className="text-xs opacity-50 p-2 italic text-center block">Sem dados</span>
- )}
- </div>
- </div>
- );
- };
+  const handleFilterClick = (e: React.MouseEvent<HTMLButtonElement>, col: 'en' | 'pt' | 'analysis' | 'ai') => {
+  e.stopPropagation();
+  if (openFilter === col) {
+    setOpenFilter(null);
+    return;
+  }
+  const rect = e.currentTarget.getBoundingClientRect();
+  setFilterPos({ top: rect.bottom + 8, left: rect.left });
+  setOpenFilter(col);
+  };
+
+  const renderFixedFilterMenu = () => {
+  if (!openFilter) return null;
+  const col = openFilter;
+  return (
+  <div 
+    className={`fixed z-[10000] w-64 max-h-60 overflow-y-auto rounded-lg shadow-2xl border flex flex-col p-2 animate-in fade-in zoom-in-95 duration-100 ${isDarkMode ? 'bg-[#1a1a1a] border-white/10' : 'bg-white border-gray-200'}`}
+    style={{ top: filterPos.top, left: filterPos.left }}
+    onMouseDown={e => e.stopPropagation()}
+    onClick={e => e.stopPropagation()}
+  >
+    <div className="flex items-center justify-between mb-2 pb-2 border-b border-black/5 dark:border-white/5 shrink-0">
+    <span className="text-[10px] font-black uppercase tracking-widest opacity-60">Filtrar ({columnFilters[col].length})</span>
+    <button 
+      onClick={() => { setColumnFilters(prev => ({...prev, [col]: []})); setOpenFilter(null); }}
+      className="text-[10px] uppercase font-black text-blue-500 hover:text-blue-400"
+    >
+      Limpar
+    </button>
+    </div>
+    <div className="flex flex-col gap-1 overflow-y-auto custom-scrollbar">
+    {uniqueValues[col].map((val, idx) => (
+      <label key={idx} className="flex items-start gap-2 text-xs cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 p-1.5 rounded transition-colors">
+      <input 
+        type="checkbox" 
+        checked={columnFilters[col].includes(val)}
+        onChange={() => toggleFilter(col, val)}
+        className="rounded border-gray-300 w-3 h-3 mt-0.5 shrink-0"
+      />
+      <span className="break-words flex-1 leading-tight">{val || '(Vazio)'}</span>
+      </label>
+    ))}
+    {uniqueValues[col].length === 0 && (
+      <span className="text-xs opacity-50 p-2 italic text-center block">Sem dados</span>
+    )}
+    </div>
+  </div>
+  );
+  };
 
  const filteredAndSortedResults = finalResults
  .filter(item => {
@@ -611,10 +630,9 @@ Brazil Ui [BUYER]
  <Card className={`p-8 transition-all duration-500 flex flex-col backdrop-blur-2xl
  ${isFocusMode 
  ? 'fixed inset-0 z-[999] rounded-none border-none bg-background' 
- : 'rounded-xl border shadow-2xl min-h-[400px]'
+ : 'rounded-xl border shadow-2xl'
  }
- ${isDarkMode ? 'bg-[#111]/40 border-white/5 shadow-black/40' : 'bg-white/60 border-slate-200 shadow-slate-200/50'}
- `}>
+ ${isDarkMode ? 'bg-[#111]/40 border-white/5 shadow-black/40' : 'bg-white/60 border-slate-200 shadow-slate-200/50'}`}>
  <div className="flex flex-col md:flex-row items-center justify-between gap-6 mb-8">
  <div>
  <h3 className="text-2xl font-black tracking-tight flex items-center gap-3">
@@ -660,38 +678,6 @@ Brazil Ui [BUYER]
  </div>
  </div>
 
- {finalResults.length > 0 && (
-  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-    <div className={`p-4 rounded-xl border flex items-center gap-4 transition-all ${isDarkMode ? 'bg-white/5 border-white/10' : 'bg-gray-50 border-black/5'}`}>
-      <div className="w-10 h-10 rounded-lg bg-blue-500/20 text-blue-500 flex items-center justify-center shrink-0">
-        <FileText className="w-5 h-5" />
-      </div>
-      <div>
-        <p className="text-[10px] font-black uppercase opacity-50 tracking-widest">Total Analisado</p>
-        <p className="text-xl font-bold">{finalResults.length}</p>
-      </div>
-    </div>
-    <div className={`p-4 rounded-xl border flex items-center gap-4 transition-all ${isDarkMode ? 'bg-emerald-500/5 border-emerald-500/20 text-emerald-400' : 'bg-emerald-50 border-emerald-200 text-emerald-700'}`}>
-      <div className="w-10 h-10 rounded-lg bg-emerald-500/20 text-emerald-500 flex items-center justify-center shrink-0">
-        <CheckCircle2 className="w-5 h-5" />
-      </div>
-      <div>
-        <p className="text-[10px] font-black uppercase opacity-70 tracking-widest">OK / Sem Sugestão</p>
-        <p className="text-xl font-bold">{finalResults.filter(r => r.advice === 'OK / Sem sugestão' || r.advice === 'Mantido' || r.advice === 'Correto' || !r.advice || r.advice === 'Sem sugestão').length}</p>
-      </div>
-    </div>
-    <div className={`p-4 rounded-xl border flex items-center gap-4 transition-all ${isDarkMode ? 'bg-red-500/5 border-red-500/20 text-red-400' : 'bg-red-50 border-red-200 text-red-700'}`}>
-      <div className="w-10 h-10 rounded-lg bg-red-500/20 text-red-500 flex items-center justify-center shrink-0">
-        <AlertCircle className="w-5 h-5" />
-      </div>
-      <div>
-        <p className="text-[10px] font-black uppercase opacity-70 tracking-widest">Erros Encontrados</p>
-        <p className="text-xl font-bold">{finalResults.length - finalResults.filter(r => r.advice === 'OK / Sem sugestão' || r.advice === 'Mantido' || r.advice === 'Correto' || !r.advice || r.advice === 'Sem sugestão').length}</p>
-      </div>
-    </div>
-  </div>
-  )}
-
  {finalResults.length === 0 ? (
  <div className="flex-1 flex flex-col items-center justify-center opacity-20 italic py-20">
  <Sparkles size={64} className="mb-4" />
@@ -715,72 +701,72 @@ Brazil Ui [BUYER]
  </Button>
  </div>
  )}
- <div className={`overflow-y-auto overflow-x-auto pb-64 rounded-xl border border-black/5 dark:border-white/10 bg-black/5 dark:bg-white/[0.02] custom-scrollbar ${isFocusMode ? 'flex-1 min-h-0' : ''}`}>
+ <div className={`overflow-y-auto overflow-x-auto rounded-xl border border-black/5 dark:border-white/10 bg-black/5 dark:bg-white/[0.02] custom-scrollbar ${isFocusMode ? 'flex-1 min-h-0' : 'h-[500px]'}`}>
  <table className="w-full text-sm text-left border-separate border-spacing-0">
  <thead>
   <tr className="bg-black/[0.02] dark:bg-white/[0.03]">
-  <th onDoubleClick={() => handleSort('en')} className="filter-container relative p-4 align-top border-b border-black/5 dark:border-white/5 w-[25%] cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 transition-colors group select-none" title="Duplo clique para ordenar">
+  <th onDoubleClick={() => handleSort('en')} className="relative p-4 align-top border-b border-black/5 dark:border-white/5 w-[25%] cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 transition-colors group select-none" title="Duplo clique para ordenar">
     <div className="flex flex-col gap-2">
       <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-[0.2em] opacity-40 group-hover:opacity-100 transition-opacity">
         <span>{t.tableHeaderEn}</span>
         <span>{sortConfig.key === 'en' ? (sortConfig.direction === 'asc' ? '↑' : '↓') : '↕'}</span>
       </div>
       <button 
-        onClick={(e) => { e.stopPropagation(); setOpenFilter(openFilter === 'en' ? null : 'en'); }}
+        ref={el => { filterButtonRefs.current['en'] = el; }}
+        onClick={(e) => handleFilterClick(e, 'en')}
         className={`w-full h-8 px-3 text-xs rounded border-none outline-none flex items-center justify-between transition-colors ${isDarkMode ? 'bg-white/5 hover:bg-white/10 text-white' : 'bg-black/5 hover:bg-black/10 text-black'} ${columnFilters.en.length > 0 ? 'bg-blue-500/20 text-blue-500' : ''}`}
       >
         <span className="opacity-60">{columnFilters.en.length > 0 ? `${columnFilters.en.length} selecionados` : 'Filtrar...'}</span>
         <Filter className="w-3 h-3 opacity-50" />
       </button>
-      {renderFilterDropdown('en')}
     </div>
   </th>
-  <th onDoubleClick={() => handleSort('pt')} className="filter-container relative p-4 align-top border-b border-black/5 dark:border-white/5 w-[25%] cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 transition-colors group select-none" title="Duplo clique para ordenar">
+  <th onDoubleClick={() => handleSort('pt')} className="relative p-4 align-top border-b border-black/5 dark:border-white/5 w-[25%] cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 transition-colors group select-none" title="Duplo clique para ordenar">
     <div className="flex flex-col gap-2">
       <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-[0.2em] opacity-40 group-hover:opacity-100 transition-opacity">
         <span>{t.tableHeaderPt}</span>
         <span>{sortConfig.key === 'pt' ? (sortConfig.direction === 'asc' ? '↑' : '↓') : '↕'}</span>
       </div>
       <button 
-        onClick={(e) => { e.stopPropagation(); setOpenFilter(openFilter === 'pt' ? null : 'pt'); }}
+        ref={el => { filterButtonRefs.current['pt'] = el; }}
+        onClick={(e) => handleFilterClick(e, 'pt')}
         className={`w-full h-8 px-3 text-xs rounded border-none outline-none flex items-center justify-between transition-colors ${isDarkMode ? 'bg-white/5 hover:bg-white/10 text-white' : 'bg-black/5 hover:bg-black/10 text-black'} ${columnFilters.pt.length > 0 ? 'bg-blue-500/20 text-blue-500' : ''}`}
       >
         <span className="opacity-60">{columnFilters.pt.length > 0 ? `${columnFilters.pt.length} selecionados` : 'Filtrar...'}</span>
         <Filter className="w-3 h-3 opacity-50" />
       </button>
-      {renderFilterDropdown('pt')}
     </div>
   </th>
-  <th onDoubleClick={() => handleSort('analysis')} className="filter-container relative p-4 align-top border-b border-black/5 dark:border-white/5 w-[20%] cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 transition-colors group select-none" title="Duplo clique para ordenar">
+  <th onDoubleClick={() => handleSort('analysis')} className="relative p-4 align-top border-b border-black/5 dark:border-white/5 w-[20%] cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 transition-colors group select-none" title="Duplo clique para ordenar">
     <div className="flex flex-col gap-2">
       <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-[0.2em] opacity-40 group-hover:opacity-100 transition-opacity">
         <span>{t.tableHeaderAnalysis}</span>
         <span>{sortConfig.key === 'analysis' ? (sortConfig.direction === 'asc' ? '↑' : '↓') : '↕'}</span>
       </div>
       <button 
-        onClick={(e) => { e.stopPropagation(); setOpenFilter(openFilter === 'analysis' ? null : 'analysis'); }}
+        ref={el => { filterButtonRefs.current['analysis'] = el; }}
+        onClick={(e) => handleFilterClick(e, 'analysis')}
         className={`w-full h-8 px-3 text-xs rounded border-none outline-none flex items-center justify-between transition-colors ${isDarkMode ? 'bg-white/5 hover:bg-white/10 text-white' : 'bg-black/5 hover:bg-black/10 text-black'} ${columnFilters.analysis.length > 0 ? 'bg-blue-500/20 text-blue-500' : ''}`}
       >
         <span className="opacity-60">{columnFilters.analysis.length > 0 ? `${columnFilters.analysis.length} selecionados` : 'Filtrar...'}</span>
         <Filter className="w-3 h-3 opacity-50" />
       </button>
-      {renderFilterDropdown('analysis')}
     </div>
   </th>
-  <th onDoubleClick={() => handleSort('ai')} className="filter-container relative p-4 align-top border-b border-black/5 dark:border-white/5 w-[30%] text-blue-500 cursor-pointer hover:bg-blue-500/5 transition-colors group select-none" title="Duplo clique para ordenar">
+  <th onDoubleClick={() => handleSort('ai')} className="relative p-4 align-top border-b border-black/5 dark:border-white/5 w-[30%] text-blue-500 cursor-pointer hover:bg-blue-500/5 transition-colors group select-none" title="Duplo clique para ordenar">
     <div className="flex flex-col gap-2">
       <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-[0.2em] opacity-80 group-hover:opacity-100 transition-opacity">
         <span>{t.tableHeaderAi}</span>
         <span>{sortConfig.key === 'ai' ? (sortConfig.direction === 'asc' ? '↑' : '↓') : '↕'}</span>
       </div>
       <button 
-        onClick={(e) => { e.stopPropagation(); setOpenFilter(openFilter === 'ai' ? null : 'ai'); }}
+        ref={el => { filterButtonRefs.current['ai'] = el; }}
+        onClick={(e) => handleFilterClick(e, 'ai')}
         className={`w-full h-8 px-3 text-xs rounded border-none outline-none flex items-center justify-between transition-colors ${isDarkMode ? 'bg-blue-500/10 hover:bg-blue-500/20 text-blue-400' : 'bg-blue-50 hover:bg-blue-100 text-blue-600'} ${columnFilters.ai.length > 0 ? 'bg-blue-500/30' : ''}`}
       >
         <span className="opacity-60">{columnFilters.ai.length > 0 ? `${columnFilters.ai.length} selecionados` : 'Filtrar...'}</span>
         <Filter className="w-3 h-3 opacity-50" />
       </button>
-      {renderFilterDropdown('ai')}
     </div>
   </th>
   </tr>
@@ -856,7 +842,6 @@ Brazil Ui [BUYER]
  <div className="flex items-center gap-1">
  {Array.from({ length: Math.ceil(filteredAndSortedResults.length / itemsPerPage) }).map((_, i) => {
  const pageNum = i + 1;
- // Lógica para mostrar apenas algumas páginas se houver muitas
  if (
  pageNum === 1 || 
  pageNum === Math.ceil(filteredAndSortedResults.length / itemsPerPage) ||
@@ -977,6 +962,8 @@ Brazil Ui [BUYER]
  100% { background-position: 200% 0; }
  }
  `}</style>
+
+ {renderFixedFilterMenu()}
  </div>
  );
 }
