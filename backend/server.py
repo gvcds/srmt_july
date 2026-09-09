@@ -765,7 +765,8 @@ async def parse_files(files: List[UploadFile] = File(...)):
             parsed_dict = parse_xml(content)
             if lang == 'en':
                 en_dicts[key] = parsed_dict
-            elif lang in ['pt', 'br', 'pt-br']:
+            elif lang in ['pt', 'br', 'pt-br', 'es', 'ko']:
+                parsed_dict['__lang'] = 'es' if lang == 'es' else 'ko' if lang == 'ko' else 'pt'
                 pt_dicts[key] = parsed_dict
             idx_set.add(key)
             
@@ -776,8 +777,11 @@ async def parse_files(files: List[UploadFile] = File(...)):
             pt_d = pt_dicts[k]
             app_name = app_names[k]
             
+            target_lang = pt_d.get('__lang', 'pt')
+            
             keys = set(en_d.keys()) | set(pt_d.keys())
             for string_key in keys:
+                if string_key == '__lang': continue
                 en_item = en_d.get(string_key, {"value": "None", "comment": ""})
                 pt_item = pt_d.get(string_key, {"value": "None", "comment": ""})
                 
@@ -787,7 +791,8 @@ async def parse_files(files: List[UploadFile] = File(...)):
                     "en": en_item.get("value", "None"),
                     "en_comment": en_item.get("comment", ""),
                     "pt": pt_item.get("value", "None"),
-                    "pt_comment": pt_item.get("comment", "")
+                    "pt_comment": pt_item.get("comment", ""),
+                    "target_lang": target_lang
                 })
                 
     return {"items": merged_items}
@@ -987,7 +992,7 @@ async def process_batch(request: BatchRequest):
     results = []
     
     with concurrent.futures.ThreadPoolExecutor(max_workers=40) as executor:
-        futures = [executor.submit(fetch_translation, item, request.target_lang, request.model) for item in items]
+        futures = [executor.submit(fetch_translation, item, item.get("target_lang", request.target_lang), request.model) for item in items]
         for future in concurrent.futures.as_completed(futures):
             results.append(future.result())
             
