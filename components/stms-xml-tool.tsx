@@ -650,6 +650,38 @@ Brazil Ui [BUYER]
  </div>
  </div>
 
+ {finalResults.length > 0 && (
+  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+    <div className={`p-4 rounded-xl border flex items-center gap-4 transition-all ${isDarkMode ? 'bg-white/5 border-white/10' : 'bg-gray-50 border-black/5'}`}>
+      <div className="w-10 h-10 rounded-lg bg-blue-500/20 text-blue-500 flex items-center justify-center shrink-0">
+        <FileText className="w-5 h-5" />
+      </div>
+      <div>
+        <p className="text-[10px] font-black uppercase opacity-50 tracking-widest">Total Analisado</p>
+        <p className="text-xl font-bold">{finalResults.length}</p>
+      </div>
+    </div>
+    <div className={`p-4 rounded-xl border flex items-center gap-4 transition-all ${isDarkMode ? 'bg-emerald-500/5 border-emerald-500/20 text-emerald-400' : 'bg-emerald-50 border-emerald-200 text-emerald-700'}`}>
+      <div className="w-10 h-10 rounded-lg bg-emerald-500/20 text-emerald-500 flex items-center justify-center shrink-0">
+        <CheckCircle2 className="w-5 h-5" />
+      </div>
+      <div>
+        <p className="text-[10px] font-black uppercase opacity-70 tracking-widest">OK / Sem Sugestão</p>
+        <p className="text-xl font-bold">{finalResults.filter(r => r.advice === 'OK / Sem sugestão' || r.advice === 'Mantido' || r.advice === 'Correto' || !r.advice || r.advice === 'Sem sugestão').length}</p>
+      </div>
+    </div>
+    <div className={`p-4 rounded-xl border flex items-center gap-4 transition-all ${isDarkMode ? 'bg-red-500/5 border-red-500/20 text-red-400' : 'bg-red-50 border-red-200 text-red-700'}`}>
+      <div className="w-10 h-10 rounded-lg bg-red-500/20 text-red-500 flex items-center justify-center shrink-0">
+        <AlertCircle className="w-5 h-5" />
+      </div>
+      <div>
+        <p className="text-[10px] font-black uppercase opacity-70 tracking-widest">Erros Encontrados</p>
+        <p className="text-xl font-bold">{finalResults.length - finalResults.filter(r => r.advice === 'OK / Sem sugestão' || r.advice === 'Mantido' || r.advice === 'Correto' || !r.advice || r.advice === 'Sem sugestão').length}</p>
+      </div>
+    </div>
+  </div>
+  )}
+
  {finalResults.length === 0 ? (
  <div className="flex-1 flex flex-col items-center justify-center opacity-20 italic py-20">
  <Sparkles size={64} className="mb-4" />
