@@ -365,85 +365,84 @@ code {
           : 'default'
     });
   </script>
-<h1 id="documentacao-tecnica-stms-ai-assist">Documentacao Tecnica: STMS AI Assist</h1>
-<p>Esta documentacao descreve exclusivamente a ferramenta <strong>STMS AI Assist</strong> (assistente inteligente para suporte nas traducoes via banco de dados) e o funcionamento da integracao com a Inteligencia Artificial (LLM) no backend.</p>
+<h1 id="documentação-técnica-stms-ai-assist">Documentação Técnica: STMS AI Assist</h1>
+<p>Esta documentação descreve exclusivamente a ferramenta <strong>STMS AI Assist</strong> (assistente inteligente para suporte nas traduções via banco de dados) e o funcionamento da integração com a Inteligência Artificial (LLM) no backend.</p>
 <hr>
-<h2 id="1-visao-geral-da-arquitetura">1. Visao Geral da Arquitetura</h2>
-<p>O STMS AI Assist atua como uma interface de analise em lote para traducoes armazenadas no banco de dados. O frontend fornece a listagem, os filtros e o motor de requisicao paralela, enquanto o backend aplica regras de negocio corporativas e orquestra a chamada externa de IA.</p>
+<h2 id="1-visão-geral-da-arquitetura">1. Visão Geral da Arquitetura</h2>
+<p>O STMS AI Assist atua como uma interface de análise em lote para traduções armazenadas no banco de dados. O frontend fornece a listagem, os filtros e o motor de requisição paralela, enquanto o backend aplica regras de negócio corporativas e orquestra a chamada externa de IA.</p>
 <pre><code class="language-mermaid"><div class="mermaid">sequenceDiagram
     participant Front as Frontend (STMS AI Assist)
     participant Back as Backend (FastAPI)
     participant DB as Banco & Contexto
     participant IA as Proxy Sidia (vLLM)
 
-    Front->>Back: Solicita Revisao em Lote
-    Back->>DB: Consulta Termos e Glossario
+    Front->>Back: Solicita Revisão em Lote
+    Back->>DB: Consulta Termos e Glossário
     DB-->>Back: Retorna Regras
     Back->>IA: Envia Prompt Formatado
     IA-->>Back: Devolve Tags XML
-    Back->>Back: Extrai Sugestao via Regex
+    Back->>Back: Extrai Sugestão via Regex
     Back-->>Front: Entrega Dados para Tabela
 </div></code></pre>
 <hr>
 <h2 id="2-tecnologias-de-desenvolvimento">2. Tecnologias de Desenvolvimento</h2>
-<p>As tecnologias abaixo englobam exclusivamente o escopo do STMS AI Assist no sistema:</p>
 <h3 id="frontend">Frontend</h3>
 <ul>
 <li><strong>React.js com Next.js:</strong> Roteamento e arquitetura de componentes para a tela da ferramenta de banco de dados (<code>STMSDBTool</code>).</li>
 <li><strong>TypeScript:</strong> Tipagem forte das interfaces, como status das strings (<code>pending</code>, <code>reviewing</code>, <code>approved</code>) e respostas da API (<code>AIReviewResponse</code>).</li>
-<li><strong>Tailwind CSS:</strong> Construcao fluida e responsiva da tabela de revisao, paginacao e cores de status dinamicas (Modo Escuro / Claro).</li>
-<li><strong>Lucide React:</strong> Biblioteca responsavel pela iconografia da ferramenta (botoes de Approve, Reject, Lotes).</li>
+<li><strong>Tailwind CSS:</strong> Construção fluida e responsiva da tabela de revisão, paginação e cores de status dinâmicas (Modo Escuro / Claro).</li>
+<li><strong>Lucide React:</strong> Biblioteca responsável pela iconografia da ferramenta (botões de Approve, Reject, Lotes).</li>
 </ul>
 <h3 id="backend">Backend</h3>
 <ul>
-<li><strong>FastAPI:</strong> Framework Python assincrono que expoem as rotas <code>/stms/strings</code> e as rotas de IA usadas pela ferramenta.</li>
-<li><strong>PostgreSQL (SQLAlchemy e psycopg2):</strong> Orquestra o pool de conexoes para resgatar as strings originais e auditar os metadados do glossario oficial da Samsung.</li>
-<li><strong>Requests:</strong> Faz as interacoes RESTful contra o Proxy da IA corporativa.</li>
-<li><strong>Concurrent.futures (ThreadPoolExecutor):</strong> Ferramenta do Python usada para paralelizar requisicoes massivas, avaliando 15 ou mais strings simultaneamente de modo nao bloqueante.</li>
-<li><strong>Regular Expressions (re):</strong> Engine nativa usada para limpar as alucinacoes textuais do LLM e recuperar somente os padroes de tag XML requeridos.</li>
+<li><strong>FastAPI:</strong> Framework Python assíncrono que expõe as rotas <code>/stms/strings</code> e as rotas de IA usadas pela ferramenta.</li>
+<li><strong>PostgreSQL (SQLAlchemy e psycopg2):</strong> Orquestra o pool de conexões para resgatar as strings originais e auditar os metadados do glossário oficial da Samsung.</li>
+<li><strong>Requests:</strong> Faz as interações RESTful contra o Proxy da IA corporativa.</li>
+<li><strong>Concurrent.futures (ThreadPoolExecutor):</strong> Ferramenta do Python usada para paralelizar requisições massivas, avaliando 15 ou mais strings simultaneamente de modo não bloqueante.</li>
+<li><strong>Regular Expressions (re):</strong> Engine nativa usada para limpar as alucinações textuais do LLM e recuperar somente os padrões de tag XML requeridos.</li>
 </ul>
 <h3 id="infraestrutura-ia">Infraestrutura IA</h3>
 <ul>
-<li><strong>Sidia OpenWebUI:</strong> Proxy de interface de seguranca corporativa que padroniza os pacotes e protege as chaves.</li>
-<li><strong>vLLM:</strong> O motor que hospeda fisicamente e executa a inferencia do modelo.</li>
+<li><strong>Sidia OpenWebUI:</strong> Proxy de interface de segurança corporativa que padroniza os pacotes e protege as chaves.</li>
+<li><strong>vLLM:</strong> O motor que hospeda fisicamente e executa a inferência do modelo.</li>
 </ul>
 <hr>
 <h2 id="3-interface-e-fluxo-no-frontend">3. Interface e Fluxo no Frontend</h2>
-<p>O componente responsavel por esta funcionalidade acessa a base de dados do sistema, exibe os itens traduziveis em tabela e permite que a Inteligencia Artificial faca a revisao tecnica.</p>
+<p>O componente responsável por esta funcionalidade acessa a base de dados do sistema, exibe os itens traduzíveis em tabela e permite que a Inteligência Artificial faça a revisão técnica.</p>
 <h3 id="fluxo-de-processamento">Fluxo de Processamento</h3>
 <ol>
-<li>O usuario acessa a tabela de strings e filtra os registros (ex: apenas itens &quot;Pending&quot;).</li>
-<li>Ao iniciar o processo em lote, o frontend agrupa os itens (blocos de 15) e dispara para a API de revisao.</li>
-<li>Apos a resposta da API, o frontend injeta a &quot;Sugestao&quot; e o &quot;Motivo&quot; diretamente na linha da tabela.</li>
-<li>O usuario aprova (Approve) ou rejeita (Reject) a sugestao da IA.</li>
+<li>O usuário acessa a tabela de strings e filtra os registros (ex: apenas itens &quot;Pending&quot;).</li>
+<li>Ao iniciar o processo em lote, o frontend agrupa os itens (blocos de 15) e dispara para a API de revisão.</li>
+<li>Após a resposta da API, o frontend injeta a &quot;Sugestão&quot; e o &quot;Motivo&quot; diretamente na linha da tabela.</li>
+<li>O usuário aprova (Approve) ou rejeita (Reject) a sugestão da IA.</li>
 </ol>
 <pre><code class="language-mermaid"><div class="mermaid">graph LR
     A[Carregar Strings] --> B[Agrupar Itens Pendentes]
     B --> C[Envio para API]
     C --> D[Retorno Parseado]
-    D --> E[Aprovacao Humana]
+    D --> E[Aprovação Humana]
 </div></code></pre>
 <hr>
-<h2 id="4-partes-do-codigo-de-ia-llm">4. Partes do Codigo de IA (LLM)</h2>
-<p>A execucao da IA no arquivo <code>server.py</code> segue um protocolo de restricoes severas para garantir previsibilidade e precisao tecnica para traducoes complexas.</p>
-<h3 id="41-configuracao-e-proxy-corporativo">4.1 Configuracao e Proxy Corporativo</h3>
-<p>O sistema se conecta a um proxy interno e por isso ignora a certificacao SSL nativa (<code>verify=False</code>).</p>
+<h2 id="4-partes-do-código-de-ia-llm">4. Partes do Código de IA (LLM)</h2>
+<p>A execução da IA no arquivo <code>server.py</code> segue um protocolo de restrições severas para garantir previsibilidade e precisão técnica para traduções complexas.</p>
+<h3 id="41-configuração-e-proxy-corporativo">4.1 Configuração e Proxy Corporativo</h3>
+<p>O sistema se conecta a um proxy interno e por isso ignora a certificação SSL nativa (<code>verify=False</code>).</p>
 <pre class="hljs"><code><div>PROXY_URL = <span class="hljs-string">&quot;https://openwebui.sidia.org.br/api/chat/completions&quot;</span>
 API_KEY   = <span class="hljs-string">&#x27;API_KEY&#x27;</span>
 MODEL_ID  = <span class="hljs-string">&quot;openai/gpt-oss-120b&quot;</span>
 </div></code></pre>
 <h3 id="42-leitura-da-base-de-conhecimento">4.2 Leitura da Base de Conhecimento</h3>
-<p>Antes de montar o prompt, o sistema precisa ler os guias de estilo e o historico de erros do usuario armazenados em arquivos de texto locais (pasta <code>knowledge_base/</code>).</p>
+<p>Antes de montar o prompt, o sistema precisa ler os guias de estilo e o histórico de erros do usuário armazenados em arquivos de texto locais (pasta <code>knowledge_base/</code>).</p>
 <p><strong>Leitura do Guia de Estilo (Tone of Voice):</strong>
-O backend le o arquivo <code>tone_of_voice.txt</code> e fragmenta o documento em secoes usando os marcadores <code>#</code>. Apenas as secoes relevantes serao injetadas no prompt.</p>
+O backend lê o arquivo <code>tone_of_voice.txt</code> e fragmenta o documento em seções usando os marcadores <code>#</code>. Apenas as seções relevantes serão injetadas no prompt.</p>
 <pre class="hljs"><code><div>kb_path = os.path.join(os.path.dirname(__file__), <span class="hljs-string">&#x27;knowledge_base&#x27;</span>, <span class="hljs-string">&#x27;tone_of_voice.txt&#x27;</span>)
 <span class="hljs-keyword">with</span> <span class="hljs-built_in">open</span>(kb_path, <span class="hljs-string">&#x27;r&#x27;</span>, encoding=<span class="hljs-string">&#x27;utf-8&#x27;</span>) <span class="hljs-keyword">as</span> f:
     content = f.read()
 
-<span class="hljs-comment"># Logica interna fragmenta o content baseado nas hashtags &#x27;#&#x27; para extracao cirurgica</span>
+<span class="hljs-comment"># Lógica interna fragmenta o content baseado nas hashtags &#x27;#&#x27; para extração cirúrgica</span>
 </div></code></pre>
 <p><strong>Leitura de Feedbacks Anteriores:</strong>
-Para evitar que a IA repita correcoes invalidas que o analista ja rejeitou, o sistema anexa os ultimos 50 erros reportados diretamente do arquivo de feedback.</p>
+Para evitar que a IA repita correções inválidas que o analista já rejeitou, o sistema anexa os últimos 50 erros reportados diretamente do arquivo de feedback.</p>
 <pre class="hljs"><code><div><span class="hljs-comment"># Injetar feedback de erros anteriores reportados pelo usuario</span>
 <span class="hljs-keyword">try</span>:
     feedback_filename = <span class="hljs-string">f&quot;feedback_<span class="hljs-subst">{target_lang}</span>.txt&quot;</span>
@@ -452,30 +451,30 @@ Para evitar que a IA repita correcoes invalidas que o analista ja rejeitou, o si
         <span class="hljs-keyword">with</span> <span class="hljs-built_in">open</span>(feedback_path, <span class="hljs-string">&#x27;r&#x27;</span>, encoding=<span class="hljs-string">&#x27;utf-8&#x27;</span>) <span class="hljs-keyword">as</span> f:
             feedback_content = f.read().strip()
         <span class="hljs-keyword">if</span> feedback_content:
-            <span class="hljs-comment"># Limitar para os ultimos 50 feedbacks para nao sobrecarregar o prompt (context window)</span>
+            <span class="hljs-comment"># Limitar para os últimos 50 feedbacks para não sobrecarregar o prompt (context window)</span>
             feedback_entries = feedback_content.split(<span class="hljs-string">&quot;--- FEEDBACK&quot;</span>)
             recent_entries = feedback_entries[-<span class="hljs-number">50</span>:] <span class="hljs-keyword">if</span> <span class="hljs-built_in">len</span>(feedback_entries) &gt; <span class="hljs-number">50</span> <span class="hljs-keyword">else</span> feedback_entries
             trimmed_feedback = <span class="hljs-string">&quot;--- FEEDBACK&quot;</span>.join(recent_entries).strip()
             
             <span class="hljs-comment"># Concatena os feedbacks nas regras relevantes do LLM</span>
-            relevant_rules += <span class="hljs-string">f&quot;\n\n[ERROS ANTERIORES REPORTADOS PELO USUARIO — NAO REPITA ESTES ERROS:]\n<span class="hljs-subst">{trimmed_feedback}</span>\n&quot;</span>
+            relevant_rules += <span class="hljs-string">f&quot;\n\n[ERROS ANTERIORES REPORTADOS PELO USUÁRIO — NÃO REPITA ESTES ERROS:]\n<span class="hljs-subst">{trimmed_feedback}</span>\n&quot;</span>
 <span class="hljs-keyword">except</span> Exception <span class="hljs-keyword">as</span> e:
-    <span class="hljs-built_in">print</span>(<span class="hljs-string">f&quot;Aviso: Nao foi possivel carregar feedback: <span class="hljs-subst">{e}</span>&quot;</span>)
+    <span class="hljs-built_in">print</span>(<span class="hljs-string">f&quot;Aviso: Não foi possível carregar feedback: <span class="hljs-subst">{e}</span>&quot;</span>)
 </div></code></pre>
-<h3 id="43-construcao-do-system-prompt">4.3 Construcao do System Prompt</h3>
-<p>Apos filtrar as regras do <code>tone_of_voice.txt</code> e anexar os feedbacks, o backend constroi o contexto. A IA e proibida de responder fora das tags.</p>
+<h3 id="43-construção-do-system-prompt">4.3 Construção do System Prompt</h3>
+<p>Após filtrar as regras do <code>tone_of_voice.txt</code> e anexar os feedbacks, o backend constrói o contexto. A IA é proibida de responder fora das tags.</p>
 <pre class="hljs"><code><div><span class="hljs-comment"># O System Prompt exige que a IA se comporte como Revisor Samsung e devolva APENAS tags XML</span>
-system_prompt = <span class="hljs-string">f&quot;&quot;&quot;Voce e o Revisor de Traducao da SAMSUNG.
-DIRETRIZES APLICAVEIS PARA ESTA STRING:
+system_prompt = <span class="hljs-string">f&quot;&quot;&quot;Você é o Revisor de Tradução da SAMSUNG.
+DIRETRIZES APLICÁVEIS PARA ESTA STRING:
 <span class="hljs-subst">{relevant_rules}</span>
 
-INSTRUCOES (LEIA COM ATENCAO):
-- O idioma alvo da revisao e obrigatoriamente <span class="hljs-subst">{lang_name}</span>.
+INSTRUÇÕES (LEIA COM ATENÇÃO):
+- O idioma alvo da revisão é obrigatoriamente <span class="hljs-subst">{lang_name}</span>.
 - Analise SEVERAMENTE o texto atual.
-- Se a Regra de Ouro do Glossario estiver presente, ELA E SOBERANA.
+- Se a Regra de Ouro do Glossário estiver presente, ELA É SOBERANA.
 - Responda EXATAMENTE neste formato XML: 
-&lt;advice&gt;sugestao corrigida ou &#x27;Mantido&#x27; se estiver perfeito&lt;/advice&gt;
-&lt;reason&gt;motivo detalhado da alteracao&lt;/reason&gt;
+&lt;advice&gt;sugestão corrigida ou &#x27;Mantido&#x27; se estiver perfeito&lt;/advice&gt;
+&lt;reason&gt;motivo detalhado da alteração&lt;/reason&gt;
 &lt;simplyReason&gt;resumo curto do erro. Retorne &#x27;Correto&#x27; SOMENTE SE advice for &#x27;Mantido&#x27;&lt;/simplyReason&gt;
 &quot;&quot;&quot;</span>
 
@@ -488,11 +487,11 @@ messages = [
 ]
 </div></code></pre>
 <h3 id="44-determinismo-e-envio-payload">4.4 Determinismo e Envio (Payload)</h3>
-<p>A chave para impedir que a Inteligencia Artificial alucine ou faca resumos criativos e baixar o parametro <code>temperature</code> a um nivel estrito.</p>
+<p>A chave para impedir que a Inteligência Artificial alucine ou faça resumos criativos é baixar o parâmetro <code>temperature</code> a um nível estrito.</p>
 <pre class="hljs"><code><div>payload = {
     <span class="hljs-string">&quot;model&quot;</span>: model <span class="hljs-keyword">or</span> MODEL_ID,
     <span class="hljs-string">&quot;messages&quot;</span>: messages,
-    <span class="hljs-string">&quot;temperature&quot;</span>: <span class="hljs-number">0.1</span>,  <span class="hljs-comment"># Impede variacoes criativas</span>
+    <span class="hljs-string">&quot;temperature&quot;</span>: <span class="hljs-number">0.1</span>,  <span class="hljs-comment"># Impede variações criativas</span>
     <span class="hljs-string">&quot;stream&quot;</span>: <span class="hljs-literal">False</span>
 }
 
@@ -502,7 +501,7 @@ headers = {
 }
 </div></code></pre>
 <h3 id="45-mecanismo-de-retry-da-ia">4.5 Mecanismo de Retry da IA</h3>
-<p>Como a API externa pode enfrentar instabilidade durante avaliacoes massivas em lote, o backend conta com um laco de repeticao com &quot;backoff&quot; (espera progressiva).</p>
+<p>Como a API externa pode enfrentar instabilidade durante avaliações massivas em lote, o backend conta com um laço de repetição com &quot;backoff&quot; (espera progressiva).</p>
 <pre class="hljs"><code><div>max_retries = <span class="hljs-number">3</span>
 <span class="hljs-keyword">for</span> attempt <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(max_retries):
     <span class="hljs-keyword">try</span>:
@@ -517,8 +516,8 @@ headers = {
     <span class="hljs-keyword">except</span> Exception <span class="hljs-keyword">as</span> e:
         time.sleep(<span class="hljs-number">2</span> * (attempt + <span class="hljs-number">1</span>))
 </div></code></pre>
-<h3 id="46-extracao-xml-e-trava-de-seguranca">4.6 Extracao XML e Trava de Seguranca</h3>
-<p>Para garantir que a resposta nao seja apenas texto livre, a saida bruta da IA e dissecada usando Expressoes Regulares (Regex). Alem disso, ha uma trava logica importante: se a IA sugeriu modificacoes no texto, ela e proibida de qualificar o texto original como &quot;Correto&quot; perante as regras gramaticais.</p>
+<h3 id="46-extração-xml-e-trava-de-segurança">4.6 Extração XML e Trava de Segurança</h3>
+<p>Para garantir que a resposta não seja apenas texto livre, a saída bruta da IA é dissecada usando Expressões Regulares (Regex). Além disso, há uma trava lógica importante: se a IA sugeriu modificações no texto, ela é proibida de qualificar o texto original como &quot;Correto&quot; perante as regras gramaticais.</p>
 <pre class="hljs"><code><div><span class="hljs-comment"># Disseca os nós da resposta da IA</span>
 <span class="hljs-keyword">match</span> = re.search(
     <span class="hljs-string">r&#x27;&lt;advice&gt;(.*?)&lt;/advice&gt;.*?&lt;reason&gt;(.*?)&lt;/reason&gt;.*?&lt;simplyReason&gt;(.*?)&lt;/simplyReason&gt;&#x27;</span>,
@@ -530,10 +529,10 @@ headers = {
     reason = <span class="hljs-keyword">match</span>.group(<span class="hljs-number">2</span>).strip()
     simply = <span class="hljs-keyword">match</span>.group(<span class="hljs-number">3</span>).strip()
 
-    <span class="hljs-comment"># Trava de alucinacao: Corrige a metrica caso a IA diga que estava certo mas efetuou trocas</span>
+    <span class="hljs-comment"># Trava de alucinação: Corrige a métrica caso a IA diga que estava certo mas efetuou trocas</span>
     <span class="hljs-keyword">if</span> advice != <span class="hljs-string">&quot;Mantido&quot;</span> <span class="hljs-keyword">and</span> advice != pt_content:
         <span class="hljs-keyword">if</span> simply.lower() <span class="hljs-keyword">in</span> [<span class="hljs-string">&quot;correto&quot;</span>, <span class="hljs-string">&quot;preciso&quot;</span>, <span class="hljs-string">&quot;ok&quot;</span>, <span class="hljs-string">&quot;perfeito&quot;</span>]:
-            simply = <span class="hljs-string">&quot;Alteracao de formatacao/pontuacao&quot;</span>
+            simply = <span class="hljs-string">&quot;Alteração de formatação/pontuação&quot;</span>
 </div></code></pre>
 
 </body>

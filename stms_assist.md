@@ -28,8 +28,6 @@ sequenceDiagram
 
 ## 2. Tecnologias de Desenvolvimento
 
-As tecnologias abaixo englobam exclusivamente o escopo do STMS AI Assist no sistema:
-
 ### Frontend
 - **React.js com Next.js:** Roteamento e arquitetura de componentes para a tela da ferramenta de banco de dados (`STMSDBTool`).
 - **TypeScript:** Tipagem forte das interfaces, como status das strings (`pending`, `reviewing`, `approved`) e respostas da API (`AIReviewResponse`).
