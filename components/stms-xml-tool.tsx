@@ -20,7 +20,10 @@ import {
  ExternalLink,
  AlertCircle,
  Minimize2,
- Maximize2
+ Maximize2,
+ Copy,
+ Plus,
+ Filter
 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -188,8 +191,9 @@ export function STMSXmlTool({ onFocusChange }: { onFocusChange?: (focused: boole
  const [elapsedTime, setElapsedTime] = useState(0);
 
  const [searchTerm, setSearchTerm] = useState('');
- const [columnFilters, setColumnFilters] = useState({ en: '', pt: '', analysis: '', ai: '' });
+ const [columnFilters, setColumnFilters] = useState<{en: string[], pt: string[], analysis: string[], ai: string[]}>({ en: [], pt: [], analysis: [], ai: [] });
  const [sortConfig, setSortConfig] = useState<{ key: keyof TranslationResult | 'analysis' | 'ai'; direction: 'asc' | 'desc' | null }>({ key: 'app_name', direction: null });
+ const [openFilter, setOpenFilter] = useState<'en' | 'pt' | 'analysis' | 'ai' | null>(null);
 
  const [selectedIssue, setSelectedIssue] = useState<TranslationResult | null>(null);
  const [selectedDetail, setSelectedDetail] = useState<TranslationResult | null>(null);
@@ -208,6 +212,12 @@ export function STMSXmlTool({ onFocusChange }: { onFocusChange?: (focused: boole
  useEffect(() => {
  setCurrentPage(1);
  }, [searchTerm, columnFilters]);
+
+ useEffect(() => {
+ const handleClickOutside = () => setOpenFilter(null);
+ document.addEventListener('click', handleClickOutside);
+ return () => document.removeEventListener('click', handleClickOutside);
+ }, []);
 
  useEffect(() => {
  if (isFocusMode) {
@@ -279,14 +289,65 @@ export function STMSXmlTool({ onFocusChange }: { onFocusChange?: (focused: boole
  setSortConfig({ key, direction });
  };
 
+ const uniqueValues = {
+ en: Array.from(new Set(finalResults.map(r => r.en))).sort(),
+ pt: Array.from(new Set(finalResults.map(r => r.pt))).sort(),
+ analysis: Array.from(new Set(finalResults.map(r => r.simplyReason || r.reason || ''))).sort(),
+ ai: Array.from(new Set(finalResults.map(r => r.advice || ''))).sort()
+ };
+
+ const toggleFilter = (col: 'en' | 'pt' | 'analysis' | 'ai', val: string) => {
+ setColumnFilters(prev => {
+ const isSelected = prev[col].includes(val);
+ const newFilter = isSelected ? prev[col].filter(v => v !== val) : [...prev[col], val];
+ return { ...prev, [col]: newFilter };
+ });
+ };
+
+ const renderFilterDropdown = (col: 'en' | 'pt' | 'analysis' | 'ai') => {
+ if (openFilter !== col) return null;
+ return (
+ <div 
+ className={`absolute top-full left-0 mt-2 w-64 max-h-60 overflow-y-auto rounded-lg shadow-xl border z-50 p-2 ${isDarkMode ? 'bg-[#1a1a1a] border-white/10' : 'bg-white border-gray-200'}`}
+ onClick={e => e.stopPropagation()}
+ >
+ <div className="flex items-center justify-between mb-2 pb-2 border-b border-black/5 dark:border-white/5">
+ <span className="text-[10px] font-black uppercase tracking-widest opacity-60">Filtrar ({columnFilters[col].length})</span>
+ <button 
+ onClick={(e) => { e.stopPropagation(); setColumnFilters(prev => ({...prev, [col]: []})); setOpenFilter(null); }}
+ className="text-[10px] uppercase font-black text-blue-500 hover:text-blue-400"
+ >
+ Limpar
+ </button>
+ </div>
+ <div className="flex flex-col gap-1">
+ {uniqueValues[col].map((val, idx) => (
+ <label key={idx} className="flex items-center gap-2 text-xs cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 p-1.5 rounded transition-colors">
+ <input 
+ type="checkbox" 
+ checked={columnFilters[col].includes(val)}
+ onChange={() => toggleFilter(col, val)}
+ className="rounded border-gray-300 w-3 h-3"
+ />
+ <span className="truncate flex-1">{val || '(Vazio)'}</span>
+ </label>
+ ))}
+ {uniqueValues[col].length === 0 && (
+ <span className="text-xs opacity-50 p-2 italic text-center block">Sem dados</span>
+ )}
+ </div>
+ </div>
+ );
+ };
+
  const filteredAndSortedResults = finalResults
  .filter(item => {
  const matchesGlobal = searchTerm === '' || Object.values(item).some(val => String(val).toLowerCase().includes(searchTerm.toLowerCase()));
- const matchesEn = columnFilters.en === '' || item.en.toLowerCase().includes(columnFilters.en.toLowerCase());
- const matchesPt = columnFilters.pt === '' || item.pt.toLowerCase().includes(columnFilters.pt.toLowerCase());
- const analysisText = `${item.simplyReason || ''} ${item.reason || ''}`.toLowerCase();
- const matchesAnalysis = columnFilters.analysis === '' || analysisText.includes(columnFilters.analysis.toLowerCase());
- const matchesAi = columnFilters.ai === '' || item.advice.toLowerCase().includes(columnFilters.ai.toLowerCase());
+ const matchesEn = columnFilters.en.length === 0 || columnFilters.en.includes(item.en);
+ const matchesPt = columnFilters.pt.length === 0 || columnFilters.pt.includes(item.pt);
+ const analysisText = item.simplyReason || item.reason || '';
+ const matchesAnalysis = columnFilters.analysis.length === 0 || columnFilters.analysis.includes(analysisText);
+ const matchesAi = columnFilters.ai.length === 0 || columnFilters.ai.includes(item.advice || '');
  
  return matchesGlobal && matchesEn && matchesPt && matchesAnalysis && matchesAi;
  })
@@ -611,68 +672,68 @@ Brazil Ui [BUYER]
  <table className="w-full text-sm text-left border-separate border-spacing-0">
  <thead>
   <tr className="bg-black/[0.02] dark:bg-white/[0.03]">
-  <th onDoubleClick={() => handleSort('en')} className="p-4 align-top border-b border-black/5 dark:border-white/5 w-[25%] cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 transition-colors group select-none" title="Duplo clique para ordenar">
+  <th onDoubleClick={() => handleSort('en')} className="relative p-4 align-top border-b border-black/5 dark:border-white/5 w-[25%] cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 transition-colors group select-none" title="Duplo clique para ordenar">
     <div className="flex flex-col gap-2">
       <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-[0.2em] opacity-40 group-hover:opacity-100 transition-opacity">
         <span>{t.tableHeaderEn}</span>
         <span>{sortConfig.key === 'en' ? (sortConfig.direction === 'asc' ? '↑' : '↓') : '↕'}</span>
       </div>
-      <input 
-        type="text"
-        placeholder="Filtrar..." 
-        value={columnFilters.en}
-        onChange={e => setColumnFilters(prev => ({...prev, en: e.target.value}))}
-        onClick={e => e.stopPropagation()}
-        className={`w-full h-8 px-3 text-xs rounded border-none outline-none ${isDarkMode ? 'bg-white/5 focus:bg-white/10 text-white' : 'bg-black/5 focus:bg-black/10 text-black'}`}
-      />
+      <button 
+        onClick={(e) => { e.stopPropagation(); setOpenFilter(openFilter === 'en' ? null : 'en'); }}
+        className={`w-full h-8 px-3 text-xs rounded border-none outline-none flex items-center justify-between transition-colors ${isDarkMode ? 'bg-white/5 hover:bg-white/10 text-white' : 'bg-black/5 hover:bg-black/10 text-black'} ${columnFilters.en.length > 0 ? 'bg-blue-500/20 text-blue-500' : ''}`}
+      >
+        <span className="opacity-60">{columnFilters.en.length > 0 ? `${columnFilters.en.length} selecionados` : 'Filtrar...'}</span>
+        <Filter className="w-3 h-3 opacity-50" />
+      </button>
+      {renderFilterDropdown('en')}
     </div>
   </th>
-  <th onDoubleClick={() => handleSort('pt')} className="p-4 align-top border-b border-black/5 dark:border-white/5 w-[25%] cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 transition-colors group select-none" title="Duplo clique para ordenar">
+  <th onDoubleClick={() => handleSort('pt')} className="relative p-4 align-top border-b border-black/5 dark:border-white/5 w-[25%] cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 transition-colors group select-none" title="Duplo clique para ordenar">
     <div className="flex flex-col gap-2">
       <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-[0.2em] opacity-40 group-hover:opacity-100 transition-opacity">
         <span>{t.tableHeaderPt}</span>
         <span>{sortConfig.key === 'pt' ? (sortConfig.direction === 'asc' ? '↑' : '↓') : '↕'}</span>
       </div>
-      <input 
-        type="text"
-        placeholder="Filtrar..." 
-        value={columnFilters.pt}
-        onChange={e => setColumnFilters(prev => ({...prev, pt: e.target.value}))}
-        onClick={e => e.stopPropagation()}
-        className={`w-full h-8 px-3 text-xs rounded border-none outline-none ${isDarkMode ? 'bg-white/5 focus:bg-white/10 text-white' : 'bg-black/5 focus:bg-black/10 text-black'}`}
-      />
+      <button 
+        onClick={(e) => { e.stopPropagation(); setOpenFilter(openFilter === 'pt' ? null : 'pt'); }}
+        className={`w-full h-8 px-3 text-xs rounded border-none outline-none flex items-center justify-between transition-colors ${isDarkMode ? 'bg-white/5 hover:bg-white/10 text-white' : 'bg-black/5 hover:bg-black/10 text-black'} ${columnFilters.pt.length > 0 ? 'bg-blue-500/20 text-blue-500' : ''}`}
+      >
+        <span className="opacity-60">{columnFilters.pt.length > 0 ? `${columnFilters.pt.length} selecionados` : 'Filtrar...'}</span>
+        <Filter className="w-3 h-3 opacity-50" />
+      </button>
+      {renderFilterDropdown('pt')}
     </div>
   </th>
-  <th onDoubleClick={() => handleSort('analysis')} className="p-4 align-top border-b border-black/5 dark:border-white/5 w-[20%] cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 transition-colors group select-none" title="Duplo clique para ordenar">
+  <th onDoubleClick={() => handleSort('analysis')} className="relative p-4 align-top border-b border-black/5 dark:border-white/5 w-[20%] cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 transition-colors group select-none" title="Duplo clique para ordenar">
     <div className="flex flex-col gap-2">
       <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-[0.2em] opacity-40 group-hover:opacity-100 transition-opacity">
         <span>{t.tableHeaderAnalysis}</span>
         <span>{sortConfig.key === 'analysis' ? (sortConfig.direction === 'asc' ? '↑' : '↓') : '↕'}</span>
       </div>
-      <input 
-        type="text"
-        placeholder="Filtrar..." 
-        value={columnFilters.analysis}
-        onChange={e => setColumnFilters(prev => ({...prev, analysis: e.target.value}))}
-        onClick={e => e.stopPropagation()}
-        className={`w-full h-8 px-3 text-xs rounded border-none outline-none ${isDarkMode ? 'bg-white/5 focus:bg-white/10 text-white' : 'bg-black/5 focus:bg-black/10 text-black'}`}
-      />
+      <button 
+        onClick={(e) => { e.stopPropagation(); setOpenFilter(openFilter === 'analysis' ? null : 'analysis'); }}
+        className={`w-full h-8 px-3 text-xs rounded border-none outline-none flex items-center justify-between transition-colors ${isDarkMode ? 'bg-white/5 hover:bg-white/10 text-white' : 'bg-black/5 hover:bg-black/10 text-black'} ${columnFilters.analysis.length > 0 ? 'bg-blue-500/20 text-blue-500' : ''}`}
+      >
+        <span className="opacity-60">{columnFilters.analysis.length > 0 ? `${columnFilters.analysis.length} selecionados` : 'Filtrar...'}</span>
+        <Filter className="w-3 h-3 opacity-50" />
+      </button>
+      {renderFilterDropdown('analysis')}
     </div>
   </th>
-  <th onDoubleClick={() => handleSort('ai')} className="p-4 align-top border-b border-black/5 dark:border-white/5 w-[30%] text-blue-500 cursor-pointer hover:bg-blue-500/5 transition-colors group select-none" title="Duplo clique para ordenar">
+  <th onDoubleClick={() => handleSort('ai')} className="relative p-4 align-top border-b border-black/5 dark:border-white/5 w-[30%] text-blue-500 cursor-pointer hover:bg-blue-500/5 transition-colors group select-none" title="Duplo clique para ordenar">
     <div className="flex flex-col gap-2">
       <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-[0.2em] opacity-80 group-hover:opacity-100 transition-opacity">
         <span>{t.tableHeaderAi}</span>
         <span>{sortConfig.key === 'ai' ? (sortConfig.direction === 'asc' ? '↑' : '↓') : '↕'}</span>
       </div>
-      <input 
-        type="text"
-        placeholder="Filtrar..." 
-        value={columnFilters.ai}
-        onChange={e => setColumnFilters(prev => ({...prev, ai: e.target.value}))}
-        onClick={e => e.stopPropagation()}
-        className={`w-full h-8 px-3 text-xs rounded border-none outline-none ${isDarkMode ? 'bg-blue-500/10 focus:bg-blue-500/20 text-blue-400' : 'bg-blue-50 focus:bg-blue-100 text-blue-600'}`}
-      />
+      <button 
+        onClick={(e) => { e.stopPropagation(); setOpenFilter(openFilter === 'ai' ? null : 'ai'); }}
+        className={`w-full h-8 px-3 text-xs rounded border-none outline-none flex items-center justify-between transition-colors ${isDarkMode ? 'bg-blue-500/10 hover:bg-blue-500/20 text-blue-400' : 'bg-blue-50 hover:bg-blue-100 text-blue-600'} ${columnFilters.ai.length > 0 ? 'bg-blue-500/30' : ''}`}
+      >
+        <span className="opacity-60">{columnFilters.ai.length > 0 ? `${columnFilters.ai.length} selecionados` : 'Filtrar...'}</span>
+        <Filter className="w-3 h-3 opacity-50" />
+      </button>
+      {renderFilterDropdown('ai')}
     </div>
   </th>
   </tr>
