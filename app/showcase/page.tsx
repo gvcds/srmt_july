@@ -36,7 +36,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { AIChart } from '@/components/ui/ai-chart';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { motion, useScroll, useTransform, Variants, MotionStyle } from 'framer-motion';
+import { motion, useScroll, useTransform, Variants, MotionStyle, AnimatePresence } from 'framer-motion';
 import { 
   OrbitControls, 
   Sphere, 
@@ -302,12 +302,77 @@ const SectionHeading = ({ icon: Icon, badge, title, highlight, description, isDa
   );
 };
 
+const CreditsModal = ({ isDarkMode, onClose }: { isDarkMode: boolean, onClose: () => void }) => {
+  const names = [
+    "Gilmar Silva", "Edgard Cunha", "Ivan Moreira", "Wallid Damon", "Felipe Luniere", 
+    "Afonso Fagundes", "Alexsandro Lemos", "Robert Pinto", "Abdo Hossaine", "David Fernandes", 
+    "Leornado Shintaku", "Denise Martins", "Janderson Brandao", "Joe Vidal", "Tatianna Bessa", 
+    "Cassio Costa", "Ronald Dominguez", "Sara Peixoto", "Antonio Prudente", "Gabriel Nagawo", 
+    "Vinicius Nascimento", "Endrew Diaz", "Kainy Medeiros", "Jaime Moura", "Gabriel Moura", 
+    "Douglas Multima", "Gabrielly Passos", "Marcelos Santos"
+  ];
+
+  return (
+    <motion.div 
+      initial={{ opacity: 0 }} 
+      animate={{ opacity: 1 }} 
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.8 }}
+      className={`fixed inset-0 z-[200] flex flex-col items-center justify-center p-6 backdrop-blur-3xl overflow-y-auto custom-scrollbar ${isDarkMode ? 'bg-[#030305]/90' : 'bg-white/90'}`}
+    >
+       <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-blue-500/10 via-transparent to-transparent" />
+       
+       <div className="relative z-10 max-w-6xl w-full flex flex-col items-center py-20 min-h-full">
+         <motion.div
+           initial={{ y: 50, opacity: 0 }}
+           animate={{ y: 0, opacity: 1 }}
+           transition={{ duration: 1, ease: "easeOut" }}
+           className="text-center mb-16"
+         >
+           <h2 className={`text-4xl md:text-6xl font-black mb-6 tracking-tight ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+             Time de SVP, SIDIA <br/>
+             <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-600">& Ex-Membros SVP/SIDIA</span>
+           </h2>
+           <p className={`text-sm md:text-base uppercase tracking-[0.4em] font-bold ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+             Reconhecimento & Contribuição
+           </p>
+         </motion.div>
+
+         <div className="flex flex-wrap justify-center gap-4 max-w-5xl mb-20">
+           {names.map((name, i) => (
+             <motion.div
+               key={name}
+               initial={{ opacity: 0, scale: 0.8, y: 20 }}
+               animate={{ opacity: 1, scale: 1, y: 0 }}
+               transition={{ delay: 0.5 + i * 0.05, duration: 0.5, type: "spring" }}
+               className={`px-5 py-2.5 rounded-full border text-sm font-bold shadow-lg ${isDarkMode ? 'bg-white/5 border-white/10 text-gray-200' : 'bg-gray-50 border-gray-200 text-gray-800'}`}
+             >
+               {name}
+             </motion.div>
+           ))}
+         </div>
+
+         <motion.div
+           initial={{ opacity: 0, y: 20 }}
+           animate={{ opacity: 1, y: 0 }}
+           transition={{ delay: 2.5, duration: 0.8 }}
+         >
+           <Button onClick={onClose} className="rounded-full px-12 h-16 text-sm font-black uppercase tracking-widest bg-blue-600 hover:bg-blue-500 text-white shadow-[0_0_50px_rgba(37,99,235,0.4)] transition-all hover:scale-105 active:scale-95">
+             Acessar Sistema <ArrowRight className="ml-3 w-5 h-5" />
+           </Button>
+         </motion.div>
+       </div>
+    </motion.div>
+  );
+};
+
 export default function ShowcasePage() {
   const { isDarkMode, setTheme } = useTheme() as ThemeContextValue;
   const containerRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: containerRef });
 
   const [lang, setLang] = useState<'pt' | 'en' | 'ko'>('pt');
+  const [showCredits, setShowCredits] = useState(true);
 
   // AI Demo States
   const [isGeneratingChart, setIsGeneratingChart] = useState(false);
@@ -716,6 +781,10 @@ export default function ShowcasePage() {
     <div ref={containerRef} className={`min-h-screen font-sans flex flex-col items-center transition-colors duration-1000 overflow-x-hidden
       ${isDarkMode ? "bg-[#030305] text-gray-200" : "bg-[#fcfcfd] text-gray-800"}`}>
       
+      <AnimatePresence>
+        {showCredits && <CreditsModal isDarkMode={isDarkMode} onClose={() => setShowCredits(false)} />}
+      </AnimatePresence>
+
       <Navbar />
 
       {/* Hero Section */}
