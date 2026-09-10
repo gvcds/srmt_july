@@ -573,7 +573,7 @@ Brazil Ui [BUYER]
  <div className="flex flex-col flex-1 min-h-0 gap-6">
     
     {/* Metrics Cards */}
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
       <div className={`p-5 rounded-2xl border flex items-center justify-between shadow-sm transition-all hover:shadow-md ${isDarkMode ? 'bg-[#1a1a1a]/80 border-white/5' : 'bg-white border-gray-100'}`}>
         <div>
           <p className="text-[11px] font-black uppercase tracking-[0.2em] opacity-40 mb-1">Erros</p>
@@ -587,13 +587,6 @@ Brazil Ui [BUYER]
           <p className="text-3xl font-bold text-emerald-500 tracking-tight">{finalResults.filter(item => normalizeAdvice(item.advice) === 'OK / Sem sugestão').length}</p>
         </div>
         <div className="p-4 bg-emerald-500/10 rounded-xl text-emerald-500"><CheckCircle2 size={28} /></div>
-      </div>
-      <div className={`p-5 rounded-2xl border flex items-center justify-between shadow-sm transition-all hover:shadow-md ${isDarkMode ? 'bg-[#1a1a1a]/80 border-white/5' : 'bg-white border-gray-100'}`}>
-        <div>
-          <p className="text-[11px] font-black uppercase tracking-[0.2em] opacity-40 mb-1">Faltam Revisar</p>
-          <p className="text-3xl font-bold text-blue-500 tracking-tight">{finalResults.filter(item => item.advice !== 'ERRO' && normalizeAdvice(item.advice) !== 'OK / Sem sugestão').length}</p>
-        </div>
-        <div className="p-4 bg-blue-500/10 rounded-xl text-blue-500"><AlertCircle size={28} /></div>
       </div>
     </div>
     
