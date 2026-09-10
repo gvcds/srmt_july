@@ -197,12 +197,6 @@ export function STMSXmlTool({ onFocusChange }: { onFocusChange?: (focused: boole
 
  const [selectedIssue, setSelectedIssue] = useState<TranslationResult | null>(null);
  const [selectedDetail, setSelectedDetail] = useState<TranslationResult | null>(null);
- const [isFocusMode, setIsFocusModeState] = useState(false);
- 
- const setIsFocusMode = (focused: boolean) => {
- setIsFocusModeState(focused);
- if (onFocusChange) onFocusChange(focused);
- };
 
  const [currentPage, setCurrentPage] = useState(1);
  const itemsPerPage = 15;
@@ -212,15 +206,6 @@ export function STMSXmlTool({ onFocusChange }: { onFocusChange?: (focused: boole
  useEffect(() => {
  setCurrentPage(1);
  }, [searchTerm, activeFilter]);
-
- useEffect(() => {
- if (isFocusMode) {
- document.body.style.overflow = 'hidden';
- } else {
- document.body.style.overflow = 'unset';
- }
- return () => { document.body.style.overflow = 'unset'; };
- }, [isFocusMode]);
 
  const API_URL = typeof window !== 'undefined' 
  ? `${window.location.protocol}//${window.location.hostname}:8001` 
@@ -417,7 +402,7 @@ Brazil Ui [BUYER]
  };
 
  return (
- <div className={`w-full space-y-8 animate-in fade-in duration-700 pb-20 px-4 ${isFocusMode ? 'relative z-[1000]' : ''}`}>
+ <div className="w-full space-y-8 animate-in fade-in duration-700 pb-20 px-4">
  {/* Top Section: Upload & Project Info side by side */}
  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
  <Card className={`p-8 rounded-xl border shadow-2xl transition-all duration-500 backdrop-blur-2xl ${isDarkMode ? 'bg-[#111]/40 border-white/5 shadow-black/40' : 'bg-white/60 border-slate-200 shadow-slate-200/50'}`}>
@@ -541,12 +526,7 @@ Brazil Ui [BUYER]
  )}
 
  {/* Results Matrix Section */}
- <Card className={`p-8 transition-all duration-500 flex flex-col backdrop-blur-2xl
- ${isFocusMode 
- ? 'fixed inset-0 z-[999] rounded-none border-none bg-background' 
- : 'rounded-xl border shadow-2xl'
- }
- ${isDarkMode ? 'bg-[#111]/40 border-white/5 shadow-black/40' : 'bg-white/60 border-slate-200 shadow-slate-200/50'}`}>
+ <Card className={`p-8 rounded-xl border shadow-2xl transition-all duration-500 flex flex-col backdrop-blur-2xl ${isDarkMode ? 'bg-[#111]/40 border-white/5 shadow-black/40' : 'bg-white/60 border-slate-200 shadow-slate-200/50'}`}>
  <div className="flex flex-col md:flex-row items-center justify-between gap-6 mb-8">
  <div>
  <h3 className="text-2xl font-black tracking-tight flex items-center gap-3">
@@ -572,14 +552,6 @@ Brazil Ui [BUYER]
  </div>
  {finalResults.length > 0 && (
  <div className="flex gap-2">
- <Button 
- onClick={() => setIsFocusMode(!isFocusMode)} 
- variant="outline"
- className={`rounded-lg h-11 w-11 p-0 font-bold transition-all ${isFocusMode ? 'bg-blue-600 text-white border-blue-600 shadow-lg shadow-blue-600/20 ' : ''}`}
- title={isFocusMode ? "Sair do Modo Foco" : "Modo Foco (Tela Cheia)"}
- >
- {isFocusMode ? <Minimize2 size={20} /> : <Maximize2 size={20} />}
- </Button>
  <Button onClick={handleGenerateReport} disabled={isGeneratingReport} className="rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white h-11 px-6 shadow-lg shadow-emerald-600/20 font-bold">
  {isGeneratingReport ? (
  <><Loader2 className="animate-spin w-4 h-4 mr-2" /> {t.preparing}</>
@@ -648,32 +620,9 @@ Brazil Ui [BUYER]
       >
         Exibir Apenas Corretos
       </Button>
-      <Button 
-        variant={activeFilter === 'pending' ? 'default' : 'ghost'} 
-        onClick={() => setActiveFilter('pending')} 
-        className={`rounded-full px-6 font-bold shadow-none ${activeFilter === 'pending' ? 'bg-blue-500 text-white hover:bg-blue-600' : 'text-blue-500 hover:bg-blue-500/10 bg-blue-500/5'}`}
-      >
-        Exibir Faltam Revisar
-      </Button>
     </div>
 
- {isFocusMode && (
- <div className={`p-4 mb-4 rounded-xl border flex justify-between items-center ${isDarkMode ? 'bg-black/40 border-white/10' : 'bg-gray-100 border-black/5'}`}>
- <div className="flex items-center gap-3">
- <TableIcon className="w-5 h-5 text-blue-500" />
- <h3 className="font-bold uppercase tracking-widest text-xs">Modo Foco Ativado - Matriz de Resultados</h3>
- </div>
- <Button 
- onClick={() => setIsFocusMode(false)} 
- variant="ghost" 
- size="sm" 
- className="rounded-lg h-9 px-4 font-bold bg-blue-600/10 text-blue-600 hover:bg-blue-600/20"
- >
- <Minimize2 className="w-4 h-4 mr-2" /> Sair do Foco
- </Button>
- </div>
- )}
- <div className={`overflow-y-auto overflow-x-auto rounded-xl border border-black/5 dark:border-white/10 bg-black/5 dark:bg-white/[0.02] custom-scrollbar ${isFocusMode ? 'flex-1 min-h-0' : 'h-[500px]'}`}>
+  <div className={`overflow-y-auto overflow-x-auto rounded-xl border border-black/5 dark:border-white/10 bg-black/5 dark:bg-white/[0.02] custom-scrollbar h-[500px]`}>
  <table className="w-full text-sm text-left border-separate border-spacing-0">
  <thead>
   <tr className="bg-black/[0.02] dark:bg-white/[0.03]">
