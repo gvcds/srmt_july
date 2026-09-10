@@ -334,7 +334,7 @@ const CreditsModal = ({ isDarkMode, onClose }: { isDarkMode: boolean, onClose: (
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-600">& Ex-Membros SVP/SIDIA</span>
           </h2>
           <p className={`text-sm md:text-base uppercase tracking-[0.4em] font-bold ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-            Agradecimentos pela contribuição no desenvolvimento e melhoria das ferramentas
+            Meu muito obrigado por toda a ajuda e parceria na construção de tudo isso!
           </p>
         </motion.div>
 
