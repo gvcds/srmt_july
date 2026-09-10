@@ -277,10 +277,9 @@ export function STMSXmlTool({ onFocusChange }: { onFocusChange?: (focused: boole
   .filter(item => {
   const matchesGlobal = searchTerm === '' || Object.values(item).some(val => String(val).toLowerCase().includes(searchTerm.toLowerCase()));
   
-  let matchesType = true;
-  if (activeFilter === 'errors') matchesType = item.advice === 'ERRO';
-  if (activeFilter === 'correct') matchesType = normalizeAdvice(item.advice) === 'OK / Sem sugestão';
-  if (activeFilter === 'pending') matchesType = item.advice !== 'ERRO' && normalizeAdvice(item.advice) !== 'OK / Sem sugestão';
+   let matchesType = true;
+   if (activeFilter === 'errors') matchesType = normalizeAdvice(item.advice) !== 'OK / Sem sugestão';
+   if (activeFilter === 'correct') matchesType = normalizeAdvice(item.advice) === 'OK / Sem sugestão';
   
   return matchesGlobal && matchesType;
   })
@@ -577,7 +576,7 @@ Brazil Ui [BUYER]
       <div className={`p-5 rounded-2xl border flex items-center justify-between shadow-sm transition-all hover:shadow-md ${isDarkMode ? 'bg-[#1a1a1a]/80 border-white/5' : 'bg-white border-gray-100'}`}>
         <div>
           <p className="text-[11px] font-black uppercase tracking-[0.2em] opacity-40 mb-1">Erros</p>
-          <p className="text-3xl font-bold text-red-500 tracking-tight">{finalResults.filter(item => item.advice === 'ERRO').length}</p>
+          <p className="text-3xl font-bold text-red-500 tracking-tight">{finalResults.filter(item => normalizeAdvice(item.advice) !== 'OK / Sem sugestão').length}</p>
         </div>
         <div className="p-4 bg-red-500/10 rounded-xl text-red-500"><XCircle size={28} /></div>
       </div>
