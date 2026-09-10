@@ -1,11 +1,11 @@
 'use client';
 
 import React, { useRef, Suspense, useEffect, useState } from 'react';
-import { 
-  BrainCircuit, 
-  CalendarDays, 
-  Cpu, 
-  Zap, 
+import {
+  BrainCircuit,
+  CalendarDays,
+  Cpu,
+  Zap,
   Database,
   ArrowRight,
   FileCode2,
@@ -37,13 +37,13 @@ import { Card } from '@/components/ui/card';
 import { AIChart } from '@/components/ui/ai-chart';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { motion, useScroll, useTransform, Variants, MotionStyle, AnimatePresence } from 'framer-motion';
-import { 
-  OrbitControls, 
-  Sphere, 
-  MeshDistortMaterial, 
-  Float, 
-  Stars, 
-  Box, 
+import {
+  OrbitControls,
+  Sphere,
+  MeshDistortMaterial,
+  Float,
+  Stars,
+  Box,
   PerspectiveCamera,
   ContactShadows,
   Environment,
@@ -55,7 +55,7 @@ import * as THREE from 'three';
 
 const NeuralNode = ({ position, color, speed = 1 }: any) => {
   const meshRef = useRef<THREE.Mesh>(null);
-  
+
   useFrame((state) => {
     const t = state.clock.getElapsedTime() * speed;
     if (meshRef.current) {
@@ -74,7 +74,7 @@ const NeuralNode = ({ position, color, speed = 1 }: any) => {
 const ConnectionLines = () => {
   const groupRef = useRef<THREE.Group>(null);
   const points = useRef<THREE.Vector3[]>([]);
-  
+
   if (points.current.length === 0) {
     for (let i = 0; i < 30; i++) {
       points.current.push(new THREE.Vector3((Math.random() - 0.5) * 15, (Math.random() - 0.5) * 15, (Math.random() - 0.5) * 15));
@@ -90,11 +90,11 @@ const ConnectionLines = () => {
   return (
     <group ref={groupRef}>
       {points.current.map((p, i) => (
-        <NeuralNode 
-          key={i} 
-          position={[p.x, p.y, p.z]} 
-          color={i % 3 === 0 ? "#00f0ff" : i % 3 === 1 ? "#8b5cf6" : "#ff007f"} 
-          speed={1 + Math.random()} 
+        <NeuralNode
+          key={i}
+          position={[p.x, p.y, p.z]}
+          color={i % 3 === 0 ? "#00f0ff" : i % 3 === 1 ? "#8b5cf6" : "#ff007f"}
+          speed={1 + Math.random()}
         />
       ))}
     </group>
@@ -129,12 +129,12 @@ const TechCrystal = ({ isDarkMode }: { isDarkMode: boolean }) => {
     <Float speed={5} rotationIntensity={3} floatIntensity={3}>
       <mesh ref={meshRef}>
         <octahedronGeometry args={[2.5, 0]} />
-        <MeshDistortMaterial 
-          color={isDarkMode ? "#00f0ff" : "#3b82f6"} 
+        <MeshDistortMaterial
+          color={isDarkMode ? "#00f0ff" : "#3b82f6"}
           emissive={isDarkMode ? "#0055ff" : "#1e40af"}
           emissiveIntensity={0.6}
-          speed={2.5} 
-          distort={0.4} 
+          speed={2.5}
+          distort={0.4}
           radius={1}
           metalness={0.9}
           roughness={0.1}
@@ -158,7 +158,7 @@ const ToolCard = ({ icon: Icon, title, description, url, isDarkMode, color = "bl
 
   return (
     <div className="block group w-full h-full">
-      <motion.div 
+      <motion.div
         whileHover={{ y: -5, scale: 1.02 }}
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -180,7 +180,7 @@ const ToolCard = ({ icon: Icon, title, description, url, isDarkMode, color = "bl
 const RealTimeDataStream = ({ isDarkMode }: { isDarkMode: boolean }) => {
   const [dataPoints, setDataPoints] = React.useState<number[]>([10, 20, 15, 30, 25, 40, 35, 50, 45, 60]);
   const [logs, setLogs] = React.useState<string[]>([]);
-  
+
   React.useEffect(() => {
     const interval = setInterval(() => {
       setDataPoints(prev => [...prev.slice(1), Math.floor(Math.random() * 80) + 20]);
@@ -212,60 +212,60 @@ const RealTimeDataStream = ({ isDarkMode }: { isDarkMode: boolean }) => {
         </div>
         <div className="relative w-full h-full bg-black/5 dark:bg-white/5 rounded-2xl overflow-hidden p-4">
           <svg viewBox="0 0 500 150" className="w-full h-full" preserveAspectRatio="none">
-             <defs>
-                <linearGradient id="streamGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#8b5cf6" stopOpacity="0.5" />
-                  <stop offset="100%" stopColor="#8b5cf6" stopOpacity="0" />
-                </linearGradient>
-             </defs>
-             <path 
-               d={`M 0,150 L ${dataPoints.map((p, i) => `${i * 55},${150 - p}`).join(' L ')} L 500,150 Z`} 
-               fill="url(#streamGrad)" 
-               className="transition-all duration-1000 ease-linear"
-             />
-             <path 
-               d={`M ${dataPoints.map((p, i) => `${i * 55},${150 - p}`).join(' L ')}`} 
-               fill="none" 
-               stroke="#8b5cf6" 
-               strokeWidth="3" 
-               strokeLinecap="round" 
-               strokeLinejoin="round"
-               className="transition-all duration-1000 ease-linear"
-             />
-             {dataPoints.map((p, i) => (
-               <motion.circle 
-                 key={i} 
-                 cx={i * 55} 
-                 cy={150 - p} 
-                 r="5" 
-                 fill="#00f0ff"
-                 initial={{ scale: 0 }}
-                 animate={{ scale: [1, 1.8, 1] }}
-                 transition={{ duration: 1, repeat: Infinity, repeatDelay: Math.random() * 2 }}
-                 className="transition-all duration-1000 ease-linear"
-               />
-             ))}
+            <defs>
+              <linearGradient id="streamGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#8b5cf6" stopOpacity="0.5" />
+                <stop offset="100%" stopColor="#8b5cf6" stopOpacity="0" />
+              </linearGradient>
+            </defs>
+            <path
+              d={`M 0,150 L ${dataPoints.map((p, i) => `${i * 55},${150 - p}`).join(' L ')} L 500,150 Z`}
+              fill="url(#streamGrad)"
+              className="transition-all duration-1000 ease-linear"
+            />
+            <path
+              d={`M ${dataPoints.map((p, i) => `${i * 55},${150 - p}`).join(' L ')}`}
+              fill="none"
+              stroke="#8b5cf6"
+              strokeWidth="3"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="transition-all duration-1000 ease-linear"
+            />
+            {dataPoints.map((p, i) => (
+              <motion.circle
+                key={i}
+                cx={i * 55}
+                cy={150 - p}
+                r="5"
+                fill="#00f0ff"
+                initial={{ scale: 0 }}
+                animate={{ scale: [1, 1.8, 1] }}
+                transition={{ duration: 1, repeat: Infinity, repeatDelay: Math.random() * 2 }}
+                className="transition-all duration-1000 ease-linear"
+              />
+            ))}
           </svg>
         </div>
       </div>
       <div className="flex-1 w-full flex flex-col justify-center">
-         <div className={`text-sm font-black uppercase tracking-widest mb-6 flex items-center gap-2 ${isDarkMode ? 'text-emerald-400' : 'text-emerald-600'}`}>
-           <Terminal size={18} /> Deep Learning Logs
-         </div>
-         <div className={`space-y-4 font-mono text-xs leading-relaxed p-6 rounded-2xl h-64 overflow-hidden ${isDarkMode ? 'bg-black/50 border border-white/10 text-emerald-400/80' : 'bg-emerald-50 border border-emerald-100 text-emerald-700/80'}`}>
-            {logs.map((log, i) => (
-              <motion.div 
-                key={i + log}
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1 - i * 0.2, x: 0 }}
-                className="flex gap-3 items-start"
-              >
-                <span className="opacity-50 shrink-0">[{new Date().toISOString().split('T')[1].substring(0, 8)}]</span>
-                <span>{log}</span>
-              </motion.div>
-            ))}
-            {logs.length === 0 && <div className="animate-pulse flex items-center gap-2"><Loader2 className="animate-spin w-4 h-4" /> Aguardando instâncias da IA...</div>}
-         </div>
+        <div className={`text-sm font-black uppercase tracking-widest mb-6 flex items-center gap-2 ${isDarkMode ? 'text-emerald-400' : 'text-emerald-600'}`}>
+          <Terminal size={18} /> Deep Learning Logs
+        </div>
+        <div className={`space-y-4 font-mono text-xs leading-relaxed p-6 rounded-2xl h-64 overflow-hidden ${isDarkMode ? 'bg-black/50 border border-white/10 text-emerald-400/80' : 'bg-emerald-50 border border-emerald-100 text-emerald-700/80'}`}>
+          {logs.map((log, i) => (
+            <motion.div
+              key={i + log}
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1 - i * 0.2, x: 0 }}
+              className="flex gap-3 items-start"
+            >
+              <span className="opacity-50 shrink-0">[{new Date().toISOString().split('T')[1].substring(0, 8)}]</span>
+              <span>{log}</span>
+            </motion.div>
+          ))}
+          {logs.length === 0 && <div className="animate-pulse flex items-center gap-2"><Loader2 className="animate-spin w-4 h-4" /> Aguardando instâncias da IA...</div>}
+        </div>
       </div>
     </div>
   );
@@ -282,7 +282,7 @@ const SectionHeading = ({ icon: Icon, badge, title, highlight, description, isDa
   };
 
   return (
-    <motion.div 
+    <motion.div
       initial={{ opacity: 0, x: -30 }}
       whileInView={{ opacity: 1, x: 0 }}
       viewport={{ once: true, margin: "-100px" }}
@@ -304,64 +304,75 @@ const SectionHeading = ({ icon: Icon, badge, title, highlight, description, isDa
 
 const CreditsModal = ({ isDarkMode, onClose }: { isDarkMode: boolean, onClose: () => void }) => {
   const names = [
-    "Gilmar Silva", "Edgard Cunha", "Ivan Moreira", "Wallid Damon", "Felipe Luniere", 
-    "Afonso Fagundes", "Alexsandro Lemos", "Robert Pinto", "Abdo Hossaine", "David Fernandes", 
-    "Leornado Shintaku", "Denise Martins", "Janderson Brandao", "Joe Vidal", "Tatianna Bessa", 
-    "Cassio Costa", "Ronald Dominguez", "Sara Peixoto", "Antonio Prudente", "Gabriel Nagawo", 
-    "Vinicius Nascimento", "Endrew Diaz", "Kainy Medeiros", "Jaime Moura", "Gabriel Moura", 
+    "Gilmar Silva", "Edgard Cunha", "Ivan Moreira", "Mr. Bom", "Marcelo Kim", "Wallid Damon", "Felipe Luniere",
+    "Afonso Fagundes", "Alexsandro Lemos", "Robert Pinto", "Abdo Hossaine", "David Fernandes",
+    "Leornado Shintaku", "Denise Martins", "Maria Elizabet", "Caroline Silva", "Victoria Andrade", "Janderson Brandao", "Joe Vidal", "Tatianna Bessa",
+    "Cassio Costa", "Ronald Dominguez", "Sara Peixoto", "Antonio Prudente", "Gabriel Nagawo",
+    "Vinicius Nascimento", "Endrew Diaz", "Kainy Medeiros", "Jaime Moura", "Gabriel Moura",
     "Douglas Multima", "Gabrielly Passos", "Marcelos Santos"
   ];
 
   return (
-    <motion.div 
-      initial={{ opacity: 0 }} 
-      animate={{ opacity: 1 }} 
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.8 }}
       className={`fixed inset-0 z-[200] flex flex-col items-center justify-center p-6 backdrop-blur-3xl overflow-y-auto custom-scrollbar ${isDarkMode ? 'bg-[#030305]/90' : 'bg-white/90'}`}
     >
-       <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-blue-500/10 via-transparent to-transparent" />
-       
-       <div className="relative z-10 max-w-6xl w-full flex flex-col items-center py-20 min-h-full">
-         <motion.div
-           initial={{ y: 50, opacity: 0 }}
-           animate={{ y: 0, opacity: 1 }}
-           transition={{ duration: 1, ease: "easeOut" }}
-           className="text-center mb-16"
-         >
-           <h2 className={`text-4xl md:text-6xl font-black mb-6 tracking-tight ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-             Time de SVP, SIDIA <br/>
-             <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-600">& Ex-Membros SVP/SIDIA</span>
-           </h2>
-           <p className={`text-sm md:text-base uppercase tracking-[0.4em] font-bold ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-             Reconhecimento & Contribuição
-           </p>
-         </motion.div>
+      <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-blue-500/10 via-transparent to-transparent" />
 
-         <div className="flex flex-wrap justify-center gap-4 max-w-5xl mb-20">
-           {names.map((name, i) => (
-             <motion.div
-               key={name}
-               initial={{ opacity: 0, scale: 0.8, y: 20 }}
-               animate={{ opacity: 1, scale: 1, y: 0 }}
-               transition={{ delay: 0.5 + i * 0.05, duration: 0.5, type: "spring" }}
-               className={`px-5 py-2.5 rounded-full border text-sm font-bold shadow-lg ${isDarkMode ? 'bg-white/5 border-white/10 text-gray-200' : 'bg-gray-50 border-gray-200 text-gray-800'}`}
-             >
-               {name}
-             </motion.div>
-           ))}
-         </div>
+      <div className="relative z-10 max-w-6xl w-full flex flex-col items-center py-20 min-h-full">
+        <motion.div
+          initial={{ y: 50, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 1, ease: "easeOut" }}
+          className="text-center mb-16"
+        >
+          <h2 className={`text-4xl md:text-6xl font-black mb-6 tracking-tight ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+            Time de SVP, SIDIA <br />
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-600">& Ex-Membros SVP/SIDIA</span>
+          </h2>
+          <p className={`text-sm md:text-base uppercase tracking-[0.4em] font-bold ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+            Agradecimentos pela contribuição no desenvolvimento e melhoria das ferramentas
+          </p>
+        </motion.div>
 
-         <motion.div
-           initial={{ opacity: 0, y: 20 }}
-           animate={{ opacity: 1, y: 0 }}
-           transition={{ delay: 2.5, duration: 0.8 }}
-         >
-           <Button onClick={onClose} className="rounded-full px-12 h-16 text-sm font-black uppercase tracking-widest bg-blue-600 hover:bg-blue-500 text-white shadow-[0_0_50px_rgba(37,99,235,0.4)] transition-all hover:scale-105 active:scale-95">
-             Acessar Sistema <ArrowRight className="ml-3 w-5 h-5" />
-           </Button>
-         </motion.div>
-       </div>
+        <div className="flex flex-wrap justify-center gap-4 max-w-5xl mb-20">
+          {names.map((name, i) => (
+            <motion.div
+              key={name}
+              initial={{ opacity: 0, scale: 0.8, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              transition={{ delay: 0.5 + i * 0.05, duration: 0.5, type: "spring" }}
+              className={`px-5 py-2.5 rounded-full border text-sm font-bold shadow-lg ${isDarkMode ? 'bg-white/5 border-white/10 text-gray-200' : 'bg-gray-50 border-gray-200 text-gray-800'}`}
+            >
+              {name}
+            </motion.div>
+          ))}
+        </div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 2.2, duration: 0.8 }}
+          className={`max-w-2xl text-center mb-16 px-6 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}
+        >
+          <p className="text-sm md:text-base italic leading-relaxed">
+            "Um agradecimento especial a todos os usuários e colaboradores que dedicaram seu tempo para abrir tickets e relatar feedbacks. O esforço contínuo de vocês foi fundamental para o aprimoramento deste ecossistema."
+          </p>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 2.5, duration: 0.8 }}
+        >
+          <Button onClick={onClose} className="rounded-full px-12 h-16 text-sm font-black uppercase tracking-widest bg-blue-600 hover:bg-blue-500 text-white shadow-[0_0_50px_rgba(37,99,235,0.4)] transition-all hover:scale-105 active:scale-95">
+            Acessar Sistema <ArrowRight className="ml-3 w-5 h-5" />
+          </Button>
+        </motion.div>
+      </div>
     </motion.div>
   );
 };
@@ -382,8 +393,8 @@ export default function ShowcasePage() {
   const [isAnalyzingLog, setIsAnalyzingLog] = useState(false);
   const [logResult, setLogResult] = useState("");
 
-  const API_URL = typeof window !== 'undefined' 
-    ? `${window.location.protocol}//${window.location.hostname}:8001` 
+  const API_URL = typeof window !== 'undefined'
+    ? `${window.location.protocol}//${window.location.hostname}:8001`
     : '';
 
   const generateAIChart = async () => {
@@ -468,7 +479,7 @@ export default function ShowcasePage() {
   }, []);
 
   const translations = {
-    pt: { 
+    pt: {
       hero: { subtitle: "A convergência entre ", h1: "Engenharia de Qualidade", and: " e ", h2: "Inteligência Generativa", explore: "Explorar Workspace", scroll: "Scroll para descobrir" },
       tech: {
         badge: "Infrastructure",
@@ -560,7 +571,7 @@ export default function ShowcasePage() {
         diagnostic: "Diagnóstico IA"
       }
     },
-    en: { 
+    en: {
       hero: { subtitle: "The convergence of ", h1: "Quality Engineering", and: " and ", h2: "Generative Intelligence", explore: "Explore Workspace", scroll: "Scroll to discover" },
       tech: {
         badge: "Infrastructure",
@@ -652,7 +663,7 @@ export default function ShowcasePage() {
         diagnostic: "AI Diagnostic"
       }
     },
-    ko: { 
+    ko: {
       hero: { subtitle: "", h1: "품질 엔지니어링", and: "과 ", h2: "생성형 AI", explore: "작업 공간 탐색", scroll: "스크롤하여 탐색" },
       tech: {
         badge: "인프라",
@@ -753,7 +764,7 @@ export default function ShowcasePage() {
       setTheme(true);
     }
   }, [setTheme]);
-  
+
   const heroOpacity = useTransform(scrollYProgress, [0, 0.15], [1, 0]);
   const heroScale = useTransform(scrollYProgress, [0, 0.15], [1, 0.9]);
   const heroY = useTransform(scrollYProgress, [0, 0.15], [0, 100]);
@@ -780,7 +791,7 @@ export default function ShowcasePage() {
   return (
     <div ref={containerRef} className={`min-h-screen font-sans flex flex-col items-center transition-colors duration-1000 overflow-x-hidden
       ${isDarkMode ? "bg-[#030305] text-gray-200" : "bg-[#fcfcfd] text-gray-800"}`}>
-      
+
       <AnimatePresence>
         {showCredits && <CreditsModal isDarkMode={isDarkMode} onClose={() => setShowCredits(false)} />}
       </AnimatePresence>
@@ -803,8 +814,8 @@ export default function ShowcasePage() {
           </Canvas>
         </div>
 
-        <motion.div 
-          style={heroStyle} 
+        <motion.div
+          style={heroStyle}
           variants={containerVariants}
           initial="hidden"
           animate="visible"
@@ -835,15 +846,15 @@ export default function ShowcasePage() {
             <Cpu className="w-5 h-5 animate-pulse" />
             <span className="text-xs font-black uppercase tracking-[0.3em]">SRMT Ecosystem v2.0</span>
           </motion.div>
-          
+
           <motion.h1 variants={itemVariants} className={`text-7xl md:text-[10rem] font-black tracking-[-0.05em] leading-none text-transparent bg-clip-text bg-gradient-to-br select-none drop-shadow-2xl ${isDarkMode ? 'from-white via-blue-200 to-[#00f0ff]' : 'from-gray-900 via-blue-600 to-[#00f0ff]'}`}>
             SRMT.
           </motion.h1>
-          
+
           <motion.p variants={itemVariants} className="text-xl md:text-3xl max-w-3xl font-bold opacity-70 tracking-tight">
             {t.hero.subtitle}<span className="text-[#00f0ff]">{t.hero.h1}</span>{t.hero.and}<span className="text-[#b026ff]">{t.hero.h2}</span>.
           </motion.p>
-          
+
           <motion.div variants={itemVariants} className="pt-10 flex gap-4">
             <Button className={`h-16 px-10 rounded-full font-black uppercase tracking-widest text-xs transition-all duration-300 hover:scale-105 hover:shadow-[0_0_40px_rgba(0,240,255,0.4)] ${isDarkMode ? 'bg-white text-black hover:bg-gray-100' : 'bg-blue-600 text-white hover:bg-blue-700 shadow-blue-500/20'}`}>
               {t.hero.explore} <ArrowRight className="ml-3" />
@@ -851,7 +862,7 @@ export default function ShowcasePage() {
           </motion.div>
         </motion.div>
 
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0 }} animate={{ opacity: 0.4 }} transition={{ delay: 2, duration: 1 }}
           className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center animate-bounce"
         >
@@ -862,46 +873,46 @@ export default function ShowcasePage() {
 
       {/* Tech Stack Section */}
       <section className="w-full max-w-[1600px] px-6 py-40 grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
           className={`relative h-[600px] rounded-[3rem] overflow-hidden border transition-all duration-500 ${isDarkMode ? 'border-white/5 bg-[#050508] shadow-[0_0_100px_rgba(59,130,246,0.1)]' : 'border-black/5 bg-gray-50 shadow-xl'}`}
         >
-           <Canvas camera={{ position: [0, 0, 5], fov: 45 }}>
-              <Suspense fallback={null}>
-                <PresentationControls global rotation={[0, 0.3, 0]} polar={[-0.4, 0.2]} azimuth={[-1, 0.75]}>
-                  <Float rotationIntensity={2} floatIntensity={2} speed={3}>
-                    <Box args={[1.5, 1.5, 1.5]}>
-                      <meshStandardMaterial color="#00f0ff" wireframe />
-                    </Box>
-                    <Box args={[1, 1, 1]} position={[0, 0, 0]}>
-                      <meshStandardMaterial color="#b026ff" emissive="#b026ff" emissiveIntensity={1.5} />
-                    </Box>
-                  </Float>
-                </PresentationControls>
-                <Environment preset="city" />
-                <ContactShadows position={[0, -2, 0]} opacity={0.6} scale={10} blur={2.5} far={4.5} color="#000" />
-              </Suspense>
-           </Canvas>
-           <div className={`absolute bottom-10 left-10 right-10 p-8 rounded-3xl backdrop-blur-2xl border transition-colors ${isDarkMode ? 'bg-black/50 border-white/10 hover:border-white/20' : 'bg-white/70 border-black/5 hover:border-black/10 shadow-lg'}`}>
-              <h4 className={`text-xl font-black mb-2 flex items-center gap-3 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}><Zap className="text-yellow-400" /> {t.tech.latencyTitle}</h4>
-              <p className={`text-sm opacity-70 leading-relaxed ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{t.tech.latencyDesc}</p>
-           </div>
+          <Canvas camera={{ position: [0, 0, 5], fov: 45 }}>
+            <Suspense fallback={null}>
+              <PresentationControls global rotation={[0, 0.3, 0]} polar={[-0.4, 0.2]} azimuth={[-1, 0.75]}>
+                <Float rotationIntensity={2} floatIntensity={2} speed={3}>
+                  <Box args={[1.5, 1.5, 1.5]}>
+                    <meshStandardMaterial color="#00f0ff" wireframe />
+                  </Box>
+                  <Box args={[1, 1, 1]} position={[0, 0, 0]}>
+                    <meshStandardMaterial color="#b026ff" emissive="#b026ff" emissiveIntensity={1.5} />
+                  </Box>
+                </Float>
+              </PresentationControls>
+              <Environment preset="city" />
+              <ContactShadows position={[0, -2, 0]} opacity={0.6} scale={10} blur={2.5} far={4.5} color="#000" />
+            </Suspense>
+          </Canvas>
+          <div className={`absolute bottom-10 left-10 right-10 p-8 rounded-3xl backdrop-blur-2xl border transition-colors ${isDarkMode ? 'bg-black/50 border-white/10 hover:border-white/20' : 'bg-white/70 border-black/5 hover:border-black/10 shadow-lg'}`}>
+            <h4 className={`text-xl font-black mb-2 flex items-center gap-3 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}><Zap className="text-yellow-400" /> {t.tech.latencyTitle}</h4>
+            <p className={`text-sm opacity-70 leading-relaxed ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{t.tech.latencyDesc}</p>
+          </div>
         </motion.div>
 
         <div className="space-y-12">
-          <SectionHeading 
-            icon={Server} 
-            badge={t.tech.badge} 
-            title={t.tech.title} 
+          <SectionHeading
+            icon={Server}
+            badge={t.tech.badge}
+            title={t.tech.title}
             highlight={t.tech.highlight}
             description={t.tech.desc}
             isDarkMode={isDarkMode}
             color="blue"
           />
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {[
               { icon: Code2, t: "Next.js 14", d: t.tech.nextDesc, c: "blue" },
@@ -909,13 +920,13 @@ export default function ShowcasePage() {
               { icon: Database, t: "PostgreSQL", d: t.tech.pgDesc, c: "emerald" },
               { icon: ShieldCheck, t: "Proxy Sidia", d: t.tech.proxyDesc, c: "purple" }
             ].map((item, i) => (
-              <motion.div 
+              <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1, duration: 0.5 }}
                 whileHover={{ y: -5, scale: 1.02 }}
-                key={i} 
+                key={i}
                 className={`p-6 rounded-[2rem] border transition-all duration-300 shadow-lg ${isDarkMode ? 'bg-white/5 border-white/5 hover:border-white/20 hover:bg-white/10 hover:shadow-[0_10px_30px_rgba(255,255,255,0.05)]' : 'bg-white border-gray-100 hover:border-blue-200 hover:shadow-xl'}`}
               >
                 <item.icon className="w-8 h-8 text-blue-500 mb-4 drop-shadow-md" />
@@ -931,10 +942,10 @@ export default function ShowcasePage() {
       <div className={`w-full border-y transition-colors duration-500 py-40 overflow-hidden ${isDarkMode ? 'bg-gradient-to-b from-[#030305] to-[#080512] border-white/5' : 'bg-gradient-to-b from-gray-50 to-white border-black/5'}`}>
         <section className="w-full max-w-[1600px] mx-auto px-6 space-y-32">
           <div className="flex flex-col items-center text-center space-y-6 max-w-4xl mx-auto">
-            <SectionHeading 
-              icon={BrainCircuit} 
-              badge={t.ai.badge} 
-              title={t.ai.title} 
+            <SectionHeading
+              icon={BrainCircuit}
+              badge={t.ai.badge}
+              title={t.ai.title}
               highlight={t.ai.highlight}
               description={t.ai.desc}
               isDarkMode={isDarkMode}
@@ -958,10 +969,10 @@ export default function ShowcasePage() {
       <div className={`w-full border-b transition-colors duration-500 py-40 ${isDarkMode ? 'bg-gradient-to-b from-blue-900/5 to-transparent border-blue-500/10' : 'bg-gradient-to-b from-blue-50 to-white border-blue-100'}`}>
         <section className="w-full max-w-[1600px] mx-auto px-6">
           <div className="flex flex-col items-center text-center space-y-6 max-w-4xl mx-auto mb-20">
-            <SectionHeading 
-              icon={GitPullRequest} 
-              badge={t.workflow.badge} 
-              title={t.workflow.title} 
+            <SectionHeading
+              icon={GitPullRequest}
+              badge={t.workflow.badge}
+              title={t.workflow.title}
               highlight={t.workflow.highlight}
               description={t.workflow.desc}
               isDarkMode={isDarkMode}
@@ -970,30 +981,30 @@ export default function ShowcasePage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-20">
-             <ToolCard icon={GitPullRequest} title={t.workflow.autoTitle} description={t.workflow.autoDesc} url="/tickets" isDarkMode={isDarkMode} color="blue" delay={0.1} />
-             <ToolCard icon={AreaChart} title={t.workflow.metricsTitle} description={t.workflow.metricsDesc} url="/metricas" isDarkMode={isDarkMode} color="purple" delay={0.2} />
+            <ToolCard icon={GitPullRequest} title={t.workflow.autoTitle} description={t.workflow.autoDesc} url="/tickets" isDarkMode={isDarkMode} color="blue" delay={0.1} />
+            <ToolCard icon={AreaChart} title={t.workflow.metricsTitle} description={t.workflow.metricsDesc} url="/metricas" isDarkMode={isDarkMode} color="purple" delay={0.2} />
           </div>
 
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.8 }}
             className={`p-12 rounded-[3rem] border backdrop-blur-3xl flex flex-col md:flex-row gap-12 items-center transition-all duration-500 ${isDarkMode ? 'bg-black/40 border-[#00f0ff]/20 shadow-[0_0_60px_rgba(0,240,255,0.05)]' : 'bg-white border-blue-100 shadow-xl'}`}
           >
-             <div className="flex-1 space-y-6">
-                <h3 className={`text-3xl font-black ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Automação e Analytics</h3>
-                <p className={`text-lg opacity-70 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                  Monitoramento contínuo com dashboards atualizados em tempo real, fornecendo controle total sobre o ecossistema do projeto.
-                </p>
-             </div>
-             <div className="grid grid-cols-2 gap-4 w-full md:w-auto shrink-0">
-                <motion.div whileHover={{ scale: 1.05 }} className={`p-6 rounded-2xl border text-center transition-all duration-300 ${isDarkMode ? 'bg-blue-500/10 border-blue-500/30 shadow-[0_0_20px_rgba(59,130,246,0.2)]' : 'bg-blue-50 border-blue-200 shadow-md'}`}>
-                   <div className="text-2xl font-black text-blue-400 drop-shadow-md">100%</div>
-                   <div className="text-[10px] uppercase font-bold opacity-50">{t.workflow.visibility}</div>
-                </motion.div>
-                <motion.div whileHover={{ scale: 1.05 }} className={`p-6 rounded-2xl border text-center transition-all duration-300 ${isDarkMode ? 'bg-emerald-500/10 border-emerald-500/30 shadow-[0_0_20px_rgba(16,185,129,0.2)]' : 'bg-emerald-50 border-emerald-200 shadow-md'}`}>
-                   <div className="text-2xl font-black text-emerald-400 drop-shadow-md">REAL-TIME</div>
-                   <div className="text-[10px] uppercase font-bold opacity-50">{t.workflow.tracking}</div>
-                </motion.div>
-             </div>
+            <div className="flex-1 space-y-6">
+              <h3 className={`text-3xl font-black ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Automação e Analytics</h3>
+              <p className={`text-lg opacity-70 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                Monitoramento contínuo com dashboards atualizados em tempo real, fornecendo controle total sobre o ecossistema do projeto.
+              </p>
+            </div>
+            <div className="grid grid-cols-2 gap-4 w-full md:w-auto shrink-0">
+              <motion.div whileHover={{ scale: 1.05 }} className={`p-6 rounded-2xl border text-center transition-all duration-300 ${isDarkMode ? 'bg-blue-500/10 border-blue-500/30 shadow-[0_0_20px_rgba(59,130,246,0.2)]' : 'bg-blue-50 border-blue-200 shadow-md'}`}>
+                <div className="text-2xl font-black text-blue-400 drop-shadow-md">100%</div>
+                <div className="text-[10px] uppercase font-bold opacity-50">{t.workflow.visibility}</div>
+              </motion.div>
+              <motion.div whileHover={{ scale: 1.05 }} className={`p-6 rounded-2xl border text-center transition-all duration-300 ${isDarkMode ? 'bg-emerald-500/10 border-emerald-500/30 shadow-[0_0_20px_rgba(16,185,129,0.2)]' : 'bg-emerald-50 border-emerald-200 shadow-md'}`}>
+                <div className="text-2xl font-black text-emerald-400 drop-shadow-md">REAL-TIME</div>
+                <div className="text-[10px] uppercase font-bold opacity-50">{t.workflow.tracking}</div>
+              </motion.div>
+            </div>
           </motion.div>
         </section>
       </div>
@@ -1001,10 +1012,10 @@ export default function ShowcasePage() {
       {/* Resource Planning Section */}
       <section className="w-full max-w-[1600px] px-6 py-40 mx-auto">
         <div className="flex flex-col items-center text-center space-y-6 max-w-4xl mx-auto mb-20">
-          <SectionHeading 
-            icon={CalendarDays} 
-            badge={t.resource.badge} 
-            title={t.resource.title} 
+          <SectionHeading
+            icon={CalendarDays}
+            badge={t.resource.badge}
+            title={t.resource.title}
             highlight={t.resource.highlight}
             description={t.resource.desc}
             isDarkMode={isDarkMode}
@@ -1021,10 +1032,10 @@ export default function ShowcasePage() {
       <div className={`w-full border-y transition-colors duration-500 py-40 overflow-hidden ${isDarkMode ? 'bg-[#050508] border-white/5' : 'bg-gradient-to-b from-blue-50/50 to-white border-gray-100'}`}>
         <section className="w-full max-w-[1600px] mx-auto px-6">
           <div className="flex flex-col items-center text-center space-y-6 max-w-4xl mx-auto mb-20">
-            <SectionHeading 
-              icon={Activity} 
-              badge="Team Management" 
-              title="Workload & " 
+            <SectionHeading
+              icon={Activity}
+              badge="Team Management"
+              title="Workload & "
               highlight="Admin."
               description="Controle de capacidade da equipe, gestão de usuários e monitoramento de horas trabalhadas em tempo real."
               isDarkMode={isDarkMode}
@@ -1034,7 +1045,7 @@ export default function ShowcasePage() {
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 mb-16">
             {/* Workload Card com gráfico animado */}
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, x: -40 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.7 }}
               className={`p-10 rounded-[3rem] border relative overflow-hidden group ${isDarkMode ? 'bg-gradient-to-br from-[#0a0a12] to-[#0e0e18] border-indigo-500/20' : 'bg-white border-indigo-100 shadow-xl'}`}
             >
@@ -1070,7 +1081,7 @@ export default function ShowcasePage() {
             </motion.div>
 
             {/* Admin Card com gráfico animado */}
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, x: 40 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.7 }}
               className={`p-10 rounded-[3rem] border relative overflow-hidden group ${isDarkMode ? 'bg-gradient-to-br from-[#0a0c0a] to-[#0e120e] border-emerald-500/20' : 'bg-white border-emerald-100 shadow-xl'}`}
             >
@@ -1110,7 +1121,7 @@ export default function ShowcasePage() {
                       transition={{ delay: 1, duration: 1 }}
                     />
                     {/* Animated dots */}
-                    {[[0,80],[100,50],[200,40],[300,30],[400,20]].map(([cx,cy], i) => (
+                    {[[0, 80], [100, 50], [200, 40], [300, 30], [400, 20]].map(([cx, cy], i) => (
                       <motion.circle
                         key={i} cx={cx} cy={cy} r="4" fill="#10b981"
                         initial={{ scale: 0, opacity: 0 }}
@@ -1145,13 +1156,12 @@ export default function ShowcasePage() {
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1, duration: 0.5 }}
                 whileHover={{ y: -5 }}
-                className={`p-8 rounded-[2rem] border text-center transition-all duration-300 ${
-                  isDarkMode 
-                    ? `${stat.bgDark} border-white/10 hover:border-white/20` 
-                    : 'bg-white border-gray-100 shadow-lg hover:shadow-xl'
-                }`}
+                className={`p-8 rounded-[2rem] border text-center transition-all duration-300 ${isDarkMode
+                  ? `${stat.bgDark} border-white/10 hover:border-white/20`
+                  : 'bg-white border-gray-100 shadow-lg hover:shadow-xl'
+                  }`}
               >
-                <motion.div 
+                <motion.div
                   className={`text-3xl font-black mb-2 ${isDarkMode ? stat.textDark : 'text-gray-900'}`}
                   initial={{ scale: 0 }}
                   whileInView={{ scale: 1 }}
@@ -1171,10 +1181,10 @@ export default function ShowcasePage() {
       <div className={`w-full border-y transition-colors duration-500 py-40 ${isDarkMode ? 'bg-gradient-to-b from-[#030305] to-[#080512] border-white/5' : 'bg-gradient-to-b from-gray-50 to-white border-black/5'}`}>
         <section className="w-full max-w-[1600px] mx-auto px-6">
           <div className="flex flex-col items-center text-center space-y-6 max-w-4xl mx-auto mb-20">
-            <SectionHeading 
-              icon={FileCheck2} 
-              badge={t.data.badge} 
-              title={t.data.title} 
+            <SectionHeading
+              icon={FileCheck2}
+              badge={t.data.badge}
+              title={t.data.title}
               highlight={t.data.highlight}
               description={t.data.desc}
               isDarkMode={isDarkMode}
@@ -1191,10 +1201,10 @@ export default function ShowcasePage() {
       {/* AI Interaction Lab */}
       <section className="w-full max-w-[1600px] px-6 py-40">
         <div className="flex flex-col items-center text-center space-y-6 max-w-4xl mx-auto mb-20">
-          <SectionHeading 
-            icon={Sparkles} 
-            badge={t.lab.badge} 
-            title={t.lab.title} 
+          <SectionHeading
+            icon={Sparkles}
+            badge={t.lab.badge}
+            title={t.lab.title}
             highlight={t.lab.highlight}
             description={t.lab.desc}
             isDarkMode={isDarkMode}
@@ -1205,60 +1215,60 @@ export default function ShowcasePage() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
           {/* Chart Generation */}
           <Card className={`p-10 rounded-[3rem] border transition-all duration-500 flex flex-col ${isDarkMode ? 'bg-[#0a0a0a] border-white/10' : 'bg-white border-gray-100 shadow-xl'}`}>
-             <div className="flex-1">
-                <h3 className={`text-2xl font-black mb-6 flex items-center gap-3 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}><BarChart2 className="text-blue-500" /> {t.lab.chartTitle}</h3>
-                <p className={`opacity-70 mb-8 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>{t.lab.chartDesc}</p>
-                <Button onClick={generateAIChart} disabled={isGeneratingChart} className="rounded-full h-12 px-8 bg-blue-600 hover:bg-blue-500 text-white font-bold shadow-lg shadow-blue-600/20">
-                    {isGeneratingChart ? <Loader2 className="animate-spin mr-2" size={18} /> : <Sparkles className="mr-2" size={18} />} {t.lab.chartBtn}
-                </Button>
-             </div>
-             
-             {chartData && (
-               <div className="mt-10 animate-in fade-in zoom-in duration-500">
-                  <AIChart 
-                    type={chartData.type} 
-                    title={chartData.title} 
-                    data={chartData.data} 
-                    isDarkMode={isDarkMode} 
-                  />
-               </div>
-             )}
+            <div className="flex-1">
+              <h3 className={`text-2xl font-black mb-6 flex items-center gap-3 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}><BarChart2 className="text-blue-500" /> {t.lab.chartTitle}</h3>
+              <p className={`opacity-70 mb-8 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>{t.lab.chartDesc}</p>
+              <Button onClick={generateAIChart} disabled={isGeneratingChart} className="rounded-full h-12 px-8 bg-blue-600 hover:bg-blue-500 text-white font-bold shadow-lg shadow-blue-600/20">
+                {isGeneratingChart ? <Loader2 className="animate-spin mr-2" size={18} /> : <Sparkles className="mr-2" size={18} />} {t.lab.chartBtn}
+              </Button>
+            </div>
+
+            {chartData && (
+              <div className="mt-10 animate-in fade-in zoom-in duration-500">
+                <AIChart
+                  type={chartData.type}
+                  title={chartData.title}
+                  data={chartData.data}
+                  isDarkMode={isDarkMode}
+                />
+              </div>
+            )}
           </Card>
 
           {/* Report Generation */}
           <Card className={`p-10 rounded-[3rem] border transition-all duration-500 flex flex-col ${isDarkMode ? 'bg-[#0a0a0a] border-white/10' : 'bg-white border-gray-100 shadow-xl'}`}>
-             <div className="flex-1">
-                <h3 className={`text-2xl font-black mb-6 flex items-center gap-3 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}><FileText className="text-emerald-500" /> {t.lab.reportTitle}</h3>
-                <p className={`opacity-70 mb-8 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>{t.lab.reportDesc}</p>
-                <Button onClick={generateSVPReport} disabled={isGeneratingReport} className="rounded-full h-12 px-8 bg-emerald-600 hover:bg-emerald-500 text-white font-bold shadow-lg shadow-emerald-600/20">
-                    {isGeneratingReport ? <Loader2 className="animate-spin mr-2" size={18} /> : <Zap className="mr-2" size={18} />} {t.lab.reportBtn}
-                </Button>
-             </div>
+            <div className="flex-1">
+              <h3 className={`text-2xl font-black mb-6 flex items-center gap-3 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}><FileText className="text-emerald-500" /> {t.lab.reportTitle}</h3>
+              <p className={`opacity-70 mb-8 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>{t.lab.reportDesc}</p>
+              <Button onClick={generateSVPReport} disabled={isGeneratingReport} className="rounded-full h-12 px-8 bg-emerald-600 hover:bg-emerald-500 text-white font-bold shadow-lg shadow-emerald-600/20">
+                {isGeneratingReport ? <Loader2 className="animate-spin mr-2" size={18} /> : <Zap className="mr-2" size={18} />} {t.lab.reportBtn}
+              </Button>
+            </div>
 
-             {reportText && (
-               <div className={`mt-10 p-6 rounded-2xl border font-mono text-[11px] leading-relaxed whitespace-pre-wrap animate-in fade-in slide-in-from-bottom-4 duration-500 max-h-[400px] overflow-y-auto custom-scrollbar ${isDarkMode ? 'bg-black/40 border-white/10 text-emerald-400' : 'bg-emerald-50 border-emerald-100 text-emerald-900'}`}>
-                  {reportText}
-               </div>
-             )}
+            {reportText && (
+              <div className={`mt-10 p-6 rounded-2xl border font-mono text-[11px] leading-relaxed whitespace-pre-wrap animate-in fade-in slide-in-from-bottom-4 duration-500 max-h-[400px] overflow-y-auto custom-scrollbar ${isDarkMode ? 'bg-black/40 border-white/10 text-emerald-400' : 'bg-emerald-50 border-emerald-100 text-emerald-900'}`}>
+                {reportText}
+              </div>
+            )}
           </Card>
 
           {/* Log Analysis Idea */}
           <Card className={`p-10 rounded-[3rem] border lg:col-span-2 transition-all duration-500 ${isDarkMode ? 'bg-gradient-to-r from-blue-600/5 to-purple-600/5 border-white/10' : 'bg-white border-gray-100 shadow-xl'}`}>
-             <div className="flex flex-col md:flex-row gap-10 items-start">
-                <div className="flex-1">
-                   <h3 className={`text-2xl font-black mb-6 flex items-center gap-3 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}><Code2 className="text-purple-500" /> {t.lab.logTitle}</h3>
-                   <p className={`opacity-70 mb-8 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>{t.lab.logDesc}</p>
-                   <Button onClick={analyzeLogs} disabled={isAnalyzingLog} className="rounded-full h-12 px-8 bg-purple-600 hover:bg-purple-500 text-white font-bold shadow-lg shadow-purple-600/20">
-                      {isAnalyzingLog ? <Loader2 className="animate-spin mr-2" size={18} /> : <BrainCircuit className="mr-2" size={18} />} {t.lab.logBtn}
-                   </Button>
+            <div className="flex flex-col md:flex-row gap-10 items-start">
+              <div className="flex-1">
+                <h3 className={`text-2xl font-black mb-6 flex items-center gap-3 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}><Code2 className="text-purple-500" /> {t.lab.logTitle}</h3>
+                <p className={`opacity-70 mb-8 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>{t.lab.logDesc}</p>
+                <Button onClick={analyzeLogs} disabled={isAnalyzingLog} className="rounded-full h-12 px-8 bg-purple-600 hover:bg-purple-500 text-white font-bold shadow-lg shadow-purple-600/20">
+                  {isAnalyzingLog ? <Loader2 className="animate-spin mr-2" size={18} /> : <BrainCircuit className="mr-2" size={18} />} {t.lab.logBtn}
+                </Button>
+              </div>
+              {logResult && (
+                <div className={`flex-1 p-6 rounded-2xl border animate-in fade-in duration-500 self-stretch ${isDarkMode ? 'bg-black/20 border-purple-500/20' : 'bg-purple-50 border-purple-100'}`}>
+                  <div className="flex items-center gap-2 text-purple-500 font-bold mb-4 text-xs uppercase tracking-widest"><AlertCircle size={16} /> {t.lab.diagnostic}</div>
+                  <p className={`text-sm italic leading-relaxed ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>{logResult}</p>
                 </div>
-                {logResult && (
-                  <div className={`flex-1 p-6 rounded-2xl border animate-in fade-in duration-500 self-stretch ${isDarkMode ? 'bg-black/20 border-purple-500/20' : 'bg-purple-50 border-purple-100'}`}>
-                     <div className="flex items-center gap-2 text-purple-500 font-bold mb-4 text-xs uppercase tracking-widest"><AlertCircle size={16}/> {t.lab.diagnostic}</div>
-                     <p className={`text-sm italic leading-relaxed ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>{logResult}</p>
-                  </div>
-                )}
-             </div>
+              )}
+            </div>
           </Card>
         </div>
       </section>
@@ -1268,27 +1278,27 @@ export default function ShowcasePage() {
       {/* Footer CTA Section */}
       <section className="w-full py-40 flex flex-col items-center justify-center text-center px-6 relative overflow-hidden">
         <div className="absolute inset-0 z-0">
-           <Canvas camera={{ position: [0, 0, 1] }}>
-              <RotatingStarField />
-           </Canvas>
+          <Canvas camera={{ position: [0, 0, 1] }}>
+            <RotatingStarField />
+          </Canvas>
         </div>
         {/* Animated radial glow */}
         <div className="absolute inset-0 z-[1] pointer-events-none">
-          <motion.div 
+          <motion.div
             animate={{ scale: [1, 1.2, 1], opacity: [0.1, 0.25, 0.1] }}
             transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
             className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-gradient-to-r from-[#00f0ff]/20 to-[#b026ff]/20 blur-[100px]"
           />
         </div>
-        <motion.div 
-          initial={{ opacity: 0, y: 40 }} 
-          whileInView={{ opacity: 1, y: 0 }} 
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 1, ease: "easeOut" }} 
+          transition={{ duration: 1, ease: "easeOut" }}
           className="relative z-10 space-y-10"
         >
           <h2 className={`text-5xl md:text-7xl font-black tracking-tight leading-tight drop-shadow-2xl ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-            {t.footer.title1} <br/>
+            {t.footer.title1} <br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00f0ff] to-[#b026ff]">{t.footer.title2}</span>
           </h2>
           <Button className={`h-20 px-16 rounded-full font-black uppercase tracking-[0.2em] text-sm shadow-2xl transition-all duration-500 hover:scale-110 active:scale-95 ${isDarkMode ? 'bg-blue-600 hover:bg-[#00f0ff] hover:text-black text-white shadow-blue-500/50 hover:shadow-[0_0_80px_rgba(0,240,255,0.6)]' : 'bg-blue-600 hover:bg-blue-700 text-white shadow-blue-500/30'}`}>
