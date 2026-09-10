@@ -998,7 +998,6 @@ export default function ShowcasePage() {
                   ))}
                 </div>
               </div>
-              <a href="/Construcao" className="absolute inset-0 z-20" />
             </motion.div>
 
             {/* Admin Card com gráfico animado */}
@@ -1059,7 +1058,6 @@ export default function ShowcasePage() {
                   </div>
                 </div>
               </div>
-              <a href="/admin" className="absolute inset-0 z-20" />
             </motion.div>
           </div>
 
