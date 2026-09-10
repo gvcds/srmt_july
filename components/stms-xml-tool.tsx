@@ -201,6 +201,7 @@ export function STMSXmlTool({ onFocusChange }: { onFocusChange?: (focused: boole
  
  const [filterPos, setFilterPos] = useState({ top: 0, left: 0 });
  const filterButtonRefs = useRef<{ [key: string]: HTMLButtonElement | null }>({ en: null, pt: null, analysis: null, ai: null });
+ const filterMenuRef = useRef<HTMLDivElement>(null);
 
  const setIsFocusMode = (focused: boolean) => {
  setIsFocusModeState(focused);
@@ -217,17 +218,32 @@ export function STMSXmlTool({ onFocusChange }: { onFocusChange?: (focused: boole
  }, [searchTerm, columnFilters]);
 
  useEffect(() => {
- const handleClickOutside = (e: MouseEvent) => {
- if (openFilter && filterButtonRefs.current[openFilter]?.contains(e.target as Node)) {
- return;
- }
- setOpenFilter(null);
- };
- if (openFilter) {
- document.addEventListener('mousedown', handleClickOutside);
- }
- return () => document.removeEventListener('mousedown', handleClickOutside);
+   const handleOutsideClick = (e: MouseEvent | TouchEvent) => {
+     if (openFilter) {
+       // Se o clique for DENTRO do menu, ignora
+       if (filterMenuRef.current && filterMenuRef.current.contains(e.target as Node)) {
+         return;
+       }
+       // Se o clique for no próprio botão que abre, ignora
+       if (filterButtonRefs.current[openFilter] && filterButtonRefs.current[openFilter]?.contains(e.target as Node)) {
+         return;
+       }
+       // Senão, fecha
+       setOpenFilter(null);
+     }
+   };
+
+   if (openFilter) {
+     document.addEventListener('mousedown', handleOutsideClick);
+     document.addEventListener('touchstart', handleOutsideClick);
+   }
+   return () => {
+     document.removeEventListener('mousedown', handleOutsideClick);
+     document.removeEventListener('touchstart', handleOutsideClick);
+   };
  }, [openFilter]);
+
+
 
  useEffect(() => {
  if (isFocusMode) {
@@ -339,17 +355,11 @@ export function STMSXmlTool({ onFocusChange }: { onFocusChange?: (focused: boole
   if (!openFilter) return null;
   const col = openFilter;
   return (
-  <>
-    <div 
-      className="fixed inset-0 z-[9999]" 
-      onMouseDown={(e) => { e.stopPropagation(); setOpenFilter(null); }}
-    />
-    <div 
-      className={`fixed z-[10000] w-64 max-h-60 overflow-y-auto rounded-lg shadow-2xl border flex flex-col p-2 animate-in fade-in zoom-in-95 duration-100 ${isDarkMode ? 'bg-[#1a1a1a] border-white/10' : 'bg-white border-gray-200'}`}
-      style={{ top: filterPos.top, left: filterPos.left }}
-      onMouseDown={e => e.stopPropagation()}
-      onClick={e => e.stopPropagation()}
-    >
+  <div 
+    ref={filterMenuRef}
+    className={`fixed z-[10000] w-64 max-h-60 overflow-y-auto rounded-lg shadow-2xl border flex flex-col p-2 animate-in fade-in zoom-in-95 duration-100 ${isDarkMode ? 'bg-[#1a1a1a] border-white/10' : 'bg-white border-gray-200'}`}
+    style={{ top: filterPos.top, left: filterPos.left }}
+  >
     <div className="flex items-center justify-between mb-2 pb-2 border-b border-black/5 dark:border-white/5 shrink-0">
     <span className="text-[10px] font-black uppercase tracking-widest opacity-60">Filtrar ({columnFilters[col].length})</span>
     <button 
@@ -361,22 +371,28 @@ export function STMSXmlTool({ onFocusChange }: { onFocusChange?: (focused: boole
     </div>
     <div className="flex flex-col gap-1 overflow-y-auto custom-scrollbar">
     {uniqueValues[col].map((val, idx) => (
-      <label key={idx} className="flex items-start gap-2 text-xs cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 p-1.5 rounded transition-colors">
+      <div 
+        key={idx} 
+        onClick={(e) => {
+          e.stopPropagation();
+          toggleFilter(col, val);
+        }}
+        className="flex items-start gap-2 text-xs cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 p-1.5 rounded transition-colors"
+      >
       <input 
         type="checkbox" 
         checked={columnFilters[col].includes(val)}
-        onChange={() => toggleFilter(col, val)}
-        className="rounded border-gray-300 w-3 h-3 mt-0.5 shrink-0"
+        readOnly
+        className="rounded border-gray-300 w-3 h-3 mt-0.5 shrink-0 pointer-events-none"
       />
-      <span className="break-words flex-1 leading-tight">{val || '(Vazio)'}</span>
-      </label>
+      <span className="break-words flex-1 leading-tight select-none">{val || '(Vazio)'}</span>
+      </div>
     ))}
     {uniqueValues[col].length === 0 && (
       <span className="text-xs opacity-50 p-2 italic text-center block">Sem dados</span>
     )}
     </div>
   </div>
-  </>
   );
   };
 
