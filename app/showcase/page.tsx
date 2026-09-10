@@ -103,6 +103,21 @@ const ConnectionLines = () => {
   );
 };
 
+const RotatingStarField = () => {
+  const groupRef = useRef<THREE.Group>(null);
+  useFrame((state) => {
+    if (groupRef.current) {
+      groupRef.current.rotation.y = state.clock.getElapsedTime() * 0.08;
+      groupRef.current.rotation.x = Math.sin(state.clock.getElapsedTime() * 0.05) * 0.15;
+    }
+  });
+  return (
+    <group ref={groupRef}>
+      <Stars radius={60} depth={60} count={2000} factor={3} saturation={1} fade speed={3} />
+    </group>
+  );
+};
+
 const TechCrystal = ({ isDarkMode }: { isDarkMode: boolean }) => {
   const meshRef = useRef<THREE.Mesh>(null);
   useFrame((state) => {
@@ -366,7 +381,7 @@ export default function ShowcasePage() {
         desc: "Centralizamos e padronizamos todas as informações vitais do projeto.",
         remarkDesc: "Padronização rigorosa da escrita técnica dos projetos para garantir auditorias limpas.",
         kbTitle: "Knowledge Base",
-        kbDesc: "A enciclopédia do time. Reúne guias, arquiteturas e glossários técnicos acessíveis a qualquer momento."
+        kbDesc: "A base de dados da nossa IA. Alimenta o SVP Assistant com contexto técnico, guias de arquitetura e glossários para respostas precisas e contextualizadas."
       },
       footer: {
         title1: "Pronto para o futuro da ",
@@ -458,7 +473,7 @@ export default function ShowcasePage() {
         desc: "We centralize and standardize all vital project information.",
         remarkDesc: "Strict standardization of technical writing to ensure clean audits.",
         kbTitle: "Knowledge Base",
-        kbDesc: "The team's encyclopedia. Gathers guides, architectures, and technical glossaries accessible anytime."
+        kbDesc: "The AI's knowledge database. Feeds the SVP Assistant with technical context, architecture guides, and glossaries for precise, contextualized responses."
       },
       footer: {
         title1: "Ready for the future of ",
@@ -550,7 +565,7 @@ export default function ShowcasePage() {
         desc: "모든 중요한 프로젝트 정보를 중앙 집중화하고 표준화합니다.",
         remarkDesc: "완벽한 감사를 보장하기 위해 기술 작성의 엄격한 표준화.",
         kbTitle: "지식 기반",
-        kbDesc: "팀의 백과사전. 언제든지 액세스할 수 있는 가이드, 아키텍처 및 기술 용어집을 모았습니다."
+        kbDesc: "AI의 지식 데이터베이스. 정확하고 맥락화된 응답을 위해 기술 컨텍스트, 아키텍처 가이드 및 용어집을 SVP 어시스턴트에 공급합니다."
       },
       footer: {
         title1: "미래를 위한 준비 ",
@@ -779,27 +794,7 @@ export default function ShowcasePage() {
 
 
 
-      {/* Daily Operations Section */}
-      <div className={`w-full border-b transition-colors duration-500 py-40 ${isDarkMode ? 'bg-[#0a0a0c] border-white/5' : 'bg-gray-50 border-gray-200'}`}>
-        <section className="w-full max-w-[1600px] mx-auto px-6">
-          <div className="flex flex-col items-center text-center space-y-6 max-w-4xl mx-auto mb-20">
-            <SectionHeading 
-              icon={Activity} 
-              badge={t.daily.badge} 
-              title={t.daily.title} 
-              highlight={t.daily.highlight}
-              description={t.daily.desc}
-              isDarkMode={isDarkMode}
-              color="emerald"
-            />
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <ToolCard icon={CheckCircle} title={t.daily.regTitle} description={t.daily.regDesc} url="/daily-issues" isDarkMode={isDarkMode} color="emerald" delay={0.1} />
-            <ToolCard icon={KanbanSquare} title={t.daily.kanbanTitle} description={t.daily.kanbanDesc} url="/kanban" isDarkMode={isDarkMode} color="blue" delay={0.2} />
-            <ToolCard icon={Timer} title={t.daily.timeTitle} description={t.daily.timeDesc} url="/time-semanal" isDarkMode={isDarkMode} color="orange" delay={0.3} />
-          </div>
-        </section>
-      </div>
+
 
       {/* Workflow Control Section */}
       <div className={`w-full border-b transition-colors duration-500 py-40 ${isDarkMode ? 'bg-gradient-to-b from-blue-900/5 to-transparent border-blue-500/10' : 'bg-gradient-to-b from-blue-50 to-white border-blue-100'}`}>
@@ -863,6 +858,158 @@ export default function ShowcasePage() {
           <ToolCard icon={CheckCircle} title={t.resource.workTitle} description={t.resource.workDesc} url="/ferias/aprovacao" isDarkMode={isDarkMode} color="emerald" delay={0.2} />
         </div>
       </section>
+
+      {/* Workload & Admin Section */}
+      <div className={`w-full border-y transition-colors duration-500 py-40 overflow-hidden ${isDarkMode ? 'bg-[#050508] border-white/5' : 'bg-gradient-to-b from-blue-50/50 to-white border-gray-100'}`}>
+        <section className="w-full max-w-[1600px] mx-auto px-6">
+          <div className="flex flex-col items-center text-center space-y-6 max-w-4xl mx-auto mb-20">
+            <SectionHeading 
+              icon={Activity} 
+              badge="Team Management" 
+              title="Workload & " 
+              highlight="Admin."
+              description="Controle de capacidade da equipe, gestão de usuários e monitoramento de horas trabalhadas em tempo real."
+              isDarkMode={isDarkMode}
+              color="blue"
+            />
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 mb-16">
+            {/* Workload Card com gráfico animado */}
+            <motion.div 
+              initial={{ opacity: 0, x: -40 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.7 }}
+              className={`p-10 rounded-[3rem] border relative overflow-hidden group ${isDarkMode ? 'bg-gradient-to-br from-[#0a0a12] to-[#0e0e18] border-indigo-500/20' : 'bg-white border-indigo-100 shadow-xl'}`}
+            >
+              <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-bl from-indigo-500/10 to-transparent rounded-bl-full" />
+              <div className="relative z-10">
+                <div className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-lg border mb-6 ${isDarkMode ? 'bg-white/5 border-white/10 text-indigo-400' : 'bg-indigo-50 border-indigo-100 text-indigo-600'}`}>
+                  <Activity className="w-4 h-4 animate-pulse" />
+                  <span className="text-[10px] font-bold uppercase tracking-widest">Capacidade e Planejamento</span>
+                </div>
+                <h3 className={`text-3xl font-black mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Workload Geral</h3>
+                <p className={`text-sm opacity-70 mb-8 leading-relaxed ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                  Visualize o tempo de trabalho disponível por equipe, descontando automaticamente ausências e faltas registradas no sistema.
+                </p>
+                {/* Animated bar chart */}
+                <div className="flex items-end gap-3 h-32 mt-6">
+                  {[65, 85, 42, 78, 55, 91, 38, 70, 60, 82, 45, 73].map((h, i) => (
+                    <motion.div
+                      key={i}
+                      initial={{ height: 0 }}
+                      whileInView={{ height: `${h}%` }}
+                      viewport={{ once: true }}
+                      transition={{ delay: 0.1 * i, duration: 0.8, ease: 'easeOut' }}
+                      className={`flex-1 rounded-t-lg ${i % 3 === 0 ? 'bg-gradient-to-t from-indigo-600 to-indigo-400' : i % 3 === 1 ? 'bg-gradient-to-t from-blue-600 to-blue-400' : 'bg-gradient-to-t from-purple-600 to-purple-400'} opacity-80 group-hover:opacity-100 transition-opacity`}
+                    />
+                  ))}
+                </div>
+                <div className="flex justify-between mt-3">
+                  {['QA', 'DEV', 'SDET', 'OPS'].map((label, i) => (
+                    <span key={i} className={`text-[9px] font-bold uppercase tracking-widest opacity-40 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{label}</span>
+                  ))}
+                </div>
+              </div>
+              <a href="/Construcao" className="absolute inset-0 z-20" />
+            </motion.div>
+
+            {/* Admin Card com gráfico animado */}
+            <motion.div 
+              initial={{ opacity: 0, x: 40 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.7 }}
+              className={`p-10 rounded-[3rem] border relative overflow-hidden group ${isDarkMode ? 'bg-gradient-to-br from-[#0a0c0a] to-[#0e120e] border-emerald-500/20' : 'bg-white border-emerald-100 shadow-xl'}`}
+            >
+              <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-bl from-emerald-500/10 to-transparent rounded-bl-full" />
+              <div className="relative z-10">
+                <div className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-lg border mb-6 ${isDarkMode ? 'bg-white/5 border-white/10 text-emerald-400' : 'bg-emerald-50 border-emerald-100 text-emerald-600'}`}>
+                  <ShieldCheck className="w-4 h-4" />
+                  <span className="text-[10px] font-bold uppercase tracking-widest">Painel Administrativo</span>
+                </div>
+                <h3 className={`text-3xl font-black mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Admin Dashboard</h3>
+                <p className={`text-sm opacity-70 mb-8 leading-relaxed ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                  Gestão completa de usuários, logs de acesso, controle de faltas e gráficos de atividade do sistema com recharts.
+                </p>
+                {/* Animated line chart SVG */}
+                <div className="relative h-32 mt-6 overflow-hidden rounded-2xl">
+                  <svg viewBox="0 0 400 120" className="w-full h-full" preserveAspectRatio="none">
+                    <defs>
+                      <linearGradient id="lineGrad" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="#10b981" stopOpacity="0.3" />
+                        <stop offset="100%" stopColor="#10b981" stopOpacity="0" />
+                      </linearGradient>
+                    </defs>
+                    <motion.path
+                      d="M0,80 C30,60 60,90 100,50 C140,10 170,70 200,40 C230,10 260,60 300,30 C340,0 370,50 400,20"
+                      fill="none" stroke="#10b981" strokeWidth="2.5" strokeLinecap="round"
+                      initial={{ pathLength: 0, opacity: 0 }}
+                      whileInView={{ pathLength: 1, opacity: 1 }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 2, ease: 'easeInOut' }}
+                    />
+                    <motion.path
+                      d="M0,80 C30,60 60,90 100,50 C140,10 170,70 200,40 C230,10 260,60 300,30 C340,0 370,50 400,20 L400,120 L0,120 Z"
+                      fill="url(#lineGrad)"
+                      initial={{ opacity: 0 }}
+                      whileInView={{ opacity: 1 }}
+                      viewport={{ once: true }}
+                      transition={{ delay: 1, duration: 1 }}
+                    />
+                    {/* Animated dots */}
+                    {[[0,80],[100,50],[200,40],[300,30],[400,20]].map(([cx,cy], i) => (
+                      <motion.circle
+                        key={i} cx={cx} cy={cy} r="4" fill="#10b981"
+                        initial={{ scale: 0, opacity: 0 }}
+                        whileInView={{ scale: 1, opacity: 1 }}
+                        viewport={{ once: true }}
+                        transition={{ delay: 0.4 * i + 0.5, duration: 0.3 }}
+                      />
+                    ))}
+                  </svg>
+                  {/* Pulse indicator */}
+                  <div className="absolute top-2 right-2 flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                    <span className={`text-[9px] font-bold uppercase tracking-widest ${isDarkMode ? 'text-emerald-400' : 'text-emerald-600'}`}>Live</span>
+                  </div>
+                </div>
+              </div>
+              <a href="/admin" className="absolute inset-0 z-20" />
+            </motion.div>
+          </div>
+
+          {/* Animated AI Stats Row */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            {[
+              { value: '7h', label: 'Horas / Pessoa', color: 'blue' },
+              { value: '98.2%', label: 'Uptime do Sistema', color: 'emerald' },
+              { value: '24/7', label: 'Monitoramento IA', color: 'purple' },
+              { value: '< 200ms', label: 'Latência API', color: 'orange' }
+            ].map((stat, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1, duration: 0.5 }}
+                whileHover={{ y: -5 }}
+                className={`p-8 rounded-[2rem] border text-center transition-all duration-300 ${
+                  isDarkMode 
+                    ? `bg-${stat.color === 'blue' ? 'blue' : stat.color === 'emerald' ? 'emerald' : stat.color === 'purple' ? 'purple' : 'orange'}-500/5 border-white/10 hover:border-white/20` 
+                    : 'bg-white border-gray-100 shadow-lg hover:shadow-xl'
+                }`}
+              >
+                <motion.div 
+                  className={`text-3xl font-black mb-2 ${isDarkMode ? `text-${stat.color === 'blue' ? 'blue' : stat.color === 'emerald' ? 'emerald' : stat.color === 'purple' ? 'purple' : 'orange'}-400` : 'text-gray-900'}`}
+                  initial={{ scale: 0 }}
+                  whileInView={{ scale: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.15 + 0.3, type: 'spring', stiffness: 200 }}
+                >
+                  {stat.value}
+                </motion.div>
+                <div className={`text-[10px] font-bold uppercase tracking-widest opacity-50 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{stat.label}</div>
+              </motion.div>
+            ))}
+          </div>
+        </section>
+      </div>
 
       {/* Data Quality Section */}
       <div className={`w-full border-y transition-colors duration-500 py-40 ${isDarkMode ? 'bg-gradient-to-b from-[#030305] to-[#080512] border-white/5' : 'bg-gradient-to-b from-gray-50 to-white border-black/5'}`}>
@@ -963,9 +1110,18 @@ export default function ShowcasePage() {
       {/* Footer CTA Section */}
       <section className="w-full py-40 flex flex-col items-center justify-center text-center px-6 relative overflow-hidden">
         <div className="absolute inset-0 z-0">
-           <Canvas>
-              <Stars radius={50} depth={50} count={3000} factor={4} saturation={1} fade speed={1.5} />
+           <Canvas camera={{ position: [0, 0, 1] }}>
+              <Stars radius={100} depth={80} count={5000} factor={6} saturation={0} fade speed={2} />
+              <RotatingStarField />
            </Canvas>
+        </div>
+        {/* Animated radial glow */}
+        <div className="absolute inset-0 z-[1] pointer-events-none">
+          <motion.div 
+            animate={{ scale: [1, 1.2, 1], opacity: [0.1, 0.25, 0.1] }}
+            transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
+            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-gradient-to-r from-[#00f0ff]/20 to-[#b026ff]/20 blur-[100px]"
+          />
         </div>
         <motion.div 
           initial={{ opacity: 0, y: 40 }} 
