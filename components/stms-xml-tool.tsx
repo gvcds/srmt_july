@@ -339,12 +339,17 @@ export function STMSXmlTool({ onFocusChange }: { onFocusChange?: (focused: boole
   if (!openFilter) return null;
   const col = openFilter;
   return (
-  <div 
-    className={`fixed z-[10000] w-64 max-h-60 overflow-y-auto rounded-lg shadow-2xl border flex flex-col p-2 animate-in fade-in zoom-in-95 duration-100 ${isDarkMode ? 'bg-[#1a1a1a] border-white/10' : 'bg-white border-gray-200'}`}
-    style={{ top: filterPos.top, left: filterPos.left }}
-    onMouseDown={e => e.stopPropagation()}
-    onClick={e => e.stopPropagation()}
-  >
+  <>
+    <div 
+      className="fixed inset-0 z-[9999]" 
+      onMouseDown={(e) => { e.stopPropagation(); setOpenFilter(null); }}
+    />
+    <div 
+      className={`fixed z-[10000] w-64 max-h-60 overflow-y-auto rounded-lg shadow-2xl border flex flex-col p-2 animate-in fade-in zoom-in-95 duration-100 ${isDarkMode ? 'bg-[#1a1a1a] border-white/10' : 'bg-white border-gray-200'}`}
+      style={{ top: filterPos.top, left: filterPos.left }}
+      onMouseDown={e => e.stopPropagation()}
+      onClick={e => e.stopPropagation()}
+    >
     <div className="flex items-center justify-between mb-2 pb-2 border-b border-black/5 dark:border-white/5 shrink-0">
     <span className="text-[10px] font-black uppercase tracking-widest opacity-60">Filtrar ({columnFilters[col].length})</span>
     <button 
@@ -371,6 +376,7 @@ export function STMSXmlTool({ onFocusChange }: { onFocusChange?: (focused: boole
     )}
     </div>
   </div>
+  </>
   );
   };
 
