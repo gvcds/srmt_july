@@ -27,7 +27,8 @@ import {
   Sparkles,
   FileText,
   AreaChart,
-  Library
+  Library,
+  Terminal
 } from 'lucide-react';
 import { Navbar } from "@/components/navbar";
 import { useTheme, ThemeContextValue } from '@/components/theme-provider';
@@ -156,14 +157,14 @@ const ToolCard = ({ icon: Icon, title, description, url, isDarkMode, color = "bl
   };
 
   return (
-    <a href={url} className="block group w-full h-full">
+    <div className="block group w-full h-full">
       <motion.div 
         whileHover={{ y: -5, scale: 1.02 }}
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: "-50px" }}
         transition={{ delay, duration: 0.5 }}
-        className={`p-8 rounded-[2rem] border bg-gradient-to-br backdrop-blur-xl transition-all duration-300 shadow-lg h-full flex flex-col 
+        className={`p-8 rounded-[2rem] border bg-gradient-to-br backdrop-blur-xl transition-all duration-300 shadow-lg h-full flex flex-col cursor-default
         ${isDarkMode ? 'bg-[#0a0a0a]' : 'bg-white'} ${colors[color]}`}
       >
         <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-6 border bg-black/5 dark:bg-white/5 shrink-0`}>
@@ -171,11 +172,102 @@ const ToolCard = ({ icon: Icon, title, description, url, isDarkMode, color = "bl
         </div>
         <h3 className={`text-2xl font-black mb-3 ${isDarkMode ? 'text-white' : 'text-gray-900'} group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-current group-hover:to-current transition-colors`}>{title}</h3>
         <p className={`text-sm opacity-70 leading-relaxed flex-1 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>{description}</p>
-        <div className="mt-8 flex items-center gap-2 text-xs font-black uppercase tracking-widest opacity-50 group-hover:opacity-100 transition-opacity">
-          Acessar Módulo <ArrowRight className="w-4 h-4" />
-        </div>
       </motion.div>
-    </a>
+    </div>
+  );
+};
+
+const RealTimeDataStream = ({ isDarkMode }: { isDarkMode: boolean }) => {
+  const [dataPoints, setDataPoints] = React.useState<number[]>([10, 20, 15, 30, 25, 40, 35, 50, 45, 60]);
+  const [logs, setLogs] = React.useState<string[]>([]);
+  
+  React.useEffect(() => {
+    const interval = setInterval(() => {
+      setDataPoints(prev => [...prev.slice(1), Math.floor(Math.random() * 80) + 20]);
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  React.useEffect(() => {
+    const messages = [
+      "Processando análise estrutural...",
+      "Otimizando parâmetros de inferência...",
+      "Sincronizando com base de conhecimento SVP...",
+      "Rede neural balanceada.",
+      "Análise de regressão completa: 99.8% precisão.",
+      "Ajustando pesos sinápticos...",
+      "Mapeamento de remarks atualizado."
+    ];
+    const logInterval = setInterval(() => {
+      setLogs(prev => [messages[Math.floor(Math.random() * messages.length)], ...prev].slice(0, 5));
+    }, 1500);
+    return () => clearInterval(logInterval);
+  }, []);
+
+  return (
+    <div className={`p-10 rounded-[3rem] border backdrop-blur-3xl transition-colors duration-500 flex flex-col lg:flex-row gap-12 items-center w-full max-w-6xl mx-auto my-32 ${isDarkMode ? 'bg-[#0a0a0a]/80 border-indigo-500/30 shadow-[0_0_80px_rgba(99,102,241,0.15)]' : 'bg-white border-indigo-100 shadow-2xl'}`}>
+      <div className="flex-1 w-full relative h-64 border-b lg:border-b-0 lg:border-r border-dashed border-gray-500/30 pb-8 lg:pb-0 lg:pr-12">
+        <div className={`text-sm font-black uppercase tracking-widest mb-6 flex items-center gap-2 ${isDarkMode ? 'text-indigo-400' : 'text-indigo-600'}`}>
+          <Activity size={18} className="animate-pulse" /> Live Neural Network Inference
+        </div>
+        <div className="relative w-full h-full bg-black/5 dark:bg-white/5 rounded-2xl overflow-hidden p-4">
+          <svg viewBox="0 0 500 150" className="w-full h-full" preserveAspectRatio="none">
+             <defs>
+                <linearGradient id="streamGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#8b5cf6" stopOpacity="0.5" />
+                  <stop offset="100%" stopColor="#8b5cf6" stopOpacity="0" />
+                </linearGradient>
+             </defs>
+             <path 
+               d={`M 0,150 L ${dataPoints.map((p, i) => `${i * 55},${150 - p}`).join(' L ')} L 500,150 Z`} 
+               fill="url(#streamGrad)" 
+               className="transition-all duration-1000 ease-linear"
+             />
+             <path 
+               d={`M ${dataPoints.map((p, i) => `${i * 55},${150 - p}`).join(' L ')}`} 
+               fill="none" 
+               stroke="#8b5cf6" 
+               strokeWidth="3" 
+               strokeLinecap="round" 
+               strokeLinejoin="round"
+               className="transition-all duration-1000 ease-linear"
+             />
+             {dataPoints.map((p, i) => (
+               <motion.circle 
+                 key={i} 
+                 cx={i * 55} 
+                 cy={150 - p} 
+                 r="5" 
+                 fill="#00f0ff"
+                 initial={{ scale: 0 }}
+                 animate={{ scale: [1, 1.8, 1] }}
+                 transition={{ duration: 1, repeat: Infinity, repeatDelay: Math.random() * 2 }}
+                 className="transition-all duration-1000 ease-linear"
+               />
+             ))}
+          </svg>
+        </div>
+      </div>
+      <div className="flex-1 w-full flex flex-col justify-center">
+         <div className={`text-sm font-black uppercase tracking-widest mb-6 flex items-center gap-2 ${isDarkMode ? 'text-emerald-400' : 'text-emerald-600'}`}>
+           <Terminal size={18} /> Deep Learning Logs
+         </div>
+         <div className={`space-y-4 font-mono text-xs leading-relaxed p-6 rounded-2xl h-64 overflow-hidden ${isDarkMode ? 'bg-black/50 border border-white/10 text-emerald-400/80' : 'bg-emerald-50 border border-emerald-100 text-emerald-700/80'}`}>
+            {logs.map((log, i) => (
+              <motion.div 
+                key={i + log}
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1 - i * 0.2, x: 0 }}
+                className="flex gap-3 items-start"
+              >
+                <span className="opacity-50 shrink-0">[{new Date().toISOString().split('T')[1].substring(0, 8)}]</span>
+                <span>{log}</span>
+              </motion.div>
+            ))}
+            {logs.length === 0 && <div className="animate-pulse flex items-center gap-2"><Loader2 className="animate-spin w-4 h-4" /> Aguardando instâncias da IA...</div>}
+         </div>
+      </div>
+    </div>
   );
 };
 
@@ -1104,11 +1196,12 @@ export default function ShowcasePage() {
         </div>
       </section>
 
+      <RealTimeDataStream isDarkMode={isDarkMode} />
+
       {/* Footer CTA Section */}
       <section className="w-full py-40 flex flex-col items-center justify-center text-center px-6 relative overflow-hidden">
         <div className="absolute inset-0 z-0">
            <Canvas camera={{ position: [0, 0, 1] }}>
-              <Stars radius={100} depth={80} count={5000} factor={6} saturation={0} fade speed={2} />
               <RotatingStarField />
            </Canvas>
         </div>
