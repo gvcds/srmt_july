@@ -8,7 +8,6 @@ import {
   Zap, 
   Database,
   ArrowRight,
-  MonitorPlay,
   FileCode2,
   MessageSquareCode,
   Activity,
@@ -27,8 +26,6 @@ import {
   AlertCircle,
   Sparkles,
   FileText,
-  KanbanSquare,
-  Timer,
   AreaChart,
   Library
 } from 'lucide-react';
@@ -977,10 +974,10 @@ export default function ShowcasePage() {
           {/* Animated AI Stats Row */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             {[
-              { value: '7h', label: 'Horas / Pessoa', color: 'blue' },
-              { value: '98.2%', label: 'Uptime do Sistema', color: 'emerald' },
-              { value: '24/7', label: 'Monitoramento IA', color: 'purple' },
-              { value: '< 200ms', label: 'Latência API', color: 'orange' }
+              { value: '7h', label: 'Horas / Pessoa', bgDark: 'bg-blue-500/5', textDark: 'text-blue-400' },
+              { value: '98.2%', label: 'Uptime do Sistema', bgDark: 'bg-emerald-500/5', textDark: 'text-emerald-400' },
+              { value: '24/7', label: 'Monitoramento IA', bgDark: 'bg-purple-500/5', textDark: 'text-purple-400' },
+              { value: '< 200ms', label: 'Latência API', bgDark: 'bg-orange-500/5', textDark: 'text-orange-400' }
             ].map((stat, i) => (
               <motion.div
                 key={i}
@@ -991,12 +988,12 @@ export default function ShowcasePage() {
                 whileHover={{ y: -5 }}
                 className={`p-8 rounded-[2rem] border text-center transition-all duration-300 ${
                   isDarkMode 
-                    ? `bg-${stat.color === 'blue' ? 'blue' : stat.color === 'emerald' ? 'emerald' : stat.color === 'purple' ? 'purple' : 'orange'}-500/5 border-white/10 hover:border-white/20` 
+                    ? `${stat.bgDark} border-white/10 hover:border-white/20` 
                     : 'bg-white border-gray-100 shadow-lg hover:shadow-xl'
                 }`}
               >
                 <motion.div 
-                  className={`text-3xl font-black mb-2 ${isDarkMode ? `text-${stat.color === 'blue' ? 'blue' : stat.color === 'emerald' ? 'emerald' : stat.color === 'purple' ? 'purple' : 'orange'}-400` : 'text-gray-900'}`}
+                  className={`text-3xl font-black mb-2 ${isDarkMode ? stat.textDark : 'text-gray-900'}`}
                   initial={{ scale: 0 }}
                   whileInView={{ scale: 1 }}
                   viewport={{ once: true }}
