@@ -26,7 +26,11 @@ import {
   BarChart2,
   AlertCircle,
   Sparkles,
-  FileText
+  FileText,
+  KanbanSquare,
+  Timer,
+  AreaChart,
+  Library
 } from 'lucide-react';
 import { Navbar } from "@/components/navbar";
 import { useTheme, ThemeContextValue } from '@/components/theme-provider';
@@ -129,37 +133,39 @@ const TechCrystal = ({ isDarkMode }: { isDarkMode: boolean }) => {
 
 // --- INTERFACE UI ---
 
-const ImagePlaceholder = ({ label, isDarkMode, className = "", url = "", delay = 0 }: any) => (
-  <motion.div 
-    initial={{ opacity: 0, scale: 0.95, y: 30 }}
-    whileInView={{ opacity: 1, scale: 1, y: 0 }}
-    viewport={{ once: true, margin: "-50px" }}
-    transition={{ duration: 0.6, delay, ease: "easeOut" }}
-    whileHover={{ scale: 1.03, y: -10 }}
-    className={`w-full aspect-video rounded-[2.5rem] flex flex-col items-center justify-center relative overflow-hidden group border shadow-2xl transition-all duration-500 hover:shadow-[0_20px_50px_rgba(59,130,246,0.15)] ${className}
-    ${isDarkMode ? 'bg-[#0a0a0a] border-white/10 hover:border-white/20' : 'bg-gray-100 border-black/5 hover:border-black/10'}
-  `}>
-    <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 via-purple-500/5 to-pink-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
-    <motion.div 
-      className="z-10 flex flex-col items-center"
-      whileHover={{ scale: 1.05 }}
-      transition={{ type: "spring", stiffness: 300 }}
-    >
-      <MonitorPlay className={`w-16 h-16 mb-4 opacity-30 group-hover:opacity-60 transition-all duration-500 ${isDarkMode ? 'text-white' : 'text-gray-900'}`} />
-      <span className={`font-black uppercase tracking-[0.4em] text-sm opacity-50 text-center px-8 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-        {label}
-      </span>
-      <span className={`text-[10px] font-bold opacity-40 mt-4 px-3 py-1 rounded-full text-[#00f0ff] ${isDarkMode ? 'bg-black/20' : 'bg-blue-500/10'}`}>
-        1920 X 1080 RESOLUTION
-      </span>
-    </motion.div>
-    {url && (
-      <div className={`absolute top-6 left-6 flex items-center gap-2 px-4 py-2 rounded-xl backdrop-blur-xl border text-[10px] font-black uppercase tracking-widest shadow-lg ${isDarkMode ? 'bg-black/40 border-white/10 text-white/80' : 'bg-white/60 border-black/5 text-gray-900'}`}>
-        <Network size={12} className="text-[#00f0ff]" /> {url}
-      </div>
-    )}
-  </motion.div>
-);
+const ToolCard = ({ icon: Icon, title, description, url, isDarkMode, color = "blue", delay = 0 }: any) => {
+  const colors: any = {
+    blue: "from-blue-500/10 to-transparent border-blue-500/20 text-blue-500 hover:shadow-[0_0_30px_rgba(59,130,246,0.15)]",
+    purple: "from-purple-500/10 to-transparent border-purple-500/20 text-purple-500 hover:shadow-[0_0_30px_rgba(168,85,247,0.15)]",
+    emerald: "from-emerald-500/10 to-transparent border-emerald-500/20 text-emerald-500 hover:shadow-[0_0_30px_rgba(16,185,129,0.15)]",
+    orange: "from-orange-500/10 to-transparent border-orange-500/20 text-orange-500 hover:shadow-[0_0_30px_rgba(249,115,22,0.15)]",
+    zinc: "from-zinc-500/10 to-transparent border-zinc-500/20 text-zinc-500 hover:shadow-[0_0_30px_rgba(161,161,170,0.15)]",
+    red: "from-red-500/10 to-transparent border-red-500/20 text-red-500 hover:shadow-[0_0_30px_rgba(239,68,68,0.15)]"
+  };
+
+  return (
+    <a href={url} className="block group w-full h-full">
+      <motion.div 
+        whileHover={{ y: -5, scale: 1.02 }}
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-50px" }}
+        transition={{ delay, duration: 0.5 }}
+        className={`p-8 rounded-[2rem] border bg-gradient-to-br backdrop-blur-xl transition-all duration-300 shadow-lg h-full flex flex-col 
+        ${isDarkMode ? 'bg-[#0a0a0a]' : 'bg-white'} ${colors[color]}`}
+      >
+        <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-6 border bg-black/5 dark:bg-white/5 shrink-0`}>
+          <Icon className="w-7 h-7" />
+        </div>
+        <h3 className={`text-2xl font-black mb-3 ${isDarkMode ? 'text-white' : 'text-gray-900'} group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-current group-hover:to-current transition-colors`}>{title}</h3>
+        <p className={`text-sm opacity-70 leading-relaxed flex-1 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>{description}</p>
+        <div className="mt-8 flex items-center gap-2 text-xs font-black uppercase tracking-widest opacity-50 group-hover:opacity-100 transition-opacity">
+          Acessar Módulo <ArrowRight className="w-4 h-4" />
+        </div>
+      </motion.div>
+    </a>
+  );
+};
 
 const SectionHeading = ({ icon: Icon, badge, title, highlight, description, isDarkMode, color = "blue" }: any) => {
   const colorMap: any = {
@@ -320,20 +326,26 @@ export default function ShowcasePage() {
       daily: {
         badge: "Daily Operations",
         title: "Daily Issues & ",
-        highlight: "Management.",
-        desc: "Acompanhamento em tempo real de impedimentos. De simples registros a análises executivas.",
+        highlight: "Tracking.",
+        desc: "Acompanhamento em tempo real de impedimentos, tarefas e horas trabalhadas.",
         regTitle: "Registro Direto",
         regDesc: "O time reporta problemas diários com severidade e status, garantindo que nada se perca.",
         aiTitle: "IA Dashboard Analysis",
-        aiDesc: "A inteligência artificial lê todas as issues e gera um resumo executivo automático."
+        aiDesc: "A inteligência artificial lê todas as issues e gera um resumo executivo automático.",
+        kanbanTitle: "Kanban Board",
+        kanbanDesc: "Organização visual das tarefas de rotina em um quadro Kanban focado em produtividade.",
+        timeTitle: "Time Semanal",
+        timeDesc: "Controle de apontamento de horas para gerenciar a distribuição do esforço da equipe."
       },
       workflow: {
         badge: "Workflow Control",
-        title: "Lifecycle de Tickets & ",
-        highlight: "ROI.",
-        desc: "Gerenciamos o fluxo de solicitações desde o pedido inicial até o cálculo financeiro de economia gerada por automação.",
+        title: "Tickets Lifecycle & ",
+        highlight: "Analytics.",
+        desc: "Gerenciamos fluxos de solicitações e visualizamos indicadores de performance em tempo real.",
         autoTitle: "Automação com Propósito",
-        autoDesc: "O módulo /tickets/automacoes permite gerenciar scripts em execução, monitorar falhas e visualizar a economia em Homem-Hora (HH) que cada automação traz para os projetos.",
+        autoDesc: "O módulo /tickets/automacoes permite gerenciar scripts e visualizar a economia em Homem-Hora.",
+        metricsTitle: "Métricas & Dashboards",
+        metricsDesc: "Visão executiva com gráficos dinâmicos sobre qualidade, produtividade e cobertura de testes.",
         visibility: "Visibilidade",
         tracking: "Tracking"
       },
@@ -342,17 +354,19 @@ export default function ShowcasePage() {
         title: "Planejamento de Férias & ",
         highlight: "Capacidade.",
         desc: "Sistema de gestão de escala para garantir que o time nunca fique desguarnecido de KPs (Key Persons).",
-        kpTitle: "KP vs Backup Conflict",
-        kpDesc: "O sistema detecta automaticamente conflitos se um KP e seu backup solicitarem férias no mesmo período.",
+        kpTitle: "Gestão de Escala e Férias",
+        kpDesc: "O sistema detecta conflitos se um KP e seu backup solicitarem férias no mesmo período.",
         workTitle: "Workflow de Aprovação",
-        workDesc: "URL: /ferias/aprovacao - Fluxo simplificado para gestores validarem ausências baseadas na capacidade atual do time."
+        workDesc: "Fluxo simplificado para gestores validarem ausências baseadas na capacidade atual do time."
       },
       data: {
-        badge: "Data Quality",
-        title: "Padronização de ",
+        badge: "Data & Documentation",
+        title: "Base de Conhecimento & ",
         highlight: "Remarks.",
-        desc: "Unificamos a escrita técnica dos projetos para garantir auditorias perfeitas.",
-        remarkDesc: "O módulo /remarks é a nossa ferramenta de governança de texto. Ela impõe regras rígidas de preenchimento, formatação de dicas e IDs de projetos, eliminando a ambiguidade nos registros de teste. O resultado é um banco de dados limpo, pronto para IA."
+        desc: "Centralizamos e padronizamos todas as informações vitais do projeto.",
+        remarkDesc: "Padronização rigorosa da escrita técnica dos projetos para garantir auditorias limpas.",
+        kbTitle: "Knowledge Base",
+        kbDesc: "A enciclopédia do time. Reúne guias, arquiteturas e glossários técnicos acessíveis a qualquer momento."
       },
       footer: {
         title1: "Pronto para o futuro da ",
@@ -404,20 +418,26 @@ export default function ShowcasePage() {
       daily: {
         badge: "Daily Operations",
         title: "Daily Issues & ",
-        highlight: "Management.",
-        desc: "Real-time tracking of impediments. From simple logs to executive analysis.",
+        highlight: "Tracking.",
+        desc: "Real-time tracking of impediments, tasks, and worked hours.",
         regTitle: "Direct Logging",
         regDesc: "The team reports daily problems with severity and status, ensuring nothing is lost.",
         aiTitle: "AI Dashboard Analysis",
-        aiDesc: "Artificial intelligence reads all issues and generates an automatic executive summary."
+        aiDesc: "Artificial intelligence reads all issues and generates an automatic executive summary.",
+        kanbanTitle: "Kanban Board",
+        kanbanDesc: "Visual organization of routine tasks in a Kanban board focused on productivity.",
+        timeTitle: "Weekly Time",
+        timeDesc: "Time tracking control to manage the distribution of team effort."
       },
       workflow: {
         badge: "Workflow Control",
         title: "Ticket Lifecycle & ",
-        highlight: "ROI.",
-        desc: "We manage the flow of requests from the initial order to the financial calculation of savings generated by automation.",
+        highlight: "Analytics.",
+        desc: "We manage request flows and visualize performance indicators in real time.",
         autoTitle: "Automation with Purpose",
-        autoDesc: "The /tickets/automations module allows managing running scripts, monitoring failures, and visualizing the Man-Hour (HH) savings each automation brings to projects.",
+        autoDesc: "The tickets module allows managing scripts and visualizing Man-Hour savings.",
+        metricsTitle: "Metrics & Dashboards",
+        metricsDesc: "Executive view with dynamic charts on quality, productivity, and test coverage.",
         visibility: "Visibility",
         tracking: "Tracking"
       },
@@ -426,17 +446,19 @@ export default function ShowcasePage() {
         title: "Vacation Planning & ",
         highlight: "Capacity.",
         desc: "Schedule management system to ensure the team is never left without KPs (Key Persons).",
-        kpTitle: "KP vs Backup Conflict",
-        kpDesc: "The system automatically detects conflicts if a KP and their backup request vacation in the same period.",
+        kpTitle: "Schedule and Vacations Management",
+        kpDesc: "The system automatically detects conflicts if a KP and their backup request vacation.",
         workTitle: "Approval Workflow",
-        workDesc: "URL: /vacations/approval - Simplified flow for managers to validate absences based on current team capacity."
+        workDesc: "Simplified flow for managers to validate absences based on current team capacity."
       },
       data: {
-        badge: "Data Quality",
-        title: "Standardization of ",
+        badge: "Data & Documentation",
+        title: "Knowledge Base & ",
         highlight: "Remarks.",
-        desc: "We unify the technical writing of projects to ensure perfect audits.",
-        remarkDesc: "The /remarks module is our text governance tool. It imposes strict rules for filling out, formatting tips, and project IDs, eliminating ambiguity in test logs. The result is a clean database, ready for AI."
+        desc: "We centralize and standardize all vital project information.",
+        remarkDesc: "Strict standardization of technical writing to ensure clean audits.",
+        kbTitle: "Knowledge Base",
+        kbDesc: "The team's encyclopedia. Gathers guides, architectures, and technical glossaries accessible anytime."
       },
       footer: {
         title1: "Ready for the future of ",
@@ -488,20 +510,26 @@ export default function ShowcasePage() {
       daily: {
         badge: "일일 운영",
         title: "일일 문제 및 ",
-        highlight: "관리.",
-        desc: "장애물의 실시간 추적. 단순한 로그에서 경영진 분석까지.",
+        highlight: "추적.",
+        desc: "장애물, 작업 및 근무 시간의 실시간 추적.",
         regTitle: "직접 로깅",
         regDesc: "팀은 심각도 및 상태와 함께 일일 문제를 보고하여 누락되는 것이 없도록 합니다.",
         aiTitle: "AI 대시보드 분석",
-        aiDesc: "인공 지능이 모든 문제를 읽고 자동 경영진 요약을 생성합니다."
+        aiDesc: "인공 지능이 모든 문제를 읽고 자동 경영진 요약을 생성합니다.",
+        kanbanTitle: "칸반 보드",
+        kanbanDesc: "생산성에 초점을 맞춘 칸반 보드에서 일상 작업의 시각적 구성.",
+        timeTitle: "주간 시간",
+        timeDesc: "팀의 노력을 관리하기 위한 시간 추적 제어."
       },
       workflow: {
         badge: "워크플로우 제어",
         title: "티켓 수명 주기 및 ",
-        highlight: "ROI.",
-        desc: "초기 주문에서 자동화로 생성된 절감액의 재무 계산에 이르기까지 요청 흐름을 관리합니다.",
+        highlight: "분석.",
+        desc: "요청 흐름을 관리하고 실시간으로 성과 지표를 시각화합니다.",
         autoTitle: "목적이 있는 자동화",
-        autoDesc: "/tickets/automations 모듈을 사용하면 실행 중인 스크립트를 관리하고, 실패를 모니터링하며, 각 자동화가 프로젝트에 가져오는 공수(HH) 절감 효과를 시각화할 수 있습니다.",
+        autoDesc: "티켓 모듈을 사용하면 스크립트를 관리하고 공수(HH) 절감 효과를 시각화할 수 있습니다.",
+        metricsTitle: "지표 및 대시보드",
+        metricsDesc: "품질, 생산성 및 테스트 적용 범위에 대한 동적 차트가 포함된 경영진 뷰.",
         visibility: "가시성",
         tracking: "추적"
       },
@@ -510,17 +538,19 @@ export default function ShowcasePage() {
         title: "휴가 계획 및 ",
         highlight: "용량.",
         desc: "팀에 핵심 인력(KP)이 부족하지 않도록 보장하는 일정 관리 시스템.",
-        kpTitle: "KP 대 백업 충돌",
-        kpDesc: "KP와 그들의 백업이 같은 기간에 휴가를 요청하면 시스템이 자동으로 충돌을 감지합니다.",
+        kpTitle: "일정 및 휴가 관리",
+        kpDesc: "KP와 그들의 백업이 휴가를 요청하면 시스템이 자동으로 충돌을 감지합니다.",
         workTitle: "승인 워크플로우",
-        workDesc: "URL: /vacations/approval - 관리자가 현재 팀 용량을 기반으로 부재를 확인하기 위한 간소화된 흐름."
+        workDesc: "관리자가 현재 팀 용량을 기반으로 부재를 확인하기 위한 간소화된 흐름."
       },
       data: {
-        badge: "데이터 품질",
-        title: "비고의 ",
-        highlight: "표준화.",
-        desc: "완벽한 감사를 보장하기 위해 프로젝트의 기술 작성을 통합합니다.",
-        remarkDesc: "/remarks 모듈은 우리의 텍스트 거버넌스 도구입니다. 작성, 팁 형식 지정 및 프로젝트 ID에 대한 엄격한 규칙을 적용하여 테스트 로그의 모호성을 제거합니다. 그 결과 AI를 위한 준비가 된 깨끗한 데이터베이스가 생성됩니다."
+        badge: "데이터 및 문서",
+        title: "지식 기반 및 ",
+        highlight: "비고.",
+        desc: "모든 중요한 프로젝트 정보를 중앙 집중화하고 표준화합니다.",
+        remarkDesc: "완벽한 감사를 보장하기 위해 기술 작성의 엄격한 표준화.",
+        kbTitle: "지식 기반",
+        kbDesc: "팀의 백과사전. 언제든지 액세스할 수 있는 가이드, 아키텍처 및 기술 용어집을 모았습니다."
       },
       footer: {
         title1: "미래를 위한 준비 ",
@@ -739,57 +769,42 @@ export default function ShowcasePage() {
             />
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
-            <div className="space-y-8">
-              <motion.div 
-                initial={{ opacity: 0, x: -30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}
-                className={`p-10 rounded-[3rem] border transition-all duration-500 ${isDarkMode ? 'bg-gradient-to-br from-purple-600/10 to-blue-600/5 border-purple-500/20 shadow-[0_0_40px_rgba(168,85,247,0.1)] hover:shadow-[0_0_60px_rgba(168,85,247,0.2)]' : 'bg-white border-purple-100 shadow-xl hover:shadow-2xl'}`}
-              >
-                <h3 className={`text-3xl font-black mb-6 flex items-center gap-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}><FileCode2 className="text-purple-400 drop-shadow-[0_0_15px_rgba(168,85,247,0.5)]" /> STMS XML Tool</h3>
-                <p className={`text-lg opacity-70 leading-relaxed mb-8 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                  {t.ai.xmlDesc}
-                </p>
-                <div className="flex items-center gap-4 text-sm font-bold text-purple-300 bg-purple-500/10 p-4 rounded-2xl border border-purple-500/20">
-                  <BarChart3 className="w-5 h-5" /> {t.ai.xmlMetric}
-                </div>
-              </motion.div>
-              
-              <motion.div 
-                initial={{ opacity: 0, x: -30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.6, delay: 0.2 }}
-                className={`p-10 rounded-[3rem] border transition-colors duration-500 ${isDarkMode ? 'border-white/5 bg-white/5 hover:bg-white/10' : 'border-gray-100 bg-white hover:bg-gray-50 shadow-lg'}`}
-              >
-                <h3 className={`text-3xl font-black mb-6 flex items-center gap-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}><Database className="text-purple-500" /> STMS AI Assist</h3>
-                <p className={`text-lg opacity-70 leading-relaxed ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                  {t.ai.dbDesc}
-                </p>
-              </motion.div>
-            </div>
-            <ImagePlaceholder label="IA SVP Interface (XML & DB Tool)" url="/ia-svp" isDarkMode={isDarkMode} className="shadow-[0_0_50px_rgba(168,85,247,0.15)] border-purple-500/20" delay={0.3} />
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
-            <ImagePlaceholder label="SVP Assistant Chat" url="/ia-svp" isDarkMode={isDarkMode} className="shadow-[0_0_50px_rgba(59,130,246,0.15)] border-blue-500/20 order-2 lg:order-1" />
-            <div className="space-y-8 order-1 lg:order-2">
-              <motion.div 
-                initial={{ opacity: 0, x: 30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}
-                className={`p-10 rounded-[3rem] border transition-all duration-500 ${isDarkMode ? 'bg-gradient-to-tr from-blue-600/10 to-indigo-600/5 border-blue-500/20 shadow-[0_0_40px_rgba(59,130,246,0.1)] hover:shadow-[0_0_60px_rgba(59,130,246,0.2)]' : 'bg-white border-blue-100 shadow-xl hover:shadow-2xl'}`}
-              >
-                <h3 className={`text-3xl font-black mb-6 flex items-center gap-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}><MessageSquareCode className="text-[#00f0ff] drop-shadow-[0_0_15px_rgba(0,240,255,0.5)]" /> SVP Assistant Chat</h3>
-                <p className={`text-lg opacity-70 leading-relaxed ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                  {t.ai.chatDesc}
-                </p>
-              </motion.div>
-            </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-10">
+            <ToolCard icon={FileCode2} title="STMS XML Tool" description={t.ai.xmlDesc} url="/ia-svp" isDarkMode={isDarkMode} color="purple" delay={0.1} />
+            <ToolCard icon={Database} title="STMS AI Assist" description={t.ai.dbDesc} url="/ia-svp" isDarkMode={isDarkMode} color="purple" delay={0.2} />
+            <ToolCard icon={MessageSquareCode} title="SVP Assistant Chat" description={t.ai.chatDesc} url="/ia-svp" isDarkMode={isDarkMode} color="blue" delay={0.3} />
           </div>
         </section>
       </div>
 
 
 
-      {/* Workflow Control Section */}
-      <div className={`w-full border-y transition-colors duration-500 py-40 ${isDarkMode ? 'bg-gradient-to-b from-blue-900/5 to-transparent border-blue-500/10' : 'bg-gradient-to-b from-blue-50 to-white border-blue-100'}`}>
+      {/* Daily Operations Section */}
+      <div className={`w-full border-b transition-colors duration-500 py-40 ${isDarkMode ? 'bg-[#0a0a0c] border-white/5' : 'bg-gray-50 border-gray-200'}`}>
         <section className="w-full max-w-[1600px] mx-auto px-6">
-          <div className="text-center mb-20 max-w-4xl mx-auto">
+          <div className="flex flex-col items-center text-center space-y-6 max-w-4xl mx-auto mb-20">
+            <SectionHeading 
+              icon={Activity} 
+              badge={t.daily.badge} 
+              title={t.daily.title} 
+              highlight={t.daily.highlight}
+              description={t.daily.desc}
+              isDarkMode={isDarkMode}
+              color="emerald"
+            />
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <ToolCard icon={CheckCircle} title={t.daily.regTitle} description={t.daily.regDesc} url="/daily-issues" isDarkMode={isDarkMode} color="emerald" delay={0.1} />
+            <ToolCard icon={KanbanSquare} title={t.daily.kanbanTitle} description={t.daily.kanbanDesc} url="/kanban" isDarkMode={isDarkMode} color="blue" delay={0.2} />
+            <ToolCard icon={Timer} title={t.daily.timeTitle} description={t.daily.timeDesc} url="/time-semanal" isDarkMode={isDarkMode} color="orange" delay={0.3} />
+          </div>
+        </section>
+      </div>
+
+      {/* Workflow Control Section */}
+      <div className={`w-full border-b transition-colors duration-500 py-40 ${isDarkMode ? 'bg-gradient-to-b from-blue-900/5 to-transparent border-blue-500/10' : 'bg-gradient-to-b from-blue-50 to-white border-blue-100'}`}>
+        <section className="w-full max-w-[1600px] mx-auto px-6">
+          <div className="flex flex-col items-center text-center space-y-6 max-w-4xl mx-auto mb-20">
             <SectionHeading 
               icon={GitPullRequest} 
               badge={t.workflow.badge} 
@@ -801,25 +816,19 @@ export default function ShowcasePage() {
             />
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
-            <div className="space-y-10">
-              <ImagePlaceholder label="Abertura de Tickets" url="/tickets" isDarkMode={isDarkMode} delay={0.1} />
-              <ImagePlaceholder label="Acompanhamento Kanban" url="/tickets/acompanhamento" isDarkMode={isDarkMode} delay={0.2} />
-            </div>
-            <div className="space-y-10">
-              <ImagePlaceholder label="Central de Automações" url="/tickets/automacoes" isDarkMode={isDarkMode} delay={0.3} />
-              <ImagePlaceholder label="ROI & Analytics Dashboard" url="/tickets/automacoes/dashboard" isDarkMode={isDarkMode} delay={0.4} />
-            </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-20">
+             <ToolCard icon={GitPullRequest} title={t.workflow.autoTitle} description={t.workflow.autoDesc} url="/tickets" isDarkMode={isDarkMode} color="blue" delay={0.1} />
+             <ToolCard icon={AreaChart} title={t.workflow.metricsTitle} description={t.workflow.metricsDesc} url="/metricas" isDarkMode={isDarkMode} color="purple" delay={0.2} />
           </div>
 
           <motion.div 
             initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.8 }}
-            className={`mt-20 p-12 rounded-[3rem] border backdrop-blur-3xl flex flex-col md:flex-row gap-12 items-center transition-all duration-500 ${isDarkMode ? 'bg-black/40 border-[#00f0ff]/20 shadow-[0_0_60px_rgba(0,240,255,0.05)]' : 'bg-white border-blue-100 shadow-xl'}`}
+            className={`p-12 rounded-[3rem] border backdrop-blur-3xl flex flex-col md:flex-row gap-12 items-center transition-all duration-500 ${isDarkMode ? 'bg-black/40 border-[#00f0ff]/20 shadow-[0_0_60px_rgba(0,240,255,0.05)]' : 'bg-white border-blue-100 shadow-xl'}`}
           >
              <div className="flex-1 space-y-6">
-                <h3 className={`text-3xl font-black ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{t.workflow.autoTitle}</h3>
+                <h3 className={`text-3xl font-black ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Automação e Analytics</h3>
                 <p className={`text-lg opacity-70 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                  {t.workflow.autoDesc}
+                  Monitoramento contínuo com dashboards atualizados em tempo real, fornecendo controle total sobre o ecossistema do projeto.
                 </p>
              </div>
              <div className="grid grid-cols-2 gap-4 w-full md:w-auto shrink-0">
@@ -837,11 +846,8 @@ export default function ShowcasePage() {
       </div>
 
       {/* Resource Planning Section */}
-      <section className="w-full max-w-[1600px] px-6 py-40 flex flex-col lg:flex-row items-center gap-20">
-        <div className="w-full lg:w-1/2">
-          <ImagePlaceholder label="Gestão de Férias e Escala" url="/ferias/gestao" isDarkMode={isDarkMode} className="!aspect-[4/3] border-orange-500/20 hover:shadow-[0_0_40px_rgba(249,115,22,0.15)]" />
-        </div>
-        <div className="w-full lg:w-1/2 space-y-8">
+      <section className="w-full max-w-[1600px] px-6 py-40 mx-auto">
+        <div className="flex flex-col items-center text-center space-y-6 max-w-4xl mx-auto mb-20">
           <SectionHeading 
             icon={CalendarDays} 
             badge={t.resource.badge} 
@@ -851,32 +857,17 @@ export default function ShowcasePage() {
             isDarkMode={isDarkMode}
             color="orange"
           />
-          <div className="grid grid-cols-1 gap-4">
-            <motion.div whileHover={{ x: -10 }} className={`flex gap-4 p-6 rounded-2xl border cursor-default transition-all duration-300 ${isDarkMode ? 'border-white/5 bg-white/5 hover:bg-white/10' : 'bg-white border-orange-100 shadow-sm hover:shadow-md'}`}>
-               <ShieldCheck className="text-orange-500 shrink-0 drop-shadow-[0_0_100px_rgba(249,115,22,0.5)]" />
-               <div>
-                 <h4 className={`font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{t.resource.kpTitle}</h4>
-                 <p className={`text-sm opacity-60 mt-1 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>{t.resource.kpDesc}</p>
-               </div>
-            </motion.div>
-            <motion.div whileHover={{ x: -10 }} className={`flex gap-4 p-6 rounded-2xl border cursor-default transition-all duration-300 ${isDarkMode ? 'border-white/5 bg-white/5 hover:bg-white/10' : 'bg-white border-orange-100 shadow-sm hover:shadow-md'}`}>
-               <CheckCircle className="text-orange-500 shrink-0 drop-shadow-[0_0_10px_rgba(249,115,22,0.5)]" />
-               <div>
-                 <h4 className={`font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{t.resource.workTitle}</h4>
-                 <p className={`text-sm opacity-60 mt-1 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>{t.resource.workDesc}</p>
-               </div>
-            </motion.div>
-          </div>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+          <ToolCard icon={ShieldCheck} title={t.resource.kpTitle} description={t.resource.kpDesc} url="/ferias" isDarkMode={isDarkMode} color="orange" delay={0.1} />
+          <ToolCard icon={CheckCircle} title={t.resource.workTitle} description={t.resource.workDesc} url="/ferias/aprovacao" isDarkMode={isDarkMode} color="emerald" delay={0.2} />
         </div>
       </section>
 
       {/* Data Quality Section */}
-      <div className={`w-full border-y transition-colors duration-500 py-40 ${isDarkMode ? 'bg-[#0a0a0c] border-white/5' : 'bg-gray-50 border-gray-200'}`}>
-        <section className="w-full max-w-[1600px] mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
-          <div className="space-y-10 order-2 lg:order-1">
-            <ImagePlaceholder label="Remarks SVP" url="/remarks" isDarkMode={isDarkMode} className="border-zinc-500/30 hover:shadow-[0_0_40px_rgba(161,161,170,0.15)]" />
-          </div>
-          <div className={`space-y-8 order-1 lg:order-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+      <div className={`w-full border-y transition-colors duration-500 py-40 ${isDarkMode ? 'bg-gradient-to-b from-[#030305] to-[#080512] border-white/5' : 'bg-gradient-to-b from-gray-50 to-white border-black/5'}`}>
+        <section className="w-full max-w-[1600px] mx-auto px-6">
+          <div className="flex flex-col items-center text-center space-y-6 max-w-4xl mx-auto mb-20">
             <SectionHeading 
               icon={FileCheck2} 
               badge={t.data.badge} 
@@ -886,20 +877,10 @@ export default function ShowcasePage() {
               isDarkMode={isDarkMode}
               color="zinc"
             />
-            <p className={`text-lg opacity-70 leading-relaxed ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-              {t.data.remarkDesc}
-            </p>
-            <div className="flex flex-wrap gap-3">
-               {['Validation Rules', 'Project IDs', 'Uniform Formatting', 'Audit Ready'].map((txt, i) => (
-                 <motion.span 
-                   key={i} 
-                   whileHover={{ scale: 1.1, backgroundColor: isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)' }}
-                   className={`px-4 py-2 rounded-xl border text-xs font-black uppercase tracking-widest cursor-default transition-colors ${isDarkMode ? 'bg-white/5 border-white/10' : 'bg-black/5 border-black/10'}`}
-                 >
-                   {txt}
-                 </motion.span>
-               ))}
-            </div>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+            <ToolCard icon={FileText} title="Padronização de Remarks" description={t.data.remarkDesc} url="/remarks" isDarkMode={isDarkMode} color="zinc" delay={0.1} />
+            <ToolCard icon={Library} title={t.data.kbTitle} description={t.data.kbDesc} url="/knowledge-base" isDarkMode={isDarkMode} color="blue" delay={0.2} />
           </div>
         </section>
       </div>
