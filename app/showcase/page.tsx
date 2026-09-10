@@ -334,7 +334,7 @@ const CreditsModal = ({ isDarkMode, onClose }: { isDarkMode: boolean, onClose: (
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-600">& Ex-Membros SVP/SIDIA</span>
           </h2>
           <p className={`text-sm md:text-base uppercase tracking-[0.4em] font-bold ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-            Meu muito obrigado por toda a ajuda e parceria na construção de tudo isso!
+            Meu muito obrigado por toda a força e parceria para construirmos tudo isso!
           </p>
         </motion.div>
 
@@ -359,7 +359,7 @@ const CreditsModal = ({ isDarkMode, onClose }: { isDarkMode: boolean, onClose: (
           className={`max-w-2xl text-center mb-16 px-6 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}
         >
           <p className="text-sm md:text-base italic leading-relaxed">
-            "Um agradecimento especial a todos os usuários e colaboradores que dedicaram seu tempo para abrir tickets e relatar feedbacks. O esforço contínuo de vocês foi fundamental para o aprimoramento deste ecossistema."
+            "E um agradecimento especial pra todo mundo que tirou um tempinho pra abrir tickets, relatar bugs e dar ideias. O feedback de vocês foi o que realmente fez a diferença pra gente conseguir evoluir e deixar o sistema com a nossa cara. Valeu demais!"
           </p>
         </motion.div>
 
