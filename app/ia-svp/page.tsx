@@ -72,6 +72,8 @@ interface AnalysisState {
 
 type Language = 'pt' | 'en' | 'ko';
 
+const AVAILABLE_MODELS = ['gpt-oss-120b', 'gpt-oss-20b'];
+
 // --- COMPONENTE ESTRELA DE NÊUTRON 3D (VERSÃO SUPREMA SUAVIZADA + NEON) ---
 const NeutronStar = ({ isDarkMode }: { isDarkMode: boolean }) => {
     const coreRef = useRef<THREE.Mesh>(null);
@@ -840,7 +842,7 @@ export default function IASVPPage() {
             setLanguage(savedLang);
         }
         const savedModel = localStorage.getItem('svp_selected_model');
-        if (savedModel) {
+        if (savedModel && AVAILABLE_MODELS.includes(savedModel)) {
             setSelectedModel(savedModel);
         }
     }, []);
@@ -1258,28 +1260,8 @@ REGRAS CRÍTICAS E INVIOLÁVEIS:
                                     }}
                                     className={`px-3 py-2 rounded-lg text-xs font-bold transition-all border outline-none ${isDarkMode ? 'bg-[#111] border-white/20 text-white' : 'bg-white border-gray-300 text-gray-900'}`}
                                 >
-                                    <optgroup label="LLM (Large Language Models)">
-                                        <option value="qwen2.5-32b">qwen2.5-32b</option>
-                                        <option value="gpt-oss-120b">gpt-oss-120b</option>
-                                        <option value="qwen2.5-72b">qwen2.5-72b</option>
-                                        <option value="qwen3.5-35b">qwen3.5-35b</option>
-                                        <option value="qwen3-next-80b">qwen3-next-80b</option>
-                                        <option value="gpt-oss-20b">gpt-oss-20b</option>
-                                        <option value="phi-4-mini">phi-4-mini</option>
-                                    </optgroup>
-                                    <optgroup label="VLM (Vision Language Models) e Multimodais">
-                                        <option value="qwen3.6-35b">qwen3.6-35b</option>
-                                        <option value="gemma-4-31B-instruct">gemma-4-31B-instruct</option>
-                                        <option value="qwen3.5-35b">qwen3.5-35b</option>
-                                    </optgroup>
-                                    <optgroup label="CLM (Code Language Models)">
-                                        <option value="codellama-13b-instruct">codellama-13b-instruct</option>
-                                    </optgroup>
-                                    <optgroup label="Embeddings">
-                                        <option value="nomic-ai/nomic-embed-text-v1.5">nomic-ai/nomic-embed-text-v1.5</option>
-                                        <option value="qwen3-embedding-8b">qwen3-embedding-8b</option>
-                                        <option value="bge-m3">bge-m3</option>
-                                    </optgroup>
+                                    <option value="gpt-oss-120b">gpt-oss-120b</option>
+                                    <option value="gpt-oss-20b">gpt-oss-20b</option>
                                 </select>
                                 <Button 
                                     variant="ghost" 
