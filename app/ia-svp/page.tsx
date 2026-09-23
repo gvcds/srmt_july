@@ -424,7 +424,7 @@ REGRAS OBRIGATÓRIAS:
         }
 
         if (role === 'assistant' && index < content.length) {
-            // Respostas longas (ex.: dados do PLM) avançam mais caracteres por tick para terminar em ~3s
+            // Respostas longas avançam mais caracteres por tick para terminar em ~3s
             const step = Math.max(1, Math.ceil(content.length / 600));
 
             // LÓGICA PARA RENDERIZAR GRÁFICO INSTANTANEAMENTE
@@ -1025,7 +1025,7 @@ REGRAS CRÍTICAS E INVIOLÁVEIS:
                         ...updatedMessages.map(m => ({ role: m.role, content: m.content }))
                     ],
                     stream: false,
-                    context: { tab: currentTab, plm: true }
+                    context: { tab: currentTab }
                 })
             });
 
