@@ -1643,7 +1643,7 @@ return (
     {/* Modal de Análise Detalhada */}
     {selectedItem && (
       <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/60 backdrop-blur-md" onClick={() => setSelectedItem(null)}>
-        <Card className={`w-full max-w-2xl overflow-hidden rounded-xl border shadow-2xl animate-in zoom-in-95 duration-200 ${isDarkMode ? 'bg-[#0a0a0a] border-white/10 text-white backdrop-blur-3xl' : 'bg-white border-black/5 text-gray-900'}`} onClick={e => e.stopPropagation()}>
+        <Card className={`w-full max-w-4xl overflow-hidden rounded-xl border shadow-2xl animate-in zoom-in-95 duration-200 ${isDarkMode ? 'bg-[#0a0a0a] border-white/10 text-white backdrop-blur-3xl' : 'bg-white border-black/5 text-gray-900'}`} onClick={e => e.stopPropagation()}>
           <div className={`p-6 border-b flex justify-between items-center ${isDarkMode ? 'border-white/10' : 'border-gray-100'}`}>
             <div className="flex items-center gap-3">
               <div className={`p-2 rounded-xl ${isDarkMode ? 'bg-blue-500/20 text-blue-400' : 'bg-blue-100 text-blue-600'}`}>
@@ -1763,7 +1763,7 @@ return (
     {/* Modal de Edição de Resultado da IA */}
     {isEditModalOpen && tempEditItem && (
       <div className="fixed inset-0 z-[300] flex items-center justify-center p-4 bg-black/60 backdrop-blur-md">
-        <Card className={`w-full max-w-xl overflow-hidden rounded-xl border shadow-2xl animate-in zoom-in-95 duration-200 ${isDarkMode ? 'bg-[#0a0a0a] border-white/10 text-white backdrop-blur-3xl' : 'bg-white border-black/5 text-gray-900'}`}>
+        <Card className={`w-full max-w-3xl overflow-hidden rounded-xl border shadow-2xl animate-in zoom-in-95 duration-200 ${isDarkMode ? 'bg-[#0a0a0a] border-white/10 text-white backdrop-blur-3xl' : 'bg-white border-black/5 text-gray-900'}`}>
           <div className={`p-6 border-b flex justify-between items-center ${isDarkMode ? 'border-white/10' : 'border-gray-100'}`}>
             <div className="flex items-center gap-3">
               <div className={`p-2 rounded-xl ${isDarkMode ? 'bg-blue-500/20 text-blue-400' : 'bg-blue-100 text-blue-600'}`}>
@@ -1829,7 +1829,7 @@ return (
     {isFeedbackModalOpen && feedbackItem && (
       <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4" onClick={() => setIsFeedbackModalOpen(false)}>
         <div className="absolute inset-0 bg-black/60 backdrop-blur-md animate-in fade-in duration-300" />
-        <Card className={`relative z-10 w-full max-w-2xl overflow-hidden rounded-2xl border shadow-2xl animate-in zoom-in-95 fade-in duration-500
+        <Card className={`relative z-10 w-full max-w-4xl overflow-hidden rounded-2xl border shadow-2xl animate-in zoom-in-95 fade-in duration-500
  ${isDarkMode ? 'bg-[#0c0c0c] border-white/10 text-gray-100' : 'bg-white border-gray-200 text-gray-900'}`}
           onClick={(e: React.MouseEvent) => e.stopPropagation()}>
 
