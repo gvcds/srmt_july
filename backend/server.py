@@ -38,6 +38,7 @@ import sys
 import asyncio
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from plm_api import plm_chat
+import close_issue_guide
 
 # --- CONFIGURAÇÃO DO BANCO DE DADOS (SRMT) ---
 DB_HOST = "localhost"
@@ -2130,6 +2131,9 @@ async def ai_analyze(payload: Dict[str, Any], db: Session = Depends(get_db)):
                 except Exception as e:
                     print(f"Erro ao ler {filename}: {e}")
 
+    # Close Issue Guide 1.4 (.md): apenas os casos relevantes para a conversa (RAG)
+    guide_prompt = close_issue_guide.build_prompt(messages)
+
     chart_instruction = (
         "\n\nOPÇÃO DE VISUALIZAÇÃO: Você PODE e DEVE responder com gráficos quando houver dados numéricos, "
         "estatísticos ou comparativos. Para gerar um gráfico, utilize EXCLUSIVAMENTE o seguinte formato de bloco de código:\n"
@@ -2157,6 +2161,7 @@ async def ai_analyze(payload: Dict[str, Any], db: Session = Depends(get_db)):
                 f"{chart_instruction}\n\n"
                 f"Base de Conhecimento (NÃO CRIE TABELAS EM SUAS RESPOSTAS), CASO VOCÊ NÃO ACHE A INFORMAÇÃO. "
                 f"DIGA QUE NÃO SABE, E NÃO INVENTE NADA:\n{knowledge_text}"
+                f"{guide_prompt}"
             )
         }
     ]
@@ -3024,7 +3029,7 @@ class SuggestKnowledgeRequest(BaseModel):
 
 @app.get("/knowledge/{filename}")
 def get_knowledge_file(filename: str):
-    valid_files = ["bug_review.txt", "general_info.txt", "tone_of_voice.txt", "tone_of_voice_es.txt", "feedback_pt.txt", "feedback_es.txt"]
+    valid_files = ["bug_review.txt", "general_info.txt", "tone_of_voice.txt", "tone_of_voice_es.txt", "feedback_pt.txt", "feedback_es.txt", close_issue_guide.GUIDE_FILENAME]
     if filename not in valid_files:
         raise HTTPException(status_code=400, detail="Arquivo inválido")
     
@@ -3037,7 +3042,7 @@ def get_knowledge_file(filename: str):
 
 @app.post("/knowledge/{filename}")
 def update_knowledge_file(filename: str, data: KnowledgeUpdateRequest):
-    valid_files = ["bug_review.txt", "general_info.txt", "tone_of_voice.txt", "tone_of_voice_es.txt", "feedback_pt.txt", "feedback_es.txt"]
+    valid_files = ["bug_review.txt", "general_info.txt", "tone_of_voice.txt", "tone_of_voice_es.txt", "feedback_pt.txt", "feedback_es.txt", close_issue_guide.GUIDE_FILENAME]
     if filename not in valid_files:
         raise HTTPException(status_code=400, detail="Arquivo inválido")
     
