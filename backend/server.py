@@ -33,6 +33,12 @@ except Exception:  # pragma: no cover - ambiente sem ldap3
     Server = None
     Connection = None
 
+# --- INTEGRAÇÃO PLM (consultas de issues via chat) ---
+import sys
+import asyncio
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from plm_api import plm_chat
+
 # --- CONFIGURAÇÃO DO BANCO DE DADOS (SRMT) ---
 DB_HOST = "localhost"
 DB_PORT = "5432"
@@ -2048,6 +2054,24 @@ def get_remark_issues(team: Optional[str] = None, db: Session = Depends(get_db))
 
 # --- PROXY PARA IA (SIDIA) ---
 
+def _llm_complete(messages: List[Dict[str, str]], model: str) -> Optional[str]:
+    """Chamada simples à IA; retorna o texto da resposta ou None em caso de erro."""
+    try:
+        response = requests.post(
+            PROXY_URL,
+            headers={"Authorization": f"Bearer {API_KEY}", "Content-Type": "application/json"},
+            json={"model": model, "messages": messages, "stream": False},
+            verify=False,
+            timeout=120,
+        )
+        if not response.ok:
+            return None
+        data = response.json()
+        return (data.get("choices") or [{}])[0].get("message", {}).get("content") or data.get("message", {}).get("content")
+    except Exception as e:
+        print(f"Erro na chamada à IA: {e}")
+        return None
+
 @app.post("/ai/analyze")
 async def ai_analyze(payload: Dict[str, Any], db: Session = Depends(get_db)):
     messages = payload.get("messages", [])
@@ -2057,7 +2081,19 @@ async def ai_analyze(payload: Dict[str, Any], db: Session = Depends(get_db)):
     user_message = messages[-1].get("content", "").lower().strip()
     context = payload.get("context", {})
     tab = context.get("tab", "geral")
-    
+
+    # Consultas ao PLM (código de issue, issues registradas/fechadas) — só no chat principal
+    if context.get("plm"):
+        def llm(msgs):
+            return _llm_complete(msgs, payload.get("model", MODEL_ID))
+        try:
+            plm_reply = await asyncio.to_thread(plm_chat.handle, messages, llm)
+        except Exception as e:
+            print(f"Erro na integração PLM: {e}")
+            plm_reply = None
+        if plm_reply:
+            return {"message": {"role": "assistant", "content": plm_reply}}
+
     is_ref_query = "referencia" in user_message or "referência" in user_message
     if is_ref_query:
         model_match = re.search(r"(sm-[a-z0-9_-]+|[a-z0-9_-]+tpa|[a-z0-9_-]+gto)", user_message)

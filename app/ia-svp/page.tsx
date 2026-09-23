@@ -424,10 +424,13 @@ REGRAS OBRIGATÓRIAS:
         }
 
         if (role === 'assistant' && index < content.length) {
+            // Respostas longas (ex.: dados do PLM) avançam mais caracteres por tick para terminar em ~3s
+            const step = Math.max(1, Math.ceil(content.length / 600));
+
             // LÓGICA PARA RENDERIZAR GRÁFICO INSTANTANEAMENTE
-            const remainingContent = content.substring(index);
-            if (remainingContent.startsWith('```json:chart')) {
-                const endBlockIndex = content.indexOf('```', index + 13);
+            const chartStart = content.indexOf('```json:chart', index);
+            if (chartStart !== -1 && chartStart < index + step) {
+                const endBlockIndex = content.indexOf('```', chartStart + 13);
                 if (endBlockIndex !== -1) {
                     const fullBlockEnd = endBlockIndex + 3;
                     setDisplayedContent(content.substring(0, fullBlockEnd));
@@ -437,8 +440,8 @@ REGRAS OBRIGATÓRIAS:
             }
 
             const timeout = setTimeout(() => {
-                setDisplayedContent(content.substring(0, index + 1));
-                setIndex(prev => prev + 1);
+                setDisplayedContent(content.substring(0, index + step));
+                setIndex(prev => prev + step);
             }, 5);
             return () => clearTimeout(timeout);
         } else if (role === 'user') {
@@ -688,7 +691,7 @@ const translations = {
         chatSearchPlaceholder: "Buscar no histórico...",
         newChatBtn: "Novo Chat",
         noChatFound: "Nenhum chat encontrado",
-        inputPlaceholder: "Pergunte qualquer coisa sobre SVP...",
+        inputPlaceholder: "Pergunte sobre SVP ou digite um código de issue (ex.: P250702-00437)...",
         footerText: "O SVP AI está utilizando o modelo escolhido acima.",
         footerSubtext: "Nossa inteligência é conectada ao proxy corporativo Sidia para garantir privacidade e performance.",
         chatRestarted: "Chat reiniciado. Como posso ajudar?",
@@ -720,7 +723,7 @@ const translations = {
         chatSearchPlaceholder: "Search history...",
         newChatBtn: "New Chat",
         noChatFound: "No chat found",
-        inputPlaceholder: "Ask anything about SVP...",
+        inputPlaceholder: "Ask about SVP or type an issue code (e.g. P250702-00437)...",
         footerText: "SVP AI is using the chosen model.",
         footerSubtext: "Our intelligence is connected to the Sidia corporate proxy to ensure privacy and performance.",
         chatRestarted: "Chat restarted. How can I help?",
@@ -752,7 +755,7 @@ const translations = {
         chatSearchPlaceholder: "기록 검색...",
         newChatBtn: "새 채팅",
         noChatFound: "채팅을 찾을 수 없습니다",
-        inputPlaceholder: "SVP에 대해 무엇이든 물어보세요...",
+        inputPlaceholder: "SVP에 대해 묻거나 이슈 코드를 입력하세요 (예: P250702-00437)...",
         footerText: "SVP AI는 선택한 모델을 사용하고 있습니다.",
         footerSubtext: "Sidia 기업 프록시를 통한 개인 정보 보호 및 성능.",
         chatRestarted: "채팅이 재시작되었습니다. 무엇을 도와드릴까요?",
@@ -1022,7 +1025,7 @@ REGRAS CRÍTICAS E INVIOLÁVEIS:
                         ...updatedMessages.map(m => ({ role: m.role, content: m.content }))
                     ],
                     stream: false,
-                    context: { tab: currentTab }
+                    context: { tab: currentTab, plm: true }
                 })
             });
 

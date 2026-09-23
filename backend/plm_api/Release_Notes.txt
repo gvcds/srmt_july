@@ -1,0 +1,18 @@
+08/08/2023 - ver_1.0.0
+	- Created SVP_Issues_Report tool.
+
+29/01/2024 - ver_1.0.1
+	- Feat: added Main Folder column.
+
+18/04/2024 - ver_1.0.2
+	- Feat: added condition in get_release_number_label_date feature when there's no CP.
+	- Feat: updated newText to 1000 in get_modelName_from_problem feature due larger issue problem sometimes.
+
+15/07/2024 - ver_1.0.3
+	- Feat: Added exception to search OWO release for models SM-S721BE_LA_TPA, SM-S928BE_LA_15_TPA, SM-S921BE_LA_15_TPA and SM-S926BE_LA_15_TPA.
+
+29/10/2024 - ver_1.0.4
+	- Refactor: use the new server IP (from 105.103.51.230 to 105.103.64.108)
+
+08/11/2024 - ver_1.1.0
+	- Refactor: use the new server IP (from 105.103.64.108 to 105.112.150.108)
