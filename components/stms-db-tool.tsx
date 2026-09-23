@@ -945,6 +945,15 @@ const handleSort = (key: keyof STMSString) => {
   setSortConfig({ key, direction });
 };
 
+// O backend grava 'OK / Sem sugestão' (ou legados como 'Mantido') em suggested_text quando não há erro
+const NO_ERROR_MARKERS = ['ok / sem sugestão', 'mantido', 'correto', 'sem sugestão', 'ok'];
+const hasError = (item: STMSString) => {
+  const suggestion = (item.suggested_text || '').trim();
+  if (!suggestion) return false;
+  if (NO_ERROR_MARKERS.includes(suggestion.toLowerCase())) return false;
+  return suggestion !== (item.target_text || '').trim();
+};
+
 const filteredAndSortedItems = items.filter(item => {
   const matchesGlobal = globalSearch === '' ||
     item.source_text.toLowerCase().includes(globalSearch.toLowerCase()) ||
@@ -959,8 +968,8 @@ const filteredAndSortedItems = items.filter(item => {
   const matchesAi = (item.suggested_text || '').toLowerCase().includes(colFilters.ai.toLowerCase());
   const matchesAnalysis = (item.simply_reason || '').toLowerCase().includes(colFilters.analysis.toLowerCase());
   const matchesStatus = colFilters.status === '' || item.status === colFilters.status;
-  const matchesError = !showOnlyErrors || (item.suggested_text && item.suggested_text !== item.target_text && item.suggested_text !== 'Mantido');
-  const matchesNonError = !hideErrors || !item.suggested_text || item.suggested_text === item.target_text || item.suggested_text === 'Mantido';
+  const matchesError = !showOnlyErrors || hasError(item);
+  const matchesNonError = !hideErrors || !hasError(item);
 
   return matchesGlobal && matchesFile && matchesEn && matchesPt && matchesAi && matchesAnalysis && matchesStatus && matchesError && matchesNonError;
 }).sort((a, b) => {
@@ -1000,7 +1009,7 @@ const handleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
 
 useEffect(() => {
   setCurrentPage(1);
-}, [globalSearch, selectedFile, colFilters]);
+}, [globalSearch, selectedFile, colFilters, showOnlyErrors, hideErrors]);
 
 const renderDiff = (original: string, suggested?: string) => {
   if (!suggested || original === suggested) return <span className="font-bold opacity-90">{suggested || original}</span>;
@@ -1198,7 +1207,7 @@ return (
             <MessageSquare size={18} className={showContext ? 'opacity-100' : 'opacity-50'} />
           </Button>
           <Button
-            onClick={() => setShowOnlyErrors(!showOnlyErrors)}
+            onClick={() => { setShowOnlyErrors(!showOnlyErrors); if (hideErrors) setHideErrors(false); }}
             variant="outline"
             title={t.errorsTooltip}
             className={`rounded-xl h-12 w-12 p-0 flex items-center justify-center transition-all ${showOnlyErrors ? (isDarkMode ? 'bg-red-600/10 text-red-400 border-red-500/30 shadow-lg shadow-red-500/10' : 'bg-red-50 text-red-600 border-red-200 shadow-xl shadow-red-600/5') : (isDarkMode ? 'bg-white/5 border-white/5 hover:bg-white/10' : 'bg-gray-50 border-black/5 hover:bg-gray-100')}`}
