@@ -19,7 +19,6 @@ import {
   Zap,
   Bot,
   Maximize2,
-  Minimize2,
   Calendar,
   Filter,
   ChevronDown,
@@ -145,8 +144,6 @@ const translations = {
     contextTooltip: 'Mostrar/Ocultar Contexto',
     errorsTooltip: 'Mostrar Apenas Erros',
     okTooltip: 'Mostrar Apenas Itens Sem Erro (OK)',
-    focusTooltip: 'Modo Foco (Tela Cheia)',
-    exitFocusTooltip: 'Sair do Modo Foco',
     selectAll: 'Selecionar Todos (Filtrados)',
     bulkApprove: 'Aprovar',
     bulkReject: 'Rejeitar',
@@ -163,8 +160,6 @@ const translations = {
     startTimer: 'Iniciar',
     pauseTimer: 'Pausar',
     resetTimer: 'Zerar Tempo',
-    focusModeOn: 'Modo Foco Ativado',
-    exitFocus: 'Sair do Foco',
     selected: 'selecionados',
     rowLabel: 'Linha',
     designIdLabel: 'Design ID',
@@ -227,8 +222,6 @@ const translations = {
     contextTooltip: 'Show/Hide Context',
     errorsTooltip: 'Show Errors Only',
     okTooltip: 'Show OK Items Only',
-    focusTooltip: 'Focus Mode (Fullscreen)',
-    exitFocusTooltip: 'Exit Focus Mode',
     selectAll: 'Select All (Filtered)',
     bulkApprove: 'Approve',
     bulkReject: 'Reject',
@@ -245,8 +238,6 @@ const translations = {
     startTimer: 'Start',
     pauseTimer: 'Pause',
     resetTimer: 'Reset Timer',
-    focusModeOn: 'Focus Mode On',
-    exitFocus: 'Exit Focus',
     selected: 'selected',
     rowLabel: 'Row',
     designIdLabel: 'Design ID',
@@ -309,8 +300,6 @@ const translations = {
     contextTooltip: '컨텍스트 표시/숨기기',
     errorsTooltip: '오류만 표시',
     okTooltip: '정상 항목만 표시 (OK)',
-    focusTooltip: '집중 모드 (전체 화면)',
-    exitFocusTooltip: '집중 모드 종료',
     selectAll: '모두 선택 (필터링됨)',
     bulkApprove: '승인',
     bulkReject: '거절',
@@ -327,8 +316,6 @@ const translations = {
     startTimer: '시작',
     pauseTimer: '일시 중지',
     resetTimer: '타이머 초기화',
-    focusModeOn: '집중 모드 켜짐',
-    exitFocus: '집중 모드 종료',
     selected: '선택됨',
     rowLabel: '행',
     designIdLabel: 'Design ID',
@@ -347,7 +334,7 @@ const getCharLimit = (limitStr: string): number | null => {
   return match ? parseInt(match[0], 10) : null;
 };
 
-export function STMSDBTool({ onFocusChange }: { onFocusChange?: (focused: boolean) => void }) {
+export function STMSDBTool() {
   const { isDarkMode } = useTheme();
   const [lang, setLanguage] = useState<'pt' | 'en' | 'ko'>('pt');
   const t = translations[lang];
@@ -362,23 +349,7 @@ export function STMSDBTool({ onFocusChange }: { onFocusChange?: (focused: boolea
   const [showDesignId, setShowDesignId] = useState(false);
   const [showOnlyErrors, setShowOnlyErrors] = useState(false);
   const [hideErrors, setHideErrors] = useState(false);
-  const [isFocusModeState, setIsFocusModeState] = useState(false);
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
-  const isFocusMode = isFocusModeState;
-
-  const setIsFocusMode = (focused: boolean) => {
-    setIsFocusModeState(focused);
-    if (onFocusChange) onFocusChange(focused);
-  };
-
-  useEffect(() => {
-    if (isFocusMode) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'unset';
-    }
-    return () => { document.body.style.overflow = 'unset'; };
-  }, [isFocusMode]);
 
   const [fileSearch, setFileSearch] = useState(''); const [selectedFile, setSelectedFile] = useState<string | null>(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -1043,7 +1014,7 @@ const stats = {
 };
 
 return (
-  <div className={`w-full space-y-8 animate-in fade-in duration-700 pb-20 ${isDarkMode ? 'text-gray-100' : 'text-gray-900'} ${isFocusMode ? 'relative z-[1000]' : ''}`}>
+  <div className={`w-full space-y-8 animate-in fade-in duration-700 pb-20 ${isDarkMode ? 'text-gray-100' : 'text-gray-900'} `}>
 
     {/* Stats Bar */}
     <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
@@ -1223,14 +1194,6 @@ return (
             {hideErrors ? <CheckSquare size={18} /> : <CheckCircle2 size={18} className="opacity-50" />}
           </Button>
           <Button
-            onClick={() => setIsFocusMode(!isFocusMode)}
-            variant="outline"
-            className={`rounded-xl h-12 w-12 p-0 transition-all ${isFocusMode ? 'bg-blue-600 text-white border-blue-600 shadow-2xl shadow-blue-600/40' : (isDarkMode ? 'bg-white/5 border-white/5 hover:bg-white/10' : 'bg-gray-50 border-black/5 hover:bg-gray-100 shadow-sm')}`}
-            title={isFocusMode ? t.exitFocusTooltip : t.focusTooltip}
-          >
-            {isFocusMode ? <Minimize2 size={18} /> : <Maximize2 size={18} />}
-          </Button>
-          <Button
             onClick={handleExportExcel}
             disabled={isExporting || items.length === 0}
             className={`rounded-xl h-12 w-12 p-0 shadow-2xl transition-all flex items-center justify-center bg-blue-600 text-white shadow-blue-600/30 hover:bg-blue-500 shrink-0`}
@@ -1276,30 +1239,10 @@ return (
 
     {/* RESULTS TABLE */}
     <Card className={`p-1 transition-all duration-700 flex flex-col overflow-hidden backdrop-blur-2xl
- ${isFocusMode
-        ? 'fixed inset-0 z-[0] rounded-none border-none bg-background'
-        : 'rounded-xl border border-white/5 dark:border-white/5 shadow-2xl shadow-black/40'
-      }
+ rounded-xl border border-white/5 dark:border-white/5 shadow-2xl shadow-black/40
  ${isDarkMode ? 'bg-[#111]/40 text-gray-100' : 'bg-white/60 text-gray-900'}
  `}>
-      {isFocusMode && (
-        <div className={`p-4 border-b flex justify-between items-center ${isDarkMode ? 'bg-black/40 border-white/10' : 'bg-gray-100 border-black/5'}`}>
-          <div className="flex items-center gap-3">
-            <TableIcon className="w-5 h-5 text-blue-500" />
-            <h3 className="font-bold uppercase tracking-widest text-xs">{t.focusModeOn}</h3>
-          </div>
-          <Button
-            onClick={() => setIsFocusMode(false)}
-            variant="ghost"
-            size="sm"
-            className="rounded-lg h-9 px-4 font-bold bg-blue-600/10 text-blue-600 hover:bg-blue-600/20"
-          >
-            <Minimize2 className="w-4 h-4 mr-2" /> {t.exitFocus}
-          </Button>
-        </div>
-      )}
-
-      <div className={`overflow-x-auto custom-scrollbar flex-1 ${!isFocusMode ? 'rounded-t-2xl' : ''}`}>
+      <div className={`overflow-x-auto custom-scrollbar flex-1 rounded-t-2xl`}>
         <table className="w-full text-left text-[11px]">
           <thead className={`${isDarkMode ? 'bg-white/5' : 'bg-gray-50'} border-b border-black/5 dark:border-white/5`}>
             {/* Row 1: Headers & Sort */}
@@ -1639,13 +1582,13 @@ return (
 
       {/* Pagination Controls Bottom (Inside Card for Focus Mode) */}
       {totalPages > 1 && (
-        <div className={`flex justify-center items-center gap-4 py-4 border-t border-black/5 dark:border-white/5 ${isFocusMode ? 'bg-black/5 dark:bg-white/5' : ''}`}>
+        <div className={`flex justify-center items-center gap-4 py-4 border-t border-black/5 dark:border-white/5 `}>
           <Button
             variant="ghost"
             size="sm"
             onClick={() => {
               setCurrentPage(prev => Math.max(1, prev - 1));
-              if (!isFocusMode) window.scrollTo({ top: 0, behavior: 'smooth' });
+              window.scrollTo({ top: 0, behavior: 'smooth' });
             }}
             disabled={currentPage === 1}
             className="rounded-lg h-10 w-10 p-0 hover:bg-black/5 dark:hover:bg-white/5 disabled:opacity-20"
@@ -1667,7 +1610,7 @@ return (
                   size="sm"
                   onClick={() => {
                     setCurrentPage(pageNum);
-                    if (!isFocusMode) window.scrollTo({ top: 0, behavior: 'smooth' });
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
                   }}
                   className={`h-8 w-8 rounded-xl font-bold text-[11px] transition-all duration-300
  ${currentPage === pageNum
@@ -1684,7 +1627,7 @@ return (
             size="sm"
             onClick={() => {
               setCurrentPage(prev => Math.min(totalPages, prev + 1));
-              if (!isFocusMode) window.scrollTo({ top: 0, behavior: 'smooth' });
+              window.scrollTo({ top: 0, behavior: 'smooth' });
             }}
             disabled={currentPage === totalPages}
             className="rounded-lg h-10 w-10 p-0 hover:bg-black/5 dark:hover:bg-white/5 disabled:opacity-20"

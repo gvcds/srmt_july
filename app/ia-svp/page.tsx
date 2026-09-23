@@ -1220,7 +1220,7 @@ REGRAS CRÍTICAS E INVIOLÁVEIS:
                 </div>
             )}
 
-            <div className={`w-full max-w-7xl relative z-10 space-y-12 ${isToolFocused || isFullScreen ? 'pt-0 px-0 space-y-0 h-screen flex flex-col' : 'px-4 pt-10'}`}>
+            <div className={`w-full ${activeView === 'db_tool' ? 'max-w-[1800px]' : 'max-w-7xl'} relative z-10 space-y-12 ${isToolFocused || isFullScreen ? 'pt-0 px-0 space-y-0 h-screen flex flex-col' : 'px-4 pt-10'}`}>
 
                 {/* CONTEÚDO A SER ESCONDIDO NO MODO FOCO/TELA CHEIA */}
                 {(!isFullScreen && !isToolFocused) && (
@@ -1357,8 +1357,8 @@ REGRAS CRÍTICAS E INVIOLÁVEIS:
                 )}
 
                 {/* Interface de Visualização */}
-                <div id="view-interface" className={`w-full mx-auto ${isToolFocused || isFullScreen ? 'max-w-[1600px] flex-1 flex flex-col' : 'max-w-6xl'}`}> {activeView === 'xml_tool' && <STMSXmlTool onFocusChange={setIsToolFocused} />}
-                    {activeView === 'db_tool' && <STMSDBTool onFocusChange={setIsToolFocused} />}
+                <div id="view-interface" className={`w-full mx-auto ${isToolFocused || isFullScreen ? 'max-w-[1600px] flex-1 flex flex-col' : activeView === 'db_tool' ? 'max-w-none' : 'max-w-6xl'}`}> {activeView === 'xml_tool' && <STMSXmlTool onFocusChange={setIsToolFocused} />}
+                    {activeView === 'db_tool' && <STMSDBTool />}
                     {activeView === 'chat' && (
                         <div id="chat-interface" className={`w-full flex flex-col items-center transition-all duration-500 ${isFullScreen ? 'fixed inset-0 z-[100] p-0' : 'w-full'}`}>
                             <Card
